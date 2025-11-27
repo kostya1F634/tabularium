@@ -7,6 +7,7 @@ class Book extends Equatable {
   final String filePath;
   final String? title;
   final String? author;
+  final String? alias;
   final String? thumbnailPath;
   final DateTime addedDate;
   final DateTime lastOpenedDate;
@@ -19,6 +20,7 @@ class Book extends Equatable {
     required this.filePath,
     this.title,
     this.author,
+    this.alias,
     this.thumbnailPath,
     required this.addedDate,
     required this.lastOpenedDate,
@@ -26,8 +28,11 @@ class Book extends Equatable {
     this.fileSize = 0,
   });
 
-  /// Get display title (use title if available, otherwise fileName without extension)
+  /// Get display title (use alias if available, then title, otherwise fileName without extension)
   String get displayTitle {
+    if (alias != null && alias!.isNotEmpty) {
+      return alias!;
+    }
     if (title != null && title!.isNotEmpty) {
       return title!;
     }
@@ -44,11 +49,13 @@ class Book extends Equatable {
     String? filePath,
     String? title,
     String? author,
+    String? alias,
     String? thumbnailPath,
     DateTime? addedDate,
     DateTime? lastOpenedDate,
     int? pageCount,
     int? fileSize,
+    bool clearAlias = false,
   }) {
     return Book(
       id: id ?? this.id,
@@ -56,6 +63,7 @@ class Book extends Equatable {
       filePath: filePath ?? this.filePath,
       title: title ?? this.title,
       author: author ?? this.author,
+      alias: clearAlias ? null : (alias ?? this.alias),
       thumbnailPath: thumbnailPath ?? this.thumbnailPath,
       addedDate: addedDate ?? this.addedDate,
       lastOpenedDate: lastOpenedDate ?? this.lastOpenedDate,
@@ -72,6 +80,7 @@ class Book extends Equatable {
       'filePath': filePath,
       'title': title,
       'author': author,
+      'alias': alias,
       'thumbnailPath': thumbnailPath,
       'addedDate': addedDate.toIso8601String(),
       'lastOpenedDate': lastOpenedDate.toIso8601String(),
@@ -88,6 +97,7 @@ class Book extends Equatable {
       filePath: json['filePath'] as String,
       title: json['title'] as String?,
       author: json['author'] as String?,
+      alias: json['alias'] as String?,
       thumbnailPath: json['thumbnailPath'] as String?,
       addedDate: DateTime.parse(json['addedDate'] as String),
       lastOpenedDate: DateTime.parse(json['lastOpenedDate'] as String),
@@ -103,6 +113,7 @@ class Book extends Equatable {
         filePath,
         title,
         author,
+        alias,
         thumbnailPath,
         addedDate,
         lastOpenedDate,

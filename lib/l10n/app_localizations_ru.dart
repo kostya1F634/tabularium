@@ -56,10 +56,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get allBooks => 'Все книги';
 
   @override
+  String get unsortedBooks => 'Без полки';
+
+  @override
   String get shelves => 'Полки';
 
   @override
   String get createShelf => 'Создать полку';
+
+  @override
+  String get editShelf => 'Редактировать полку';
 
   @override
   String get shelfName => 'Название полки';
@@ -133,4 +139,43 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteFromShelf => 'Удалить из полки';
+
+  @override
+  String get remove => 'Убрать';
+
+  @override
+  String get open => 'Открыть';
+
+  @override
+  String get properties => 'Свойства';
+
+  @override
+  String get bookProperties => 'Свойства книги';
+
+  @override
+  String get alias => 'Псевдоним';
+
+  @override
+  String get filePath => 'Путь к файлу';
+
+  @override
+  String get author => 'Автор';
+
+  @override
+  String get title => 'Название';
+
+  @override
+  String get pageCount => 'Страниц';
+
+  @override
+  String get fileSize => 'Размер файла';
+
+  @override
+  String get save => 'Сохранить';
+
+  @override
+  String get shortcuts => 'Горячие клавиши';
+
+  @override
+  String get keyboardShortcuts => 'Горячие клавиши';
 }

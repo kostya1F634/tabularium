@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../features/library/presentation/pages/library_screen.dart';
+import '../../features/library/presentation/pages/library_view_wrapper.dart';
 import '../../features/welcome/di/welcome_dependencies.dart';
 import '../../features/welcome/presentation/bloc/welcome_event.dart';
 import '../../features/welcome/presentation/pages/welcome_screen.dart';
@@ -44,7 +44,8 @@ class AppRoutes {
         }
         final path = settings.arguments as String;
         return MaterialPageRoute(
-          builder: (_) => LibraryScreen(directoryPath: path),
+          settings: settings,
+          builder: (_) => LibraryViewWrapper(directoryPath: path),
         );
 
       default:

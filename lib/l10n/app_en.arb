@@ -82,6 +82,11 @@
     "description": "Name of default shelf with all books"
   },
 
+  "unsortedBooks": "Unsorted",
+  "@unsortedBooks": {
+    "description": "Name of default shelf with unsorted books"
+  },
+
   "shelves": "Shelves",
   "@shelves": {
     "description": "Title for shelves sidebar"
@@ -90,6 +95,11 @@
   "createShelf": "Create Shelf",
   "@createShelf": {
     "description": "Button to create new shelf"
+  },
+
+  "editShelf": "Edit Shelf",
+  "@editShelf": {
+    "description": "Dialog title for editing shelf"
   },
 
   "shelfName": "Shelf Name",
@@ -201,5 +211,75 @@
   "deleteFromShelf": "Delete from Shelf",
   "@deleteFromShelf": {
     "description": "Button to delete selected books from shelf"
+  },
+
+  "removeFromShelf": "Remove from Shelf",
+  "@removeFromShelf": {
+    "description": "Button to remove book from shelf (context menu)"
+  },
+
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove menu item"
+  },
+
+  "open": "Open",
+  "@open": {
+    "description": "Open menu item"
+  },
+
+  "properties": "Properties",
+  "@properties": {
+    "description": "Properties menu item"
+  },
+
+  "bookProperties": "Book Properties",
+  "@bookProperties": {
+    "description": "Book properties dialog title"
+  },
+
+  "alias": "Alias",
+  "@alias": {
+    "description": "Book alias field label"
+  },
+
+  "filePath": "File Path",
+  "@filePath": {
+    "description": "File path field label"
+  },
+
+  "author": "Author",
+  "@author": {
+    "description": "Author field label"
+  },
+
+  "title": "Title",
+  "@title": {
+    "description": "Title field label"
+  },
+
+  "pageCount": "Pages",
+  "@pageCount": {
+    "description": "Page count field label"
+  },
+
+  "fileSize": "File Size",
+  "@fileSize": {
+    "description": "File size field label"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+
+  "shortcuts": "Shortcuts",
+  "@shortcuts": {
+    "description": "Menu item for keyboard shortcuts"
+  },
+
+  "keyboardShortcuts": "Keyboard Shortcuts",
+  "@keyboardShortcuts": {
+    "description": "Dialog title for keyboard shortcuts"
   }
 }

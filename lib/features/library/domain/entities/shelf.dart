@@ -19,11 +19,25 @@ class Shelf extends Equatable {
   /// Default "All" shelf ID
   static const String allShelfId = 'all';
 
+  /// Default "Unsorted" shelf ID
+  static const String unsortedShelfId = 'unsorted';
+
   /// Create default "All" shelf
   static Shelf createAll() {
     return Shelf(
       id: allShelfId,
       name: 'All',
+      bookIds: const [],
+      isDefault: true,
+      createdDate: DateTime.now(),
+    );
+  }
+
+  /// Create default "Unsorted" shelf
+  static Shelf createUnsorted() {
+    return Shelf(
+      id: unsortedShelfId,
+      name: 'Unsorted',
       bookIds: const [],
       isDefault: true,
       createdDate: DateTime.now(),

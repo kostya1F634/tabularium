@@ -1,13 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import '../../../../core/services/ui_settings_provider.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
 import '../bloc/library_state.dart';
+import 'book_properties_dialog.dart';
 
 /// Grid view displaying books with covers and titles
 class BooksGrid extends StatelessWidget {
@@ -23,6 +26,7 @@ class BooksGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final uiSettings = UISettingsProvider.of(context);
 
     if (books.isEmpty) {
       return Center(
@@ -46,19 +50,26 @@ class BooksGrid extends StatelessWidget {
       );
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 200,
-        childAspectRatio: 0.65,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: books.length,
-      itemBuilder: (context, index) {
-        return _BookCard(
-          book: books[index],
-          shelves: shelves,
+    return ListenableBuilder(
+      listenable: uiSettings,
+      builder: (context, child) {
+        final bookScale = uiSettings.bookScale;
+        return GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200 * bookScale,
+            childAspectRatio: 0.65,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: books.length,
+          itemBuilder: (context, index) {
+            return _BookCard(
+              book: books[index],
+              shelves: shelves,
+              bookScale: bookScale,
+            );
+          },
         );
       },
     );
@@ -68,10 +79,12 @@ class BooksGrid extends StatelessWidget {
 class _BookCard extends StatelessWidget {
   final Book book;
   final List<Shelf> shelves;
+  final double bookScale;
 
   const _BookCard({
     required this.book,
     required this.shelves,
+    required this.bookScale,
   });
 
   @override
@@ -133,6 +146,9 @@ class _BookCard extends StatelessWidget {
             onTap: () {
               context.read<LibraryBloc>().add(ToggleBookSelection(book.id));
             },
+            onSecondaryTapDown: (details) {
+              _showContextMenu(context, details.globalPosition);
+            },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -142,7 +158,7 @@ class _BookCard extends StatelessWidget {
                 ),
                 // Book title
                 Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8 * bookScale),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -150,16 +166,18 @@ class _BookCard extends StatelessWidget {
                         book.displayTitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w500,
+                              fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * bookScale,
                             ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (book.author != null) ...[
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4 * bookScale),
                         Text(
                           book.author!,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontSize: (Theme.of(context).textTheme.bodySmall?.fontSize ?? 12) * bookScale,
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -203,6 +221,84 @@ class _BookCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _showContextMenu(BuildContext context, Offset position) async {
+    final l10n = AppLocalizations.of(context)!;
+    final bloc = context.read<LibraryBloc>();
+    final state = bloc.state;
+
+    if (state is! LibraryLoaded) return;
+
+    final isAllShelf = state.selectedShelf.id == Shelf.allShelfId;
+    final isUnsortedShelf = state.selectedShelf.id == Shelf.unsortedShelfId;
+    final isDefaultShelf = isAllShelf || isUnsortedShelf;
+
+    final result = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy,
+        position.dx + 1,
+        position.dy + 1,
+      ),
+      items: [
+        PopupMenuItem<String>(
+          value: 'open',
+          child: Row(
+            children: [
+              const Icon(Icons.open_in_new, size: 18),
+              const SizedBox(width: 8),
+              Text(l10n.open),
+            ],
+          ),
+        ),
+        if (!isDefaultShelf)
+          PopupMenuItem<String>(
+            value: 'remove',
+            child: Row(
+              children: [
+                Icon(Icons.remove_circle_outline, size: 18, color: Theme.of(context).colorScheme.error),
+                const SizedBox(width: 8),
+                Text(l10n.remove, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              ],
+            ),
+          ),
+        PopupMenuItem<String>(
+          value: 'properties',
+          child: Row(
+            children: [
+              const Icon(Icons.info_outline, size: 18),
+              const SizedBox(width: 8),
+              Text(l10n.properties),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (result != null && context.mounted) {
+      switch (result) {
+        case 'open':
+          bloc.add(OpenBook(book));
+          break;
+        case 'remove':
+          bloc.add(DeleteBookFromShelf(
+            bookId: book.id,
+            shelfId: state.selectedShelf.id,
+          ));
+          break;
+        case 'properties':
+          showDialog(
+            context: context,
+            builder: (dialogContext) => BlocProvider.value(
+              value: bloc,
+              child: BookPropertiesDialog(book: book),
+            ),
+          );
+          break;
+      }
+    }
   }
 }
 

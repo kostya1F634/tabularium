@@ -188,6 +188,12 @@ abstract class AppLocalizations {
   /// **'All Books'**
   String get allBooks;
 
+  /// Name of default shelf with unsorted books
+  ///
+  /// In en, this message translates to:
+  /// **'Unsorted'**
+  String get unsortedBooks;
+
   /// Title for shelves sidebar
   ///
   /// In en, this message translates to:
@@ -199,6 +205,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Shelf'**
   String get createShelf;
+
+  /// Dialog title for editing shelf
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Shelf'**
+  String get editShelf;
 
   /// Label for shelf name input
   ///
@@ -266,7 +278,7 @@ abstract class AppLocalizations {
   /// **'Add to Shelf'**
   String get addToShelf;
 
-  /// Menu item to remove book from shelf
+  /// Button to remove book from shelf (context menu)
   ///
   /// In en, this message translates to:
   /// **'Remove from Shelf'**
@@ -325,6 +337,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete from Shelf'**
   String get deleteFromShelf;
+
+  /// Remove menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// Open menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get open;
+
+  /// Properties menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Properties'**
+  String get properties;
+
+  /// Book properties dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Book Properties'**
+  String get bookProperties;
+
+  /// Book alias field label
+  ///
+  /// In en, this message translates to:
+  /// **'Alias'**
+  String get alias;
+
+  /// File path field label
+  ///
+  /// In en, this message translates to:
+  /// **'File Path'**
+  String get filePath;
+
+  /// Author field label
+  ///
+  /// In en, this message translates to:
+  /// **'Author'**
+  String get author;
+
+  /// Title field label
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get title;
+
+  /// Page count field label
+  ///
+  /// In en, this message translates to:
+  /// **'Pages'**
+  String get pageCount;
+
+  /// File size field label
+  ///
+  /// In en, this message translates to:
+  /// **'File Size'**
+  String get fileSize;
+
+  /// Save button text
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// Menu item for keyboard shortcuts
+  ///
+  /// In en, this message translates to:
+  /// **'Shortcuts'**
+  String get shortcuts;
+
+  /// Dialog title for keyboard shortcuts
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard Shortcuts'**
+  String get keyboardShortcuts;
 }
 
 class _AppLocalizationsDelegate

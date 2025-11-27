@@ -27,7 +27,7 @@ class LibraryConfig extends Equatable {
     return LibraryConfig(
       directoryPath: directoryPath,
       books: const [],
-      shelves: [Shelf.createAll()],
+      shelves: [Shelf.createAll(), Shelf.createUnsorted()],
       lastScanDate: DateTime.now(),
     );
   }
@@ -78,6 +78,14 @@ class LibraryConfig extends Equatable {
     );
   }
 
+  /// Get unsorted shelf (default shelf)
+  Shelf get unsortedShelf {
+    return shelves.firstWhere(
+      (shelf) => shelf.id == Shelf.unsortedShelfId,
+      orElse: () => Shelf.createUnsorted(),
+    );
+  }
+
   /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -93,14 +101,29 @@ class LibraryConfig extends Equatable {
 
   /// Create from JSON
   factory LibraryConfig.fromJson(Map<String, dynamic> json) {
+    final shelves = (json['shelves'] as List)
+        .map((shelfJson) => Shelf.fromJson(shelfJson as Map<String, dynamic>))
+        .toList();
+
+    // Ensure "Unsorted" shelf exists (for backwards compatibility)
+    final hasUnsortedShelf = shelves.any((shelf) => shelf.id == Shelf.unsortedShelfId);
+    if (!hasUnsortedShelf) {
+      // Insert Unsorted shelf after All shelf (at index 1)
+      final allShelfIndex = shelves.indexWhere((shelf) => shelf.id == Shelf.allShelfId);
+      if (allShelfIndex >= 0) {
+        shelves.insert(allShelfIndex + 1, Shelf.createUnsorted());
+      } else {
+        // If no All shelf found (shouldn't happen), add at beginning
+        shelves.insert(0, Shelf.createUnsorted());
+      }
+    }
+
     return LibraryConfig(
       directoryPath: json['directoryPath'] as String,
       books: (json['books'] as List)
           .map((bookJson) => Book.fromJson(bookJson as Map<String, dynamic>))
           .toList(),
-      shelves: (json['shelves'] as List)
-          .map((shelfJson) => Shelf.fromJson(shelfJson as Map<String, dynamic>))
-          .toList(),
+      shelves: shelves,
       theme: json['theme'] as String? ?? 'system',
       language: json['language'] as String? ?? 'en',
       lastScanDate: DateTime.parse(json['lastScanDate'] as String),

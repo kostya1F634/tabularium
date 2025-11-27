@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
@@ -12,12 +13,16 @@ class ShelfsSidebar extends StatelessWidget {
   final List<Shelf> shelves;
   final String selectedShelfId;
   final int totalBooksCount;
+  final List<Book> allBooks;
+  final bool isFocused;
 
   const ShelfsSidebar({
     super.key,
     required this.shelves,
     required this.selectedShelfId,
     required this.totalBooksCount,
+    required this.allBooks,
+    this.isFocused = false,
   });
 
   @override
@@ -31,42 +36,82 @@ class ShelfsSidebar extends StatelessWidget {
           // Header
           Container(
             padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.collections_bookmark,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.shelves,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
+            child: SizedBox(
+              height: 40, // Fixed height to match LibraryHeader
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.collections_bookmark,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.shelves,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const Divider(height: 1),
+          Container(
+            height: 3,
+            color: isFocused
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).dividerColor,
+          ),
           // Shelves list
           Expanded(
-            child: ListView.builder(
+            child: ReorderableListView.builder(
+              buildDefaultDragHandles: false,
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: shelves.length,
+              onReorder: (oldIndex, newIndex) {
+                // Don't allow reordering "All" shelf (index 0) or "Unsorted" shelf (index 1)
+                if (oldIndex <= 1 || newIndex <= 1) return;
+
+                context.read<LibraryBloc>().add(ReorderShelves(
+                  oldIndex: oldIndex,
+                  newIndex: newIndex,
+                  fromDrag: true,
+                ));
+              },
               itemBuilder: (context, index) {
                 final shelf = shelves[index];
                 final isSelected = shelf.id == selectedShelfId;
                 final isAllShelf = shelf.id == Shelf.allShelfId;
+                final isUnsortedShelf = shelf.id == Shelf.unsortedShelfId;
+                final isDefaultShelf = shelf.isDefault;
+
+                // Calculate book count
+                int bookCount;
+                if (isAllShelf) {
+                  bookCount = totalBooksCount;
+                } else if (isUnsortedShelf) {
+                  // Count books that are not in any user shelf
+                  final Set<String> booksInShelves = {};
+                  for (final s in shelves) {
+                    if (!s.isDefault) {
+                      booksInShelves.addAll(s.bookIds);
+                    }
+                  }
+                  bookCount = allBooks.where((book) => !booksInShelves.contains(book.id)).length;
+                } else {
+                  bookCount = shelf.bookIds.length;
+                }
 
                 return _ShelfItem(
+                  key: ValueKey(shelf.id),
+                  index: index,
                   shelf: shelf,
                   isSelected: isSelected,
-                  isAllShelf: isAllShelf,
-                  bookCount: isAllShelf ? totalBooksCount : shelf.bookIds.length,
+                  isDefaultShelf: isDefaultShelf,
+                  bookCount: bookCount,
                   onTap: () {
                     context.read<LibraryBloc>().add(SelectShelf(shelf.id));
                   },
-                  onDelete: isAllShelf
+                  onDelete: isDefaultShelf
                       ? null
                       : () {
                           _showDeleteDialog(context, shelf);
@@ -165,17 +210,20 @@ class ShelfsSidebar extends StatelessWidget {
 }
 
 class _ShelfItem extends StatelessWidget {
+  final int index;
   final Shelf shelf;
   final bool isSelected;
-  final bool isAllShelf;
+  final bool isDefaultShelf;
   final int bookCount;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
 
   const _ShelfItem({
+    super.key,
+    required this.index,
     required this.shelf,
     required this.isSelected,
-    required this.isAllShelf,
+    required this.isDefaultShelf,
     required this.bookCount,
     required this.onTap,
     this.onDelete,
@@ -187,8 +235,8 @@ class _ShelfItem extends StatelessWidget {
 
     return DragTarget<Map<String, dynamic>>(
       onWillAcceptWithDetails: (details) {
-        // Don't accept drops on "All" shelf
-        return !isAllShelf;
+        // Don't accept drops on default shelves (All and Unsorted)
+        return !isDefaultShelf;
       },
       onAcceptWithDetails: (details) {
         final data = details.data;
@@ -221,15 +269,38 @@ class _ShelfItem extends StatelessWidget {
   }
 
   Widget _buildListTile(BuildContext context, AppLocalizations l10n) {
+    final isAllShelf = shelf.id == Shelf.allShelfId;
+    final isUnsortedShelf = shelf.id == Shelf.unsortedShelfId;
+
+    // Determine icon based on shelf type
+    IconData icon;
+    if (isAllShelf) {
+      icon = Icons.library_books;
+    } else if (isUnsortedShelf) {
+      icon = Icons.inbox;
+    } else {
+      icon = Icons.bookmark;
+    }
+
+    // Determine display name
+    String displayName;
+    if (isAllShelf) {
+      displayName = l10n.allBooks;
+    } else if (isUnsortedShelf) {
+      displayName = l10n.unsortedBooks;
+    } else {
+      displayName = shelf.name;
+    }
+
     return ListTile(
       leading: Icon(
-        isAllShelf ? Icons.library_books : Icons.bookmark,
+        icon,
         color: isSelected
             ? Theme.of(context).colorScheme.primary
             : Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       title: Text(
-        isAllShelf ? l10n.allBooks : shelf.name,
+        displayName,
         style: TextStyle(
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           color: isSelected
@@ -248,13 +319,22 @@ class _ShelfItem extends StatelessWidget {
       selectedTileColor:
           Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
       onTap: onTap,
-      trailing: onDelete != null
-          ? IconButton(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (onDelete != null)
+            IconButton(
               icon: const Icon(Icons.delete_outline, size: 20),
               onPressed: onDelete,
               tooltip: l10n.deleteShelf,
-            )
-          : null,
+            ),
+          if (!isDefaultShelf)
+            ReorderableDragStartListener(
+              index: index,
+              child: const Icon(Icons.drag_handle, size: 20),
+            ),
+        ],
+      ),
     );
   }
 }

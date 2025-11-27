@@ -65,6 +65,9 @@ dependencies:
   # Opening files with system default applications
   open_filex: ^4.5.0
 
+  # Window management for desktop platforms
+  window_manager: ^0.4.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

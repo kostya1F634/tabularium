@@ -59,6 +59,20 @@ class DeleteShelf extends LibraryEvent {
   List<Object?> get props => [shelfId];
 }
 
+/// Event to rename a shelf
+class RenameShelf extends LibraryEvent {
+  final String shelfId;
+  final String newName;
+
+  const RenameShelf({
+    required this.shelfId,
+    required this.newName,
+  });
+
+  @override
+  List<Object?> get props => [shelfId, newName];
+}
+
 /// Event to add book to shelf
 class AddBookToShelf extends LibraryEvent {
   final String bookId;
@@ -161,4 +175,48 @@ class MoveBooksToShelf extends LibraryEvent {
 /// Event to delete selected books from shelf
 class DeleteSelectedBooks extends LibraryEvent {
   const DeleteSelectedBooks();
+}
+
+/// Event to update book alias
+class UpdateBookAlias extends LibraryEvent {
+  final String bookId;
+  final String? alias;
+
+  const UpdateBookAlias({
+    required this.bookId,
+    required this.alias,
+  });
+
+  @override
+  List<Object?> get props => [bookId, alias];
+}
+
+/// Event to delete book from shelf
+class DeleteBookFromShelf extends LibraryEvent {
+  final String bookId;
+  final String shelfId;
+
+  const DeleteBookFromShelf({
+    required this.bookId,
+    required this.shelfId,
+  });
+
+  @override
+  List<Object?> get props => [bookId, shelfId];
+}
+
+/// Event to reorder shelves
+class ReorderShelves extends LibraryEvent {
+  final int oldIndex;
+  final int newIndex;
+  final bool fromDrag;
+
+  const ReorderShelves({
+    required this.oldIndex,
+    required this.newIndex,
+    this.fromDrag = false,
+  });
+
+  @override
+  List<Object?> get props => [oldIndex, newIndex, fromDrag];
 }

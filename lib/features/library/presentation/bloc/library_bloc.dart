@@ -38,6 +38,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<SelectShelf>(_onSelectShelf);
     on<CreateShelf>(_onCreateShelf);
     on<DeleteShelf>(_onDeleteShelf);
+    on<RenameShelf>(_onRenameShelf);
     on<AddBookToShelf>(_onAddBookToShelf);
     on<RemoveBookFromShelf>(_onRemoveBookFromShelf);
     on<SearchBooks>(_onSearchBooks);
@@ -50,6 +51,9 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<ClearBookSelection>(_onClearBookSelection);
     on<MoveBooksToShelf>(_onMoveBooksToShelf);
     on<DeleteSelectedBooks>(_onDeleteSelectedBooks);
+    on<UpdateBookAlias>(_onUpdateBookAlias);
+    on<DeleteBookFromShelf>(_onDeleteBookFromShelf);
+    on<ReorderShelves>(_onReorderShelves);
   }
 
   Future<void> _onInitializeLibrary(
@@ -136,6 +140,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       selectedShelf: shelf,
       displayedBooks: displayedBooks,
       clearSearch: true,
+      selectedBookIds: const {}, // Clear selection when switching shelves
     ));
   }
 
@@ -196,6 +201,49 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       config: updatedConfig,
       selectedShelf: selectedShelf,
       displayedBooks: displayedBooks,
+    ));
+  }
+
+  Future<void> _onRenameShelf(
+    RenameShelf event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+
+    // Can't rename default shelves
+    final shelf = currentState.config.shelves.firstWhere(
+      (s) => s.id == event.shelfId,
+      orElse: () => Shelf.createAll(),
+    );
+
+    if (shelf.isDefault) return;
+
+    final updatedShelves = currentState.config.shelves.map((s) {
+      if (s.id == event.shelfId) {
+        return Shelf(
+          id: s.id,
+          name: event.newName,
+          bookIds: s.bookIds,
+          isDefault: s.isDefault,
+          createdDate: s.createdDate,
+        );
+      }
+      return s;
+    }).toList();
+
+    final updatedConfig = currentState.config.copyWith(shelves: updatedShelves);
+    await _saveLibrary(updatedConfig);
+
+    // Update selected shelf if it was renamed
+    final selectedShelf = currentState.selectedShelf.id == event.shelfId
+        ? updatedShelves.firstWhere((s) => s.id == event.shelfId)
+        : currentState.selectedShelf;
+
+    emit(currentState.copyWith(
+      config: updatedConfig,
+      selectedShelf: selectedShelf,
     ));
   }
 
@@ -395,6 +443,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       return config.books;
     }
 
+    if (shelfId == Shelf.unsortedShelfId) {
+      // Get all book IDs that are in user shelves (not default shelves)
+      final Set<String> booksInShelves = {};
+      for (final shelf in config.shelves) {
+        if (!shelf.isDefault) {
+          booksInShelves.addAll(shelf.bookIds);
+        }
+      }
+      // Return books that are not in any user shelf
+      return config.books.where((book) => !booksInShelves.contains(book.id)).toList();
+    }
+
     final shelf = config.getShelf(shelfId);
     if (shelf == null) return [];
 
@@ -525,6 +585,99 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       config: updatedConfig,
       displayedBooks: displayedBooks,
       clearSelection: true,
+    ));
+  }
+
+  Future<void> _onUpdateBookAlias(
+    UpdateBookAlias event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+
+    // Update book with new alias
+    final updatedBooks = currentState.config.books.map((book) {
+      if (book.id == event.bookId) {
+        return event.alias == null || event.alias!.isEmpty
+            ? book.copyWith(clearAlias: true)
+            : book.copyWith(alias: event.alias);
+      }
+      return book;
+    }).toList();
+
+    final updatedConfig = currentState.config.copyWith(books: updatedBooks);
+    await _saveLibrary(updatedConfig);
+
+    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+
+    emit(currentState.copyWith(
+      config: updatedConfig,
+      displayedBooks: displayedBooks,
+    ));
+  }
+
+  Future<void> _onDeleteBookFromShelf(
+    DeleteBookFromShelf event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+
+    // Cannot delete from "All" shelf
+    if (event.shelfId == Shelf.allShelfId) return;
+
+    // Remove book from shelf
+    final updatedShelves = currentState.config.shelves.map((shelf) {
+      if (shelf.id == event.shelfId) {
+        return shelf.removeBook(event.bookId);
+      }
+      return shelf;
+    }).toList();
+
+    final updatedConfig = currentState.config.copyWith(shelves: updatedShelves);
+    await _saveLibrary(updatedConfig);
+
+    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+
+    emit(currentState.copyWith(
+      config: updatedConfig,
+      displayedBooks: displayedBooks,
+    ));
+  }
+
+  Future<void> _onReorderShelves(
+    ReorderShelves event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+    final shelves = List<Shelf>.from(currentState.config.shelves);
+
+    int oldIndex = event.oldIndex;
+    int newIndex = event.newIndex;
+
+    // Only adjust indices if this came from drag-and-drop
+    // ReorderableListView provides adjusted indices, but keyboard doesn't
+    if (event.fromDrag && newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    if (oldIndex == newIndex) {
+      return;
+    }
+
+    // Remove the shelf from old position and insert at new position
+    final shelf = shelves.removeAt(oldIndex);
+    shelves.insert(newIndex, shelf);
+
+    final updatedConfig = currentState.config.copyWith(shelves: shelves);
+    await _saveLibrary(updatedConfig);
+
+    emit(currentState.copyWith(
+      config: updatedConfig,
     ));
   }
 }

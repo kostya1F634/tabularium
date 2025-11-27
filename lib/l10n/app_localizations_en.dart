@@ -56,10 +56,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allBooks => 'All Books';
 
   @override
+  String get unsortedBooks => 'Unsorted';
+
+  @override
   String get shelves => 'Shelves';
 
   @override
   String get createShelf => 'Create Shelf';
+
+  @override
+  String get editShelf => 'Edit Shelf';
 
   @override
   String get shelfName => 'Shelf Name';
@@ -132,4 +138,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteFromShelf => 'Delete from Shelf';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get open => 'Open';
+
+  @override
+  String get properties => 'Properties';
+
+  @override
+  String get bookProperties => 'Book Properties';
+
+  @override
+  String get alias => 'Alias';
+
+  @override
+  String get filePath => 'File Path';
+
+  @override
+  String get author => 'Author';
+
+  @override
+  String get title => 'Title';
+
+  @override
+  String get pageCount => 'Pages';
+
+  @override
+  String get fileSize => 'File Size';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get shortcuts => 'Shortcuts';
+
+  @override
+  String get keyboardShortcuts => 'Keyboard Shortcuts';
 }

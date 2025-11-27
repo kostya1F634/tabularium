@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
+import '../../../../core/widgets/app_menu_bar.dart';
 import '../bloc/welcome_bloc.dart';
 import '../bloc/welcome_event.dart';
 import '../bloc/welcome_state.dart';
@@ -22,6 +23,14 @@ class WelcomeScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          leading: const AppMenuBar(),
+          leadingWidth: double.infinity,
+          toolbarHeight: kToolbarHeight / 2,
+          elevation: 1,
+        ),
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(

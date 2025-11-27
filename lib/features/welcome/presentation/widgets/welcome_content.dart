@@ -19,29 +19,6 @@ class WelcomeContent extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Application icon
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Icon(
-            Icons.book_rounded,
-            size: 80,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
         // Application name
         Text(
           AppLocalizations.of(context)!.appTitle,
@@ -113,14 +90,6 @@ class WelcomeContent extends StatelessWidget {
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 20,
                       vertical: 8,
-                    ),
-                    leading: CircleAvatar(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      child: Icon(
-                        Icons.folder,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
                     ),
                     title: Text(
                       dir.name,
