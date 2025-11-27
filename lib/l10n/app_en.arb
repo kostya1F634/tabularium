@@ -1,0 +1,205 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Tabularium",
+  "@appTitle": {
+    "description": "Application title"
+  },
+
+  "appSubtitle": "Your Personal Library",
+  "@appSubtitle": {
+    "description": "Application subtitle on welcome screen"
+  },
+
+  "selectBooksDirectory": "Select Books Directory",
+  "@selectBooksDirectory": {
+    "description": "Button text for selecting books directory"
+  },
+
+  "recentDirectories": "Recent Directories",
+  "@recentDirectories": {
+    "description": "Title for recent directories list"
+  },
+
+  "mainScreen": "Main Screen",
+  "@mainScreen": {
+    "description": "Main screen title"
+  },
+
+  "selectedDirectory": "Selected directory:",
+  "@selectedDirectory": {
+    "description": "Label for selected directory path"
+  },
+
+  "error": "Error",
+  "@error": {
+    "description": "Error label"
+  },
+
+  "errorMessage": "Error: {message}",
+  "@errorMessage": {
+    "description": "Error message with placeholder",
+    "placeholders": {
+      "message": {
+        "type": "String",
+        "example": "Failed to load"
+      }
+    }
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language name"
+  },
+
+  "languageRussian": "Russian",
+  "@languageRussian": {
+    "description": "Russian language name"
+  },
+
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings menu item"
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Language setting label"
+  },
+
+  "allBooks": "All Books",
+  "@allBooks": {
+    "description": "Name of default shelf with all books"
+  },
+
+  "shelves": "Shelves",
+  "@shelves": {
+    "description": "Title for shelves sidebar"
+  },
+
+  "createShelf": "Create Shelf",
+  "@createShelf": {
+    "description": "Button to create new shelf"
+  },
+
+  "shelfName": "Shelf Name",
+  "@shelfName": {
+    "description": "Label for shelf name input"
+  },
+
+  "deleteShelf": "Delete Shelf",
+  "@deleteShelf": {
+    "description": "Button to delete shelf"
+  },
+
+  "openAllBooks": "Open All Books",
+  "@openAllBooks": {
+    "description": "Button to open all books in current view"
+  },
+
+  "searchBooks": "Search books...",
+  "@searchBooks": {
+    "description": "Placeholder for search input"
+  },
+
+  "noBooks": "No books found",
+  "@noBooks": {
+    "description": "Message when no books are in the library"
+  },
+
+  "noBooksInShelf": "No books in this shelf",
+  "@noBooksInShelf": {
+    "description": "Message when selected shelf is empty"
+  },
+
+  "scanForNewBooks": "Scan for New Books",
+  "@scanForNewBooks": {
+    "description": "Button to scan directory for new books"
+  },
+
+  "initializingLibrary": "Initializing library...",
+  "@initializingLibrary": {
+    "description": "Message during library initialization"
+  },
+
+  "loadingLibrary": "Loading library...",
+  "@loadingLibrary": {
+    "description": "Message during library loading"
+  },
+
+  "backToWelcome": "Back to Welcome",
+  "@backToWelcome": {
+    "description": "Tooltip for button to return to welcome screen"
+  },
+
+  "addToShelf": "Add to Shelf",
+  "@addToShelf": {
+    "description": "Menu item to add book to shelf"
+  },
+
+  "removeFromShelf": "Remove from Shelf",
+  "@removeFromShelf": {
+    "description": "Menu item to remove book from shelf"
+  },
+
+  "bookCount": "{count, plural, =0{No books} =1{1 book} other{{count} books}}",
+  "@bookCount": {
+    "description": "Display book count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+
+  "create": "Create",
+  "@create": {
+    "description": "Create button text"
+  },
+
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+
+  "selected": "selected",
+  "@selected": {
+    "description": "Text showing number of selected items"
+  },
+
+  "openSelected": "Open Selected",
+  "@openSelected": {
+    "description": "Button to open selected books"
+  },
+
+  "selectAll": "Select All",
+  "@selectAll": {
+    "description": "Button to select all books"
+  },
+
+  "clearSelection": "Clear Selection",
+  "@clearSelection": {
+    "description": "Button to clear book selection"
+  },
+
+  "deleteFromShelf": "Delete from Shelf",
+  "@deleteFromShelf": {
+    "description": "Button to delete selected books from shelf"
+  }
+}

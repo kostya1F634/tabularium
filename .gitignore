@@ -1,0 +1,154 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Linux build output
+/linux/flutter/ephemeral
+
+# macOS build output
+/macos/Flutter/ephemeral
+
+# Windows build output
+/windows/flutter/ephemeral
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.config.dart
+*.mocks.dart
+
+# Coverage
+coverage/
+*.lcov
+
+# Test related
+.test_coverage.dart
+
+# Environment files
+.env
+.env.*
+
+# Local configuration
+*.local
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE - IntelliJ
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# Generated localization files (if auto-generated)
+# Uncomment if you auto-generate these
+# lib/l10n/*.dart
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# Sensitive data
+*.key
+*.keystore
+*.jks
+credentials.json
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Makefile build artifacts
+*.o
+*.a
+*.so
+
+# OS specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.AppleDouble
+.LSOverride
+._*
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Application specific
+# PDFs and thumbnails from test directories (optional - uncomment if needed)
+# *.pdf
+# .thumbnails/
+
+# Exclude unused platforms (uncomment if you only need Linux)
+# /android/
+# /ios/
+# /macos/
+# /web/
+# /windows/
