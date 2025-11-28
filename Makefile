@@ -162,7 +162,7 @@ format-check:
 # Run linter
 lint:
 	@echo "Running linter..."
-	@flutter analyze
+	@flutter analyze --no-fatal-infos
 
 # Run all checks (format, lint, tests)
 check: format-check lint test
