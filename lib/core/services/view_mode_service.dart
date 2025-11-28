@@ -1,11 +1,11 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'app_settings.dart';
 
 import '../../features/library/presentation/pages/library_view_wrapper.dart';
 
 /// Service to persist and retrieve the last used view mode
 class ViewModeService {
   static const String _viewModeKey = 'view_mode';
-  final SharedPreferences _prefs;
+  final AppSettings _prefs;
 
   ViewModeService(this._prefs);
 

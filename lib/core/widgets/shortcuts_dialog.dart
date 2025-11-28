@@ -17,46 +17,30 @@ class ShortcutsDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildSection(
-                context,
-                'General',
-                [
-                  _ShortcutItem('Ctrl+N', 'Create new shelf'),
-                  _ShortcutItem('Ctrl+O', 'Open books (all or selected)'),
-                  _ShortcutItem('Ctrl+E', 'Edit shelf / Book properties'),
-                  _ShortcutItem('Ctrl+S', 'Select all books'),
-                  _ShortcutItem('Ctrl+D', 'Clear selection'),
-                ],
-              ),
+              _buildSection(context, 'General', [
+                _ShortcutItem('Ctrl+N', 'Create new shelf'),
+                _ShortcutItem('Ctrl+O', 'Open books (all or selected)'),
+                _ShortcutItem('Ctrl+E', 'Edit shelf / Book properties'),
+                _ShortcutItem('Ctrl+S', 'Select all books'),
+                _ShortcutItem('Ctrl+D', 'Clear selection'),
+              ]),
               const SizedBox(height: 16),
-              _buildSection(
-                context,
-                'Navigation',
-                [
-                  _ShortcutItem('H / ←', 'Focus on shelves'),
-                  _ShortcutItem('L / →', 'Focus on books'),
-                  _ShortcutItem('J / ↓', 'Move down (in shelves)'),
-                  _ShortcutItem('K / ↑', 'Move up (in shelves)'),
-                ],
-              ),
+              _buildSection(context, 'Navigation', [
+                _ShortcutItem('H / ←', 'Focus on shelves'),
+                _ShortcutItem('L / →', 'Focus on books'),
+                _ShortcutItem('J / ↓', 'Move down (in shelves)'),
+                _ShortcutItem('K / ↑', 'Move up (in shelves)'),
+              ]),
               const SizedBox(height: 16),
-              _buildSection(
-                context,
-                'Shelves',
-                [
-                  _ShortcutItem('Ctrl+J / Ctrl+↓', 'Move shelf down'),
-                  _ShortcutItem('Ctrl+K / Ctrl+↑', 'Move shelf up'),
-                  _ShortcutItem('Delete', 'Delete shelf'),
-                ],
-              ),
+              _buildSection(context, 'Shelves', [
+                _ShortcutItem('Ctrl+J / Ctrl+↓', 'Move shelf down'),
+                _ShortcutItem('Ctrl+K / Ctrl+↑', 'Move shelf up'),
+                _ShortcutItem('Delete', 'Delete shelf'),
+              ]),
               const SizedBox(height: 16),
-              _buildSection(
-                context,
-                'Books',
-                [
-                  _ShortcutItem('Delete', 'Remove book from shelf'),
-                ],
-              ),
+              _buildSection(context, 'Books', [
+                _ShortcutItem('Delete', 'Remove book from shelf'),
+              ]),
             ],
           ),
         ),
@@ -70,48 +54,61 @@ class ShortcutsDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(BuildContext context, String title, List<_ShortcutItem> shortcuts) {
+  Widget _buildSection(
+    BuildContext context,
+    String title,
+    List<_ShortcutItem> shortcuts,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        ...shortcuts.map((shortcut) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-                      ),
-                    ),
-                    child: Text(
-                      shortcut.keys,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
-                            fontWeight: FontWeight.w500,
-                          ),
+        ...shortcuts.map(
+          (shortcut) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withOpacity(0.3),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Text(
-                      shortcut.description,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                  child: Text(
+                    shortcut.keys,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ],
-              ),
-            )),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    shortcut.description,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

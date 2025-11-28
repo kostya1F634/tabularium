@@ -23,9 +23,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
     required PdfScannerDataSource pdfScanner,
     required ThumbnailGeneratorDataSource thumbnailGenerator,
     required ConfigDataSource configDataSource,
-  })  : _pdfScanner = pdfScanner,
-        _thumbnailGenerator = thumbnailGenerator,
-        _configDataSource = configDataSource;
+  }) : _pdfScanner = pdfScanner,
+       _thumbnailGenerator = thumbnailGenerator,
+       _configDataSource = configDataSource;
 
   @override
   Future<LibraryConfig> initializeLibrary(
@@ -37,7 +37,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
     // Try to load existing config first
     final existingConfig = await loadLibrary(directoryPath);
     if (existingConfig != null) {
-      print('[LibraryRepository] Found existing config with ${existingConfig.books.length} books');
+      print(
+        '[LibraryRepository] Found existing config with ${existingConfig.books.length} books',
+      );
 
       // Check if any books are missing thumbnails
       final booksNeedingThumbnails = existingConfig.books
@@ -45,7 +47,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
           .toList();
 
       if (booksNeedingThumbnails.isNotEmpty) {
-        print('[LibraryRepository] Found ${booksNeedingThumbnails.length} books without thumbnails');
+        print(
+          '[LibraryRepository] Found ${booksNeedingThumbnails.length} books without thumbnails',
+        );
         print('[LibraryRepository] Generating missing thumbnails...');
 
         final thumbnailsDirectory = path.join(directoryPath, thumbnailsDir);
@@ -59,7 +63,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
           onProgress?.call(i + 1, existingConfig.books.length);
 
           if (book.thumbnailPath == null) {
-            print('[LibraryRepository] [${i + 1}/${existingConfig.books.length}] Generating thumbnail for: ${book.fileName}');
+            print(
+              '[LibraryRepository] [${i + 1}/${existingConfig.books.length}] Generating thumbnail for: ${book.fileName}',
+            );
 
             try {
               final thumbnailPath = await _thumbnailGenerator.generateThumbnail(
@@ -78,7 +84,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
               // Save config every 3 books to prevent data loss on crash
               if ((i + 1) % 3 == 0) {
                 savedCount++;
-                print('[LibraryRepository] Saving intermediate progress (${updatedBooks.length} books processed)...');
+                print(
+                  '[LibraryRepository] Saving intermediate progress (${updatedBooks.length} books processed)...',
+                );
                 final intermediateConfig = existingConfig.copyWith(
                   books: updatedBooks,
                   lastScanDate: DateTime.now(),
@@ -90,7 +98,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
                 await Future.delayed(const Duration(milliseconds: 500));
               }
             } catch (e, stackTrace) {
-              print('[LibraryRepository] ✗ Exception while generating thumbnail: $e');
+              print(
+                '[LibraryRepository] ✗ Exception while generating thumbnail: $e',
+              );
               print('[LibraryRepository] Stack trace: $stackTrace');
               updatedBooks.add(book);
             }
@@ -106,7 +116,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
 
         print('[LibraryRepository] Saving final config...');
         await saveLibrary(updatedConfig);
-        print('[LibraryRepository] ✓ All thumbnails processed (saved ${savedCount} times during process)');
+        print(
+          '[LibraryRepository] ✓ All thumbnails processed (saved ${savedCount} times during process)',
+        );
 
         return updatedConfig;
       }
@@ -148,7 +160,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
       // Report progress
       onProgress?.call(i + 1, pdfPaths.length);
 
-      print('[LibraryRepository] Processing book ${i + 1}/${pdfPaths.length}: ${path.basename(pdfPath)}');
+      print(
+        '[LibraryRepository] Processing book ${i + 1}/${pdfPaths.length}: ${path.basename(pdfPath)}',
+      );
 
       final fileName = path.basename(pdfPath);
       final fileStats = await File(pdfPath).stat();
@@ -216,7 +230,9 @@ class LibraryRepositoryImpl implements LibraryRepository {
     final existingPaths = config.books.map((b) => b.filePath).toSet();
 
     // Find new PDFs
-    final newPdfPaths = pdfPaths.where((p) => !existingPaths.contains(p)).toList();
+    final newPdfPaths = pdfPaths
+        .where((p) => !existingPaths.contains(p))
+        .toList();
 
     if (newPdfPaths.isEmpty) {
       return [];

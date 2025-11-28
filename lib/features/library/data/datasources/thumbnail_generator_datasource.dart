@@ -58,7 +58,9 @@ class ThumbnailGeneratorDataSourceImpl implements ThumbnailGeneratorDataSource {
       // Create thumbnails directory if it doesn't exist
       final thumbnailDir = Directory(thumbnailsDirectory);
       if (!await thumbnailDir.exists()) {
-        print('[ThumbnailGenerator] Creating thumbnails directory: $thumbnailsDirectory');
+        print(
+          '[ThumbnailGenerator] Creating thumbnails directory: $thumbnailsDirectory',
+        );
         await thumbnailDir.create(recursive: true);
       }
 
@@ -79,9 +81,13 @@ class ThumbnailGeneratorDataSourceImpl implements ThumbnailGeneratorDataSource {
         return null;
       }
 
-      print('[ThumbnailGenerator] PDF loaded, pages count: ${doc.pages.length}');
+      print(
+        '[ThumbnailGenerator] PDF loaded, pages count: ${doc.pages.length}',
+      );
       final page = doc.pages[0];
-      print('[ThumbnailGenerator] First page size: ${page.width}x${page.height}');
+      print(
+        '[ThumbnailGenerator] First page size: ${page.width}x${page.height}',
+      );
 
       // Render page to image
       print('[ThumbnailGenerator] Rendering page to image...');
@@ -95,7 +101,9 @@ class ThumbnailGeneratorDataSourceImpl implements ThumbnailGeneratorDataSource {
         return null;
       }
 
-      print('[ThumbnailGenerator] Page rendered: ${pdfImage.width}x${pdfImage.height}');
+      print(
+        '[ThumbnailGenerator] Page rendered: ${pdfImage.width}x${pdfImage.height}',
+      );
 
       try {
         // Convert to ui.Image
@@ -104,14 +112,20 @@ class ThumbnailGeneratorDataSourceImpl implements ThumbnailGeneratorDataSource {
 
         // Convert to PNG bytes
         print('[ThumbnailGenerator] Converting to PNG bytes...');
-        final byteData = await uiImage.toByteData(format: ui.ImageByteFormat.png);
+        final byteData = await uiImage.toByteData(
+          format: ui.ImageByteFormat.png,
+        );
         if (byteData == null) {
-          print('[ThumbnailGenerator] Failed to convert to PNG - byteData is null');
+          print(
+            '[ThumbnailGenerator] Failed to convert to PNG - byteData is null',
+          );
           pdfImage.dispose();
           return null;
         }
 
-        print('[ThumbnailGenerator] PNG data size: ${byteData.lengthInBytes} bytes');
+        print(
+          '[ThumbnailGenerator] PNG data size: ${byteData.lengthInBytes} bytes',
+        );
 
         // Save to file
         print('[ThumbnailGenerator] Saving to file: $thumbnailPath');
@@ -161,7 +175,10 @@ class ThumbnailGeneratorDataSourceImpl implements ThumbnailGeneratorDataSource {
     final pdfFileNameWithoutExt = path.basenameWithoutExtension(pdfPath);
 
     // Use hash of full path to avoid collisions for files with same name
-    final pathHash = md5.convert(utf8.encode(pdfPath)).toString().substring(0, 8);
+    final pathHash = md5
+        .convert(utf8.encode(pdfPath))
+        .toString()
+        .substring(0, 8);
     final thumbnailFileName = '${pdfFileNameWithoutExt}_$pathHash.png';
 
     return path.join(thumbnailsDirectory, thumbnailFileName);

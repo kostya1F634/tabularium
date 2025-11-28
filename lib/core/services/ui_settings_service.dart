@@ -1,18 +1,18 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'app_settings.dart';
 
 /// Service for managing UI settings like font size and book scale
 class UISettingsService extends ChangeNotifier {
   static const String _fontSizeKey = 'ui_font_size';
   static const String _bookScaleKey = 'ui_book_scale';
 
-  final SharedPreferences _prefs;
+  final AppSettings _prefs;
   double _fontSize;
   double _bookScale;
 
   UISettingsService(this._prefs)
-      : _fontSize = _prefs.getDouble(_fontSizeKey) ?? 1.0,
-        _bookScale = _prefs.getDouble(_bookScaleKey) ?? 1.0;
+    : _fontSize = _prefs.getDouble(_fontSizeKey) ?? 1.0,
+      _bookScale = _prefs.getDouble(_bookScaleKey) ?? 1.0;
 
   /// Current font size multiplier (0.8 to 1.5)
   double get fontSize => _fontSize;

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'app_settings.dart';
 import '../theme/app_theme.dart';
 
 class ThemeService extends ChangeNotifier {
   static const String _themeKey = 'app_theme';
-  final SharedPreferences _prefs;
+  final AppSettings _prefs;
   AppThemeMode _currentTheme;
 
   ThemeService(this._prefs)
-      : _currentTheme = AppThemeMode.values.firstWhere(
-          (theme) => theme.name == _prefs.getString(_themeKey),
-          orElse: () => AppThemeMode.light,
-        );
+    : _currentTheme = AppThemeMode.values.firstWhere(
+        (theme) => theme.name == _prefs.getString(_themeKey),
+        orElse: () => AppThemeMode.light,
+      );
 
   AppThemeMode get currentTheme => _currentTheme;
   ThemeData get themeData => AppTheme.getTheme(_currentTheme);

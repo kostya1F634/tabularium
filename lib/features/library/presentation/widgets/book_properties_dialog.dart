@@ -11,10 +11,7 @@ import '../bloc/library_event.dart';
 class BookPropertiesDialog extends StatefulWidget {
   final Book book;
 
-  const BookPropertiesDialog({
-    super.key,
-    required this.book,
-  });
+  const BookPropertiesDialog({super.key, required this.book});
 
   @override
   State<BookPropertiesDialog> createState() => _BookPropertiesDialogState();
@@ -43,10 +40,12 @@ class _BookPropertiesDialogState extends State<BookPropertiesDialog> {
   void _saveAlias() {
     final newAlias = _aliasController.text.trim();
     if (newAlias != widget.book.alias) {
-      context.read<LibraryBloc>().add(UpdateBookAlias(
-        bookId: widget.book.id,
-        alias: newAlias.isEmpty ? null : newAlias,
-      ));
+      context.read<LibraryBloc>().add(
+        UpdateBookAlias(
+          bookId: widget.book.id,
+          alias: newAlias.isEmpty ? null : newAlias,
+        ),
+      );
     }
     Navigator.of(context).pop();
   }
@@ -66,10 +65,7 @@ class _BookPropertiesDialogState extends State<BookPropertiesDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Title
-              Text(
-                l10n.bookProperties,
-                style: theme.textTheme.headlineSmall,
-              ),
+              Text(l10n.bookProperties, style: theme.textTheme.headlineSmall),
               const SizedBox(height: 24),
 
               // Content
@@ -212,10 +208,7 @@ class _BookPropertiesDialogState extends State<BookPropertiesDialog> {
                     child: Text(l10n.cancel),
                   ),
                   const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _saveAlias,
-                    child: Text(l10n.save),
-                  ),
+                  ElevatedButton(onPressed: _saveAlias, child: Text(l10n.save)),
                 ],
               ),
             ],

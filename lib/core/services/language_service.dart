@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'app_settings.dart';
 
 /// Service for managing application language
 class LanguageService extends ChangeNotifier {
@@ -7,7 +7,7 @@ class LanguageService extends ChangeNotifier {
   static const Locale _defaultLocale = Locale('en');
 
   Locale _currentLocale = _defaultLocale;
-  final SharedPreferences _prefs;
+  final AppSettings _prefs;
 
   LanguageService(this._prefs) {
     _loadLanguage();
@@ -36,9 +36,9 @@ class LanguageService extends ChangeNotifier {
 
   /// Get list of supported locales
   static List<Locale> get supportedLocales => const [
-        Locale('en'), // English
-        Locale('ru'), // Russian
-      ];
+    Locale('en'), // English
+    Locale('ru'), // Russian
+  ];
 
   /// Check if locale is supported
   static bool isSupported(Locale locale) {

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/app_settings.dart';
 
 import '../../../../core/services/view_mode_service.dart';
 import '../../di/library_dependencies.dart';
-import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
 import 'library_screen.dart';
 import 'cabinet_screen.dart';
@@ -15,10 +14,7 @@ enum LibraryViewMode { grid, cabinet }
 class LibraryViewWrapper extends StatefulWidget {
   final String directoryPath;
 
-  const LibraryViewWrapper({
-    super.key,
-    required this.directoryPath,
-  });
+  const LibraryViewWrapper({super.key, required this.directoryPath});
 
   @override
   State<LibraryViewWrapper> createState() => _LibraryViewWrapperState();
@@ -35,7 +31,7 @@ class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
   }
 
   Future<void> _loadViewMode() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppSettings.getInstance();
     _viewModeService = ViewModeService(prefs);
 
     if (mounted) {
@@ -62,8 +58,9 @@ class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
     final screen = _viewMode == LibraryViewMode.grid
         ? LibraryScreen(directoryPath: widget.directoryPath)
         : BlocProvider(
-            create: (_) => LibraryDependencies().createLibraryBloc()
-              ..add(InitializeLibrary(widget.directoryPath)),
+            create: (_) =>
+                LibraryDependencies().createLibraryBloc()
+                  ..add(InitializeLibrary(widget.directoryPath)),
             child: const CabinetScreen(),
           );
 

@@ -108,16 +108,16 @@ class Book extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        fileName,
-        filePath,
-        title,
-        author,
-        alias,
-        thumbnailPath,
-        addedDate,
-        lastOpenedDate,
-        pageCount,
-        fileSize,
-      ];
+    id,
+    fileName,
+    filePath,
+    title,
+    author,
+    alias,
+    thumbnailPath,
+    addedDate,
+    lastOpenedDate,
+    pageCount,
+    fileSize,
+  ];
 }

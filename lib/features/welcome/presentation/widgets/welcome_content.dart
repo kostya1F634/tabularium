@@ -23,9 +23,9 @@ class WelcomeContent extends StatelessWidget {
         Text(
           AppLocalizations.of(context)!.appTitle,
           style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
 
         const SizedBox(height: 8),
@@ -34,8 +34,8 @@ class WelcomeContent extends StatelessWidget {
         Text(
           AppLocalizations.of(context)!.appSubtitle,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+          ),
         ),
 
         const SizedBox(height: 48),
@@ -46,10 +46,7 @@ class WelcomeContent extends StatelessWidget {
           icon: const Icon(Icons.folder_open, size: 24),
           label: Text(AppLocalizations.of(context)!.selectBooksDirectory),
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 32,
-              vertical: 20,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
             textStyle: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -67,9 +64,9 @@ class WelcomeContent extends StatelessWidget {
         if (recentDirectories.isNotEmpty) ...[
           Text(
             AppLocalizations.of(context)!.recentDirectories,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           ConstrainedBox(
@@ -93,28 +90,24 @@ class WelcomeContent extends StatelessWidget {
                     ),
                     title: Text(
                       dir.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                       overflow: TextOverflow.ellipsis,
                     ),
                     subtitle: Text(
                       dir.path,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                     trailing: Icon(
                       Icons.arrow_forward_ios,
                       size: 16,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.4),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.4),
                     ),
                     onTap: () => onSelectDirectory(dir.path),
                   ),

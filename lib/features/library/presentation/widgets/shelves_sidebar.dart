@@ -6,7 +6,6 @@ import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
-import '../bloc/library_state.dart';
 
 /// Sidebar showing list of shelves
 class ShelfsSidebar extends StatelessWidget {
@@ -48,8 +47,8 @@ class ShelfsSidebar extends StatelessWidget {
                   Text(
                     l10n.shelves,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -71,11 +70,13 @@ class ShelfsSidebar extends StatelessWidget {
                 // Don't allow reordering "All" shelf (index 0) or "Unsorted" shelf (index 1)
                 if (oldIndex <= 1 || newIndex <= 1) return;
 
-                context.read<LibraryBloc>().add(ReorderShelves(
-                  oldIndex: oldIndex,
-                  newIndex: newIndex,
-                  fromDrag: true,
-                ));
+                context.read<LibraryBloc>().add(
+                  ReorderShelves(
+                    oldIndex: oldIndex,
+                    newIndex: newIndex,
+                    fromDrag: true,
+                  ),
+                );
               },
               itemBuilder: (context, index) {
                 final shelf = shelves[index];
@@ -96,7 +97,9 @@ class ShelfsSidebar extends StatelessWidget {
                       booksInShelves.addAll(s.bookIds);
                     }
                   }
-                  bookCount = allBooks.where((book) => !booksInShelves.contains(book.id)).length;
+                  bookCount = allBooks
+                      .where((book) => !booksInShelves.contains(book.id))
+                      .length;
                 } else {
                   bookCount = shelf.bookIds.length;
                 }
@@ -243,11 +246,13 @@ class _ShelfItem extends StatelessWidget {
         final bookIds = List<String>.from(data['bookIds'] as List);
         final sourceShelfId = data['sourceShelfId'] as String;
 
-        context.read<LibraryBloc>().add(MoveBooksToShelf(
-              bookIds: bookIds,
-              targetShelfId: shelf.id,
-              sourceShelfId: sourceShelfId,
-            ));
+        context.read<LibraryBloc>().add(
+          MoveBooksToShelf(
+            bookIds: bookIds,
+            targetShelfId: shelf.id,
+            sourceShelfId: sourceShelfId,
+          ),
+        );
       },
       builder: (context, candidateData, rejectedData) {
         final isHovering = candidateData.isNotEmpty;
@@ -255,7 +260,9 @@ class _ShelfItem extends StatelessWidget {
         return Container(
           decoration: isHovering
               ? BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer.withOpacity(0.5),
                   border: Border.all(
                     color: Theme.of(context).colorScheme.primary,
                     width: 2,
@@ -316,8 +323,9 @@ class _ShelfItem extends StatelessWidget {
         ),
       ),
       selected: isSelected,
-      selectedTileColor:
-          Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+      selectedTileColor: Theme.of(
+        context,
+      ).colorScheme.primaryContainer.withOpacity(0.3),
       onTap: onTap,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

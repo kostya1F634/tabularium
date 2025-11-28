@@ -1,20 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tabularium/core/services/app_settings.dart';
 import 'package:tabularium/features/welcome/data/datasources/file_picker_datasource.dart';
 import 'package:tabularium/features/welcome/data/repositories/directory_repository_impl.dart';
 
 import 'directory_repository_impl_test.mocks.dart';
 
-@GenerateMocks([SharedPreferences, FilePickerDataSource])
+@GenerateMocks([AppSettings, FilePickerDataSource])
 void main() {
   late DirectoryRepositoryImpl repository;
-  late MockSharedPreferences mockPrefs;
+  late MockAppSettings mockPrefs;
   late MockFilePickerDataSource mockFilePicker;
 
   setUp(() {
-    mockPrefs = MockSharedPreferences();
+    mockPrefs = MockAppSettings();
     mockFilePicker = MockFilePickerDataSource();
     repository = DirectoryRepositoryImpl(
       prefs: mockPrefs,
@@ -27,8 +27,9 @@ void main() {
       test('should return empty list when no directories stored', () async {
         // Arrange
         when(mockPrefs.getStringList('recent_directories')).thenReturn(null);
-        when(mockPrefs.getStringList('recent_directories_timestamps'))
-            .thenReturn(null);
+        when(
+          mockPrefs.getStringList('recent_directories_timestamps'),
+        ).thenReturn(null);
 
         // Act
         final result = await repository.getRecentDirectories();
@@ -37,34 +38,38 @@ void main() {
         expect(result, isEmpty);
       });
 
-      test('should return list of DirectoryPath when directories exist',
-          () async {
-        // Arrange
-        final paths = ['/home/user/books', '/home/user/documents'];
-        final timestamps = [
-          DateTime(2025, 1, 1).toIso8601String(),
-          DateTime(2025, 1, 2).toIso8601String(),
-        ];
+      test(
+        'should return list of DirectoryPath when directories exist',
+        () async {
+          // Arrange
+          final paths = ['/home/user/books', '/home/user/documents'];
+          final timestamps = [
+            DateTime(2025, 1, 1).toIso8601String(),
+            DateTime(2025, 1, 2).toIso8601String(),
+          ];
 
-        when(mockPrefs.getStringList('recent_directories')).thenReturn(paths);
-        when(mockPrefs.getStringList('recent_directories_timestamps'))
-            .thenReturn(timestamps);
+          when(mockPrefs.getStringList('recent_directories')).thenReturn(paths);
+          when(
+            mockPrefs.getStringList('recent_directories_timestamps'),
+          ).thenReturn(timestamps);
 
-        // Act
-        final result = await repository.getRecentDirectories();
+          // Act
+          final result = await repository.getRecentDirectories();
 
-        // Assert
-        expect(result.length, equals(2));
-        expect(result[0].path, equals('/home/user/books'));
-        expect(result[1].path, equals('/home/user/documents'));
-      });
+          // Assert
+          expect(result.length, equals(2));
+          expect(result[0].path, equals('/home/user/books'));
+          expect(result[1].path, equals('/home/user/documents'));
+        },
+      );
 
       test('should handle missing timestamps gracefully', () async {
         // Arrange
         final paths = ['/home/user/books'];
         when(mockPrefs.getStringList('recent_directories')).thenReturn(paths);
-        when(mockPrefs.getStringList('recent_directories_timestamps'))
-            .thenReturn(null);
+        when(
+          mockPrefs.getStringList('recent_directories_timestamps'),
+        ).thenReturn(null);
 
         // Act
         final result = await repository.getRecentDirectories();
@@ -81,21 +86,27 @@ void main() {
         // Arrange
         const path = '/home/user/books';
         when(mockPrefs.getStringList('recent_directories')).thenReturn(null);
-        when(mockPrefs.getStringList('recent_directories_timestamps'))
-            .thenReturn(null);
-        when(mockPrefs.setStringList('recent_directories', any))
-            .thenAnswer((_) async => true);
-        when(mockPrefs.setStringList('recent_directories_timestamps', any))
-            .thenAnswer((_) async => true);
+        when(
+          mockPrefs.getStringList('recent_directories_timestamps'),
+        ).thenReturn(null);
+        when(
+          mockPrefs.setStringList('recent_directories', any),
+        ).thenAnswer((_) async => true);
+        when(
+          mockPrefs.setStringList('recent_directories_timestamps', any),
+        ).thenAnswer((_) async => true);
 
         // Act
         await repository.addRecentDirectory(path);
 
         // Assert
         verify(mockPrefs.setStringList('recent_directories', [path])).called(1);
-        verify(mockPrefs.setStringList(
-                'recent_directories_timestamps', argThat(hasLength(1))))
-            .called(1);
+        verify(
+          mockPrefs.setStringList(
+            'recent_directories_timestamps',
+            argThat(hasLength(1)),
+          ),
+        ).called(1);
       });
 
       test('should add directory to beginning of existing list', () async {
@@ -104,22 +115,29 @@ void main() {
         final existingPaths = ['/home/user/documents'];
         final existingTimestamps = [DateTime(2025, 1, 1).toIso8601String()];
 
-        when(mockPrefs.getStringList('recent_directories'))
-            .thenReturn(existingPaths);
-        when(mockPrefs.getStringList('recent_directories_timestamps'))
-            .thenReturn(existingTimestamps);
-        when(mockPrefs.setStringList('recent_directories', any))
-            .thenAnswer((_) async => true);
-        when(mockPrefs.setStringList('recent_directories_timestamps', any))
-            .thenAnswer((_) async => true);
+        when(
+          mockPrefs.getStringList('recent_directories'),
+        ).thenReturn(existingPaths);
+        when(
+          mockPrefs.getStringList('recent_directories_timestamps'),
+        ).thenReturn(existingTimestamps);
+        when(
+          mockPrefs.setStringList('recent_directories', any),
+        ).thenAnswer((_) async => true);
+        when(
+          mockPrefs.setStringList('recent_directories_timestamps', any),
+        ).thenAnswer((_) async => true);
 
         // Act
         await repository.addRecentDirectory(newPath);
 
         // Assert
-        verify(mockPrefs.setStringList(
-                'recent_directories', [newPath, '/home/user/documents']))
-            .called(1);
+        verify(
+          mockPrefs.setStringList('recent_directories', [
+            newPath,
+            '/home/user/documents',
+          ]),
+        ).called(1);
       });
 
       test('should remove duplicate and add to beginning', () async {
@@ -131,47 +149,60 @@ void main() {
           DateTime(2025, 1, 2).toIso8601String(),
         ];
 
-        when(mockPrefs.getStringList('recent_directories'))
-            .thenReturn(existingPaths);
-        when(mockPrefs.getStringList('recent_directories_timestamps'))
-            .thenReturn(existingTimestamps);
-        when(mockPrefs.setStringList('recent_directories', any))
-            .thenAnswer((_) async => true);
-        when(mockPrefs.setStringList('recent_directories_timestamps', any))
-            .thenAnswer((_) async => true);
+        when(
+          mockPrefs.getStringList('recent_directories'),
+        ).thenReturn(existingPaths);
+        when(
+          mockPrefs.getStringList('recent_directories_timestamps'),
+        ).thenReturn(existingTimestamps);
+        when(
+          mockPrefs.setStringList('recent_directories', any),
+        ).thenAnswer((_) async => true);
+        when(
+          mockPrefs.setStringList('recent_directories_timestamps', any),
+        ).thenAnswer((_) async => true);
 
         // Act
         await repository.addRecentDirectory(existingPath);
 
         // Assert
-        verify(mockPrefs.setStringList(
-                'recent_directories', [existingPath, '/home/user/documents']))
-            .called(1);
+        verify(
+          mockPrefs.setStringList('recent_directories', [
+            existingPath,
+            '/home/user/documents',
+          ]),
+        ).called(1);
       });
 
       test('should limit list to max 10 items', () async {
         // Arrange
         const newPath = '/home/user/new';
         final existingPaths = List.generate(10, (i) => '/home/user/path$i');
-        final existingTimestamps =
-            List.generate(10, (i) => DateTime(2025, 1, i + 1).toIso8601String());
+        final existingTimestamps = List.generate(
+          10,
+          (i) => DateTime(2025, 1, i + 1).toIso8601String(),
+        );
 
-        when(mockPrefs.getStringList('recent_directories'))
-            .thenReturn(existingPaths);
-        when(mockPrefs.getStringList('recent_directories_timestamps'))
-            .thenReturn(existingTimestamps);
-        when(mockPrefs.setStringList('recent_directories', any))
-            .thenAnswer((_) async => true);
-        when(mockPrefs.setStringList('recent_directories_timestamps', any))
-            .thenAnswer((_) async => true);
+        when(
+          mockPrefs.getStringList('recent_directories'),
+        ).thenReturn(existingPaths);
+        when(
+          mockPrefs.getStringList('recent_directories_timestamps'),
+        ).thenReturn(existingTimestamps);
+        when(
+          mockPrefs.setStringList('recent_directories', any),
+        ).thenAnswer((_) async => true);
+        when(
+          mockPrefs.setStringList('recent_directories_timestamps', any),
+        ).thenAnswer((_) async => true);
 
         // Act
         await repository.addRecentDirectory(newPath);
 
         // Assert
-        final captured = verify(mockPrefs.setStringList(
-                'recent_directories', captureAny))
-            .captured;
+        final captured = verify(
+          mockPrefs.setStringList('recent_directories', captureAny),
+        ).captured;
         expect((captured[0] as List).length, equals(10));
         expect((captured[0] as List).first, equals(newPath));
       });
@@ -180,10 +211,12 @@ void main() {
     group('clearRecentDirectories', () {
       test('should remove both keys from preferences', () async {
         // Arrange
-        when(mockPrefs.remove('recent_directories'))
-            .thenAnswer((_) async => true);
-        when(mockPrefs.remove('recent_directories_timestamps'))
-            .thenAnswer((_) async => true);
+        when(
+          mockPrefs.remove('recent_directories'),
+        ).thenAnswer((_) async => true);
+        when(
+          mockPrefs.remove('recent_directories_timestamps'),
+        ).thenAnswer((_) async => true);
 
         // Act
         await repository.clearRecentDirectories();

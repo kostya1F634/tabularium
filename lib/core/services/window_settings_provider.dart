@@ -12,7 +12,8 @@ class WindowSettingsProvider extends InheritedWidget {
   });
 
   static WindowSettingsService of(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<WindowSettingsProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<WindowSettingsProvider>();
     assert(provider != null, 'No WindowSettingsProvider found in context');
     return provider!.windowSettingsService;
   }

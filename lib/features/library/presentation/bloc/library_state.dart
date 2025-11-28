@@ -53,17 +53,19 @@ class LibraryLoaded extends LibraryState {
 
   @override
   List<Object?> get props => [
-        config,
-        selectedShelf,
-        searchQuery,
-        displayedBooks,
-        selectedBookIds,
-      ];
+    config,
+    selectedShelf,
+    searchQuery,
+    displayedBooks,
+    selectedBookIds,
+  ];
 
   bool get hasSelection => selectedBookIds.isNotEmpty;
 
   List<Book> get selectedBooks {
-    return displayedBooks.where((book) => selectedBookIds.contains(book.id)).toList();
+    return displayedBooks
+        .where((book) => selectedBookIds.contains(book.id))
+        .toList();
   }
 
   LibraryLoaded copyWith({
@@ -80,7 +82,9 @@ class LibraryLoaded extends LibraryState {
       selectedShelf: selectedShelf ?? this.selectedShelf,
       searchQuery: clearSearch ? null : (searchQuery ?? this.searchQuery),
       displayedBooks: displayedBooks ?? this.displayedBooks,
-      selectedBookIds: clearSelection ? {} : (selectedBookIds ?? this.selectedBookIds),
+      selectedBookIds: clearSelection
+          ? {}
+          : (selectedBookIds ?? this.selectedBookIds),
     );
   }
 }

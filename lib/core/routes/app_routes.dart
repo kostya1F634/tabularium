@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/services/app_settings.dart';
 import '../../features/library/presentation/pages/library_view_wrapper.dart';
 import '../../features/welcome/di/welcome_dependencies.dart';
 import '../../features/welcome/presentation/bloc/welcome_event.dart';
@@ -12,13 +12,15 @@ class AppRoutes {
 
   static Route<dynamic> generateRoute(
     RouteSettings settings,
-    SharedPreferences prefs,
+    AppSettings prefs,
   ) {
     switch (settings.name) {
       case welcome:
         return MaterialPageRoute(
           builder: (_) {
-            final repository = WelcomeDependencies.createDirectoryRepository(prefs);
+            final repository = WelcomeDependencies.createDirectoryRepository(
+              prefs,
+            );
             final bloc = WelcomeDependencies.createWelcomeBloc(repository);
 
             // Загружаем недавние директории при создании экрана
@@ -36,9 +38,7 @@ class AppRoutes {
           // This shouldn't happen, but just in case
           return MaterialPageRoute(
             builder: (_) => Scaffold(
-              body: Center(
-                child: Text('Error: No directory path provided'),
-              ),
+              body: Center(child: Text('Error: No directory path provided')),
             ),
           );
         }
@@ -51,9 +51,7 @@ class AppRoutes {
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            body: Center(
-              child: Text('No route defined for ${settings.name}'),
-            ),
+            body: Center(child: Text('No route defined for ${settings.name}')),
           ),
         );
     }

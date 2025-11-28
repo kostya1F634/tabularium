@@ -21,8 +21,7 @@ void main() {
       // Arrange
       const path = '/home/user/books';
       when(mockRepository.pickDirectory()).thenAnswer((_) async => path);
-      when(mockRepository.addRecentDirectory(any))
-          .thenAnswer((_) async => {});
+      when(mockRepository.addRecentDirectory(any)).thenAnswer((_) async => {});
 
       // Act
       final result = await useCase();
@@ -33,17 +32,20 @@ void main() {
       verify(mockRepository.addRecentDirectory(path)).called(1);
     });
 
-    test('should return null and not add to recent when user cancels', () async {
-      // Arrange
-      when(mockRepository.pickDirectory()).thenAnswer((_) async => null);
+    test(
+      'should return null and not add to recent when user cancels',
+      () async {
+        // Arrange
+        when(mockRepository.pickDirectory()).thenAnswer((_) async => null);
 
-      // Act
-      final result = await useCase();
+        // Act
+        final result = await useCase();
 
-      // Assert
-      expect(result, isNull);
-      verify(mockRepository.pickDirectory()).called(1);
-      verifyNever(mockRepository.addRecentDirectory(any));
-    });
+        // Assert
+        expect(result, isNull);
+        verify(mockRepository.pickDirectory()).called(1);
+        verifyNever(mockRepository.addRecentDirectory(any));
+      },
+    );
   });
 }

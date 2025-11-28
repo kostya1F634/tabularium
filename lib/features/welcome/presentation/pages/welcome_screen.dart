@@ -16,10 +16,9 @@ class WelcomeScreen extends StatelessWidget {
       listener: (context, state) {
         if (state is DirectorySelected) {
           // Navigate to main screen
-          Navigator.of(context).pushReplacementNamed(
-            '/main',
-            arguments: state.path,
-          );
+          Navigator.of(
+            context,
+          ).pushReplacementNamed('/main', arguments: state.path);
         }
       },
       child: Scaffold(
@@ -65,18 +64,22 @@ class WelcomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                AppLocalizations.of(context)!.errorMessage(state.message),
+                                AppLocalizations.of(
+                                  context,
+                                )!.errorMessage(state.message),
                                 style: Theme.of(context).textTheme.titleMedium,
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 24),
                               ElevatedButton(
                                 onPressed: () {
-                                  context
-                                      .read<WelcomeBloc>()
-                                      .add(const LoadRecentDirectories());
+                                  context.read<WelcomeBloc>().add(
+                                    const LoadRecentDirectories(),
+                                  );
                                 },
-                                child: Text(AppLocalizations.of(context)!.retry),
+                                child: Text(
+                                  AppLocalizations.of(context)!.retry,
+                                ),
                               ),
                             ],
                           ),
@@ -87,14 +90,14 @@ class WelcomeScreen extends StatelessWidget {
                         return WelcomeContent(
                           recentDirectories: state.recentDirectories,
                           onPickDirectory: () {
-                            context
-                                .read<WelcomeBloc>()
-                                .add(const PickDirectory());
+                            context.read<WelcomeBloc>().add(
+                              const PickDirectory(),
+                            );
                           },
                           onSelectDirectory: (path) {
-                            context
-                                .read<WelcomeBloc>()
-                                .add(SelectRecentDirectory(path));
+                            context.read<WelcomeBloc>().add(
+                              SelectRecentDirectory(path),
+                            );
                           },
                         );
                       }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tabularium/l10n/app_localizations.dart';
 
 import '../../../../core/widgets/app_menu_bar.dart';
 import '../bloc/library_bloc.dart';
@@ -15,8 +14,6 @@ class LibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return AppBar(
       automaticallyImplyLeading: false,
       centerTitle: true,
@@ -45,9 +42,9 @@ class LibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
                         child: Text(
                           state.config.directoryPath,
                           style: TextStyle(
-                                fontSize: 14,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                            fontSize: 14,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),

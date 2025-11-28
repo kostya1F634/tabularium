@@ -9,10 +9,7 @@ void main() {
       final timestamp = DateTime(2025, 1, 1);
 
       // Act
-      final directoryPath = DirectoryPath(
-        path: path,
-        lastAccessed: timestamp,
-      );
+      final directoryPath = DirectoryPath(path: path, lastAccessed: timestamp);
 
       // Assert
       expect(directoryPath.path, equals(path));
@@ -23,10 +20,7 @@ void main() {
       // Arrange
       const path = '/home/user/books';
       final timestamp = DateTime(2025, 1, 1);
-      final directoryPath = DirectoryPath(
-        path: path,
-        lastAccessed: timestamp,
-      );
+      final directoryPath = DirectoryPath(path: path, lastAccessed: timestamp);
 
       // Act
       final name = directoryPath.name;
@@ -39,10 +33,7 @@ void main() {
       // Arrange
       const path = '/home/user/books/';
       final timestamp = DateTime(2025, 1, 1);
-      final directoryPath = DirectoryPath(
-        path: path,
-        lastAccessed: timestamp,
-      );
+      final directoryPath = DirectoryPath(path: path, lastAccessed: timestamp);
 
       // Act
       final name = directoryPath.name;
@@ -56,15 +47,9 @@ void main() {
       final timestamp = DateTime(2025, 1, 1);
       const path = '/home/user/books';
 
-      final directoryPath1 = DirectoryPath(
-        path: path,
-        lastAccessed: timestamp,
-      );
+      final directoryPath1 = DirectoryPath(path: path, lastAccessed: timestamp);
 
-      final directoryPath2 = DirectoryPath(
-        path: path,
-        lastAccessed: timestamp,
-      );
+      final directoryPath2 = DirectoryPath(path: path, lastAccessed: timestamp);
 
       // Assert
       expect(directoryPath1, equals(directoryPath2));

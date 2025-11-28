@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/app_settings.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../features/library/presentation/pages/library_view_wrapper.dart';
 import '../services/language_provider.dart';
@@ -14,10 +15,7 @@ import 'shortcuts_dialog.dart';
 class AppMenuBar extends StatelessWidget {
   final Widget? centerWidget;
 
-  const AppMenuBar({
-    super.key,
-    this.centerWidget,
-  });
+  const AppMenuBar({super.key, this.centerWidget});
 
   bool _isInLibraryScreen(BuildContext context) {
     final currentRoute = ModalRoute.of(context);
@@ -27,7 +25,8 @@ class AppMenuBar extends StatelessWidget {
   bool _canToggleView(BuildContext context) {
     try {
       // Try to find the ViewModeProviderWidget in the widget tree
-      return context.findAncestorWidgetOfExactType<ViewModeProviderWidget>() != null;
+      return context.findAncestorWidgetOfExactType<ViewModeProviderWidget>() !=
+          null;
     } catch (e) {
       return false;
     }
@@ -35,11 +34,35 @@ class AppMenuBar extends StatelessWidget {
 
   void _toggleView(BuildContext context) {
     try {
-      final provider = context.findAncestorWidgetOfExactType<ViewModeProviderWidget>();
+      final provider = context
+          .findAncestorWidgetOfExactType<ViewModeProviderWidget>();
       provider?.onToggle();
     } catch (e) {
       // Ignore
     }
+  }
+
+  Future<void> _showAboutDialog(BuildContext context) async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About Tabularium'),
+        content: Text(
+          'Tabularium - Your Personal Library\n\n'
+          'Version: ${packageInfo.version}\n\n'
+          'A modern PDF library manager built with Flutter.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -69,9 +92,7 @@ class AppMenuBar extends StatelessWidget {
               return IconButton(
                 icon: const Icon(Icons.view_module, size: 16),
                 tooltip: 'Toggle View Mode',
-                onPressed: canToggle
-                    ? () => _toggleView(context)
-                    : null,
+                onPressed: canToggle ? () => _toggleView(context) : null,
               );
             },
           ),
@@ -141,7 +162,10 @@ class AppMenuBar extends StatelessWidget {
                   ),
                 ],
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: Row(
                     children: const [
                       Icon(Icons.language, size: 16),
@@ -179,7 +203,10 @@ class AppMenuBar extends StatelessWidget {
                   );
                 }).toList(),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: Row(
                     children: const [
                       Icon(Icons.text_fields, size: 16),
@@ -201,23 +228,27 @@ class AppMenuBar extends StatelessWidget {
                   uiSettings.setBookScale(scale);
                   Navigator.pop(context); // Close parent menu
                 },
-                itemBuilder: (context) => [0.7, 0.85, 1.0, 1.25, 1.5, 2.0].map((scale) {
-                  return PopupMenuItem(
-                    value: scale,
-                    child: Row(
-                      children: [
-                        if (uiSettings.bookScale == scale)
-                          const Icon(Icons.check, size: 16)
-                        else
-                          const SizedBox(width: 16),
-                        const SizedBox(width: 8),
-                        Text(uiSettings.getBookScaleLabel(scale)),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                itemBuilder: (context) =>
+                    [0.7, 0.85, 1.0, 1.25, 1.5, 2.0].map((scale) {
+                      return PopupMenuItem(
+                        value: scale,
+                        child: Row(
+                          children: [
+                            if (uiSettings.bookScale == scale)
+                              const Icon(Icons.check, size: 16)
+                            else
+                              const SizedBox(width: 16),
+                            const SizedBox(width: 8),
+                            Text(uiSettings.getBookScaleLabel(scale)),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: Row(
                     children: const [
                       Icon(Icons.photo_size_select_large, size: 16),
@@ -246,7 +277,7 @@ class AppMenuBar extends StatelessWidget {
               windowSettings.resetWindowSettings();
 
               // Reset view mode
-              final prefs = await SharedPreferences.getInstance();
+              final prefs = await AppSettings.getInstance();
               await prefs.remove('view_mode');
             } else if (value == 'shortcuts') {
               showDialog(
@@ -254,23 +285,7 @@ class AppMenuBar extends StatelessWidget {
                 builder: (context) => const ShortcutsDialog(),
               );
             } else if (value == 'about') {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('About Tabularium'),
-                  content: const Text(
-                    'Tabularium - Your Personal Library\n\n'
-                    'Version: 0.5.0\n\n'
-                    'A modern PDF library manager built with Flutter.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ),
-              );
+              _showAboutDialog(context);
             }
           },
           itemBuilder: (context) {

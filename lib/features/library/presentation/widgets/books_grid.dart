@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
@@ -17,11 +16,7 @@ class BooksGrid extends StatelessWidget {
   final List<Book> books;
   final List<Shelf> shelves;
 
-  const BooksGrid({
-    super.key,
-    required this.books,
-    required this.shelves,
-  });
+  const BooksGrid({super.key, required this.books, required this.shelves});
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +31,16 @@ class BooksGrid extends StatelessWidget {
             Icon(
               Icons.book_outlined,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withOpacity(0.5),
             ),
             const SizedBox(height: 16),
             Text(
               l10n.noBooks,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -134,10 +131,7 @@ class _BookCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: isSelected
-            ? BorderSide(
-                color: Theme.of(context).colorScheme.primary,
-                width: 3,
-              )
+            ? BorderSide(color: Theme.of(context).colorScheme.primary, width: 3)
             : BorderSide.none,
       ),
       child: Stack(
@@ -153,9 +147,7 @@ class _BookCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Book cover/thumbnail
-                Expanded(
-                  child: _BookCover(thumbnailPath: book.thumbnailPath),
-                ),
+                Expanded(child: _BookCover(thumbnailPath: book.thumbnailPath)),
                 // Book title
                 Padding(
                   padding: EdgeInsets.all(8 * bookScale),
@@ -165,9 +157,14 @@ class _BookCard extends StatelessWidget {
                       Text(
                         book.displayTitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              fontSize: (Theme.of(context).textTheme.bodyMedium?.fontSize ?? 14) * bookScale,
-                            ),
+                          fontWeight: FontWeight.w500,
+                          fontSize:
+                              (Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.fontSize ??
+                                  14) *
+                              bookScale,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -175,9 +172,17 @@ class _BookCard extends StatelessWidget {
                         SizedBox(height: 4 * bookScale),
                         Text(
                           book.author!,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                fontSize: (Theme.of(context).textTheme.bodySmall?.fontSize ?? 12) * bookScale,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                                fontSize:
+                                    (Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall?.fontSize ??
+                                        12) *
+                                    bookScale,
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -195,7 +200,9 @@ class _BookCard extends StatelessWidget {
               child: IgnorePointer(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Align(
@@ -258,9 +265,16 @@ class _BookCard extends StatelessWidget {
             value: 'remove',
             child: Row(
               children: [
-                Icon(Icons.remove_circle_outline, size: 18, color: Theme.of(context).colorScheme.error),
+                Icon(
+                  Icons.remove_circle_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 const SizedBox(width: 8),
-                Text(l10n.remove, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                Text(
+                  l10n.remove,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
               ],
             ),
           ),
@@ -283,10 +297,12 @@ class _BookCard extends StatelessWidget {
           bloc.add(OpenBook(book));
           break;
         case 'remove':
-          bloc.add(DeleteBookFromShelf(
-            bookId: book.id,
-            shelfId: state.selectedShelf.id,
-          ));
+          bloc.add(
+            DeleteBookFromShelf(
+              bookId: book.id,
+              shelfId: state.selectedShelf.id,
+            ),
+          );
           break;
         case 'properties':
           showDialog(
@@ -332,7 +348,9 @@ class _PlaceholderCover extends StatelessWidget {
         child: Icon(
           Icons.menu_book,
           size: 64,
-          color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.3),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurfaceVariant.withOpacity(0.3),
         ),
       ),
     );

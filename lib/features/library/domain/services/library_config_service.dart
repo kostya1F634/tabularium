@@ -12,7 +12,10 @@ class LibraryConfigService {
 
   /// Check if library needs rescan
   /// Returns true if enough time has passed since last scan
-  bool needsRescan(LibraryConfig config, {Duration threshold = const Duration(hours: 1)}) {
+  bool needsRescan(
+    LibraryConfig config, {
+    Duration threshold = const Duration(hours: 1),
+  }) {
     final timeSinceLastScan = DateTime.now().difference(config.lastScanDate);
     return timeSinceLastScan > threshold;
   }
@@ -54,10 +57,7 @@ class LibraryConfigService {
       return shelf.copyWith(bookIds: filteredBookIds);
     }).toList();
 
-    return config.copyWith(
-      books: updatedBooks,
-      shelves: updatedShelves,
-    );
+    return config.copyWith(books: updatedBooks, shelves: updatedShelves);
   }
 
   /// Merge new books with existing ones
@@ -101,9 +101,7 @@ class LibraryConfigService {
       return config;
     }
 
-    return config.copyWith(
-      shelves: [...config.shelves, newShelf],
-    );
+    return config.copyWith(shelves: [...config.shelves, newShelf]);
   }
 
   /// Remove a shelf from config

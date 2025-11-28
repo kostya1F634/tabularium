@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/app_settings.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
 import '../../di/library_dependencies.dart';
@@ -21,16 +21,14 @@ enum FocusArea { shelves, books }
 class LibraryScreen extends StatelessWidget {
   final String directoryPath;
 
-  const LibraryScreen({
-    super.key,
-    required this.directoryPath,
-  });
+  const LibraryScreen({super.key, required this.directoryPath});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LibraryDependencies().createLibraryBloc()
-        ..add(InitializeLibrary(directoryPath)),
+      create: (_) =>
+          LibraryDependencies().createLibraryBloc()
+            ..add(InitializeLibrary(directoryPath)),
       child: const _LibraryScreenContent(),
     );
   }
@@ -68,7 +66,7 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
   }
 
   Future<void> _loadSidebarWidth() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppSettings.getInstance();
     final savedWidth = prefs.getDouble(_sidebarWidthKey);
     if (savedWidth != null && mounted) {
       setState(() {
@@ -78,13 +76,16 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
   }
 
   Future<void> _saveSidebarWidth(double width) async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await AppSettings.getInstance();
     await prefs.setDouble(_sidebarWidthKey, width);
   }
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
     setState(() {
-      _sidebarWidth = (_sidebarWidth + details.delta.dx).clamp(_minSidebarWidth, _maxSidebarWidth);
+      _sidebarWidth = (_sidebarWidth + details.delta.dx).clamp(
+        _minSidebarWidth,
+        _maxSidebarWidth,
+      );
     });
   }
 
@@ -158,11 +159,13 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
 
     // Handle focus switching with Left/Right arrows or H/L (only without Ctrl)
     if (!isCtrlPressed) {
-      if (event.logicalKey == LogicalKeyboardKey.arrowLeft || event.logicalKey == LogicalKeyboardKey.keyH) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
+          event.logicalKey == LogicalKeyboardKey.keyH) {
         setState(() => _currentFocus = FocusArea.shelves);
         return KeyEventResult.handled;
       }
-      if (event.logicalKey == LogicalKeyboardKey.arrowRight || event.logicalKey == LogicalKeyboardKey.keyL) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowRight ||
+          event.logicalKey == LogicalKeyboardKey.keyL) {
         setState(() => _currentFocus = FocusArea.books);
         return KeyEventResult.handled;
       }
@@ -175,20 +178,30 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     }
   }
 
-  KeyEventResult _handleShelvesKeyEvent(KeyEvent event, LibraryBloc bloc, LibraryLoaded state, bool isCtrlPressed) {
+  KeyEventResult _handleShelvesKeyEvent(
+    KeyEvent event,
+    LibraryBloc bloc,
+    LibraryLoaded state,
+    bool isCtrlPressed,
+  ) {
     final shelves = state.config.shelves;
-    final currentIndex = shelves.indexWhere((s) => s.id == state.selectedShelf.id);
+    final currentIndex = shelves.indexWhere(
+      (s) => s.id == state.selectedShelf.id,
+    );
     if (currentIndex == -1) return KeyEventResult.ignored;
 
     // Navigation (Up/Down or K/J)
-    if (event.logicalKey == LogicalKeyboardKey.arrowUp || event.logicalKey == LogicalKeyboardKey.keyK) {
+    if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
+        event.logicalKey == LogicalKeyboardKey.keyK) {
       if (isCtrlPressed) {
         // Move shelf up (must be at least at index 3, and move to at least index 2)
         // This ensures "All" (0) and "Unsorted" (1) stay in place
         if (currentIndex >= 3) {
           final newIndex = currentIndex - 1;
           if (newIndex >= 2) {
-            bloc.add(ReorderShelves(oldIndex: currentIndex, newIndex: newIndex));
+            bloc.add(
+              ReorderShelves(oldIndex: currentIndex, newIndex: newIndex),
+            );
           }
         }
       } else if (currentIndex > 0) {
@@ -197,13 +210,16 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       }
       return KeyEventResult.handled;
     }
-    if (event.logicalKey == LogicalKeyboardKey.arrowDown || event.logicalKey == LogicalKeyboardKey.keyJ) {
+    if (event.logicalKey == LogicalKeyboardKey.arrowDown ||
+        event.logicalKey == LogicalKeyboardKey.keyJ) {
       if (isCtrlPressed) {
         // Move shelf down (must be at least at index 2, and not be the last shelf)
         if (currentIndex >= 2) {
           final newIndex = currentIndex + 1;
           if (newIndex < shelves.length) {
-            bloc.add(ReorderShelves(oldIndex: currentIndex, newIndex: newIndex));
+            bloc.add(
+              ReorderShelves(oldIndex: currentIndex, newIndex: newIndex),
+            );
           }
         }
       } else if (currentIndex < shelves.length - 1) {
@@ -225,11 +241,17 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     return KeyEventResult.ignored;
   }
 
-  KeyEventResult _handleBooksKeyEvent(KeyEvent event, LibraryBloc bloc, LibraryLoaded state) {
+  KeyEventResult _handleBooksKeyEvent(
+    KeyEvent event,
+    LibraryBloc bloc,
+    LibraryLoaded state,
+  ) {
     // Delete book from shelf
     if (event.logicalKey == LogicalKeyboardKey.delete) {
       final isDefaultShelf = state.selectedShelf.isDefault;
-      if (!isDefaultShelf && state.hasSelection && state.selectedBookIds.isNotEmpty) {
+      if (!isDefaultShelf &&
+          state.hasSelection &&
+          state.selectedBookIds.isNotEmpty) {
         bloc.add(const DeleteSelectedBooks());
       }
       return KeyEventResult.handled;
@@ -280,7 +302,11 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     );
   }
 
-  void _showEditShelfDialog(BuildContext context, LibraryBloc bloc, Shelf shelf) {
+  void _showEditShelfDialog(
+    BuildContext context,
+    LibraryBloc bloc,
+    Shelf shelf,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     // Don't allow editing default shelves
@@ -337,145 +363,145 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
         appBar: const LibraryAppBar(),
         body: BlocBuilder<LibraryBloc, LibraryState>(
           builder: (context, state) {
-          if (state is LibraryLoading) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.initializingLibrary,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (state is LibraryInitializing) {
-            final progress = state.currentBook / state.totalBooks;
-            return Center(
-              child: Container(
-                padding: const EdgeInsets.all(32),
-                constraints: const BoxConstraints(maxWidth: 500),
+            if (state is LibraryLoading) {
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      l10n.initializingLibrary,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 32),
-                    LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 8,
-                    ),
+                    const CircularProgressIndicator(),
                     const SizedBox(height: 16),
                     Text(
-                      '${state.currentBook} / ${state.totalBooks}',
-                      style: Theme.of(context).textTheme.titleMedium,
+                      l10n.initializingLibrary,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          if (state is LibraryError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    state.message,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pushReplacementNamed('/'),
-                    child: Text(l10n.backToWelcome),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (state is LibraryLoaded) {
-            return Row(
-              children: [
-                // Left sidebar with shelves
-                SizedBox(
-                  width: _sidebarWidth,
-                  child: ShelfsSidebar(
-                    shelves: state.config.shelves,
-                    selectedShelfId: state.selectedShelf.id,
-                    totalBooksCount: state.config.books.length,
-                    allBooks: state.config.books,
-                    isFocused: _currentFocus == FocusArea.shelves,
-                  ),
-                ),
-                // Resize handle
-                MouseRegion(
-                  cursor: SystemMouseCursors.resizeColumn,
-                  child: GestureDetector(
-                    onHorizontalDragStart: _onHorizontalDragStart,
-                    onHorizontalDragUpdate: _onHorizontalDragUpdate,
-                    onHorizontalDragEnd: _onHorizontalDragEnd,
-                    child: Container(
-                      width: 8,
-                      color: _isResizing
-                          ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                          : Colors.transparent,
-                      child: Center(
-                        child: Container(
-                          width: 1,
-                          color: Theme.of(context).dividerColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // Main content area
-                Expanded(
+            if (state is LibraryInitializing) {
+              final progress = state.currentBook / state.totalBooks;
+              return Center(
+                child: Container(
+                  padding: const EdgeInsets.all(32),
+                  constraints: const BoxConstraints(maxWidth: 500),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Header with action buttons
-                      LibraryHeader(
-                        selectedShelf: state.selectedShelf,
-                        bookCount: state.displayedBooks.length,
-                        isFocused: _currentFocus == FocusArea.books,
+                      Text(
+                        l10n.initializingLibrary,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
-                      Container(
-                        height: 3,
-                        color: _currentFocus == FocusArea.books
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).dividerColor,
-                      ),
-                      // Books grid
-                      Expanded(
-                        child: BooksGrid(
-                          books: state.displayedBooks,
-                          shelves: state.config.shelves,
-                        ),
+                      const SizedBox(height: 32),
+                      LinearProgressIndicator(value: progress, minHeight: 8),
+                      const SizedBox(height: 16),
+                      Text(
+                        '${state.currentBook} / ${state.totalBooks}',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
                   ),
                 ),
-              ],
-            );
-          }
+              );
+            }
 
-          return const SizedBox.shrink();
-        },
-      ),
+            if (state is LibraryError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () =>
+                          Navigator.of(context).pushReplacementNamed('/'),
+                      child: Text(l10n.backToWelcome),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (state is LibraryLoaded) {
+              return Row(
+                children: [
+                  // Left sidebar with shelves
+                  SizedBox(
+                    width: _sidebarWidth,
+                    child: ShelfsSidebar(
+                      shelves: state.config.shelves,
+                      selectedShelfId: state.selectedShelf.id,
+                      totalBooksCount: state.config.books.length,
+                      allBooks: state.config.books,
+                      isFocused: _currentFocus == FocusArea.shelves,
+                    ),
+                  ),
+                  // Resize handle
+                  MouseRegion(
+                    cursor: SystemMouseCursors.resizeColumn,
+                    child: GestureDetector(
+                      onHorizontalDragStart: _onHorizontalDragStart,
+                      onHorizontalDragUpdate: _onHorizontalDragUpdate,
+                      onHorizontalDragEnd: _onHorizontalDragEnd,
+                      child: Container(
+                        width: 8,
+                        color: _isResizing
+                            ? Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.2)
+                            : Colors.transparent,
+                        child: Center(
+                          child: Container(
+                            width: 1,
+                            color: Theme.of(context).dividerColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Main content area
+                  Expanded(
+                    child: Column(
+                      children: [
+                        // Header with action buttons
+                        LibraryHeader(
+                          selectedShelf: state.selectedShelf,
+                          bookCount: state.displayedBooks.length,
+                          isFocused: _currentFocus == FocusArea.books,
+                        ),
+                        Container(
+                          height: 3,
+                          color: _currentFocus == FocusArea.books
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).dividerColor,
+                        ),
+                        // Books grid
+                        Expanded(
+                          child: BooksGrid(
+                            books: state.displayedBooks,
+                            shelves: state.config.shelves,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

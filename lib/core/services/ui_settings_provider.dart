@@ -12,7 +12,8 @@ class UISettingsProvider extends InheritedWidget {
   });
 
   static UISettingsService of(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<UISettingsProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<UISettingsProvider>();
     assert(provider != null, 'No UISettingsProvider found in context');
     return provider!.uiSettingsService;
   }

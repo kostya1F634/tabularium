@@ -64,10 +64,7 @@ class RenameShelf extends LibraryEvent {
   final String shelfId;
   final String newName;
 
-  const RenameShelf({
-    required this.shelfId,
-    required this.newName,
-  });
+  const RenameShelf({required this.shelfId, required this.newName});
 
   @override
   List<Object?> get props => [shelfId, newName];
@@ -78,10 +75,7 @@ class AddBookToShelf extends LibraryEvent {
   final String bookId;
   final String shelfId;
 
-  const AddBookToShelf({
-    required this.bookId,
-    required this.shelfId,
-  });
+  const AddBookToShelf({required this.bookId, required this.shelfId});
 
   @override
   List<Object?> get props => [bookId, shelfId];
@@ -92,10 +86,7 @@ class RemoveBookFromShelf extends LibraryEvent {
   final String bookId;
   final String shelfId;
 
-  const RemoveBookFromShelf({
-    required this.bookId,
-    required this.shelfId,
-  });
+  const RemoveBookFromShelf({required this.bookId, required this.shelfId});
 
   @override
   List<Object?> get props => [bookId, shelfId];
@@ -182,10 +173,7 @@ class UpdateBookAlias extends LibraryEvent {
   final String bookId;
   final String? alias;
 
-  const UpdateBookAlias({
-    required this.bookId,
-    required this.alias,
-  });
+  const UpdateBookAlias({required this.bookId, required this.alias});
 
   @override
   List<Object?> get props => [bookId, alias];
@@ -196,10 +184,7 @@ class DeleteBookFromShelf extends LibraryEvent {
   final String bookId;
   final String shelfId;
 
-  const DeleteBookFromShelf({
-    required this.bookId,
-    required this.shelfId,
-  });
+  const DeleteBookFromShelf({required this.bookId, required this.shelfId});
 
   @override
   List<Object?> get props => [bookId, shelfId];

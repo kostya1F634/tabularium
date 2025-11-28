@@ -31,8 +31,9 @@ void main() {
         ),
       ];
 
-      when(mockRepository.getRecentDirectories())
-          .thenAnswer((_) async => directories);
+      when(
+        mockRepository.getRecentDirectories(),
+      ).thenAnswer((_) async => directories);
 
       // Act
       final result = await useCase();
@@ -45,8 +46,7 @@ void main() {
 
     test('should return empty list when no recent directories', () async {
       // Arrange
-      when(mockRepository.getRecentDirectories())
-          .thenAnswer((_) async => []);
+      when(mockRepository.getRecentDirectories()).thenAnswer((_) async => []);
 
       // Act
       final result = await useCase();

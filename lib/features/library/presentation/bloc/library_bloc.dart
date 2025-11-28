@@ -27,12 +27,12 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     required SaveLibraryUseCase saveLibrary,
     required OpenBookUseCase openBook,
     required OpenAllBooksUseCase openAllBooks,
-  })  : _initializeLibrary = initializeLibrary,
-        _loadLibrary = loadLibrary,
-        _saveLibrary = saveLibrary,
-        _openBook = openBook,
-        _openAllBooks = openAllBooks,
-        super(const LibraryInitial()) {
+  }) : _initializeLibrary = initializeLibrary,
+       _loadLibrary = loadLibrary,
+       _saveLibrary = saveLibrary,
+       _openBook = openBook,
+       _openAllBooks = openAllBooks,
+       super(const LibraryInitial()) {
     on<InitializeLibrary>(_onInitializeLibrary);
     on<LoadLibrary>(_onLoadLibrary);
     on<SelectShelf>(_onSelectShelf);
@@ -66,10 +66,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       final config = await _initializeLibrary(
         event.directoryPath,
         onProgress: (current, total) {
-          emit(LibraryInitializing(
-            currentBook: current,
-            totalBooks: total,
-          ));
+          emit(LibraryInitializing(currentBook: current, totalBooks: total));
         },
       );
 
@@ -80,11 +77,13 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
       final displayedBooks = _getBooksForShelf(config, selectedShelf.id);
 
-      emit(LibraryLoaded(
-        config: config,
-        selectedShelf: selectedShelf,
-        displayedBooks: displayedBooks,
-      ));
+      emit(
+        LibraryLoaded(
+          config: config,
+          selectedShelf: selectedShelf,
+          displayedBooks: displayedBooks,
+        ),
+      );
     } catch (e) {
       emit(LibraryError('Failed to initialize library: $e'));
     }
@@ -106,11 +105,13 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       final allShelf = config.allShelf;
       final displayedBooks = _getBooksForShelf(config, allShelf.id);
 
-      emit(LibraryLoaded(
-        config: config,
-        selectedShelf: allShelf,
-        displayedBooks: displayedBooks,
-      ));
+      emit(
+        LibraryLoaded(
+          config: config,
+          selectedShelf: allShelf,
+          displayedBooks: displayedBooks,
+        ),
+      );
     } catch (e) {
       emit(LibraryError('Failed to load library: $e'));
     }
@@ -135,13 +136,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     );
     await _saveLibrary(updatedConfig);
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      selectedShelf: shelf,
-      displayedBooks: displayedBooks,
-      clearSearch: true,
-      selectedBookIds: const {}, // Clear selection when switching shelves
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        selectedShelf: shelf,
+        displayedBooks: displayedBooks,
+        clearSearch: true,
+        selectedBookIds: const {}, // Clear selection when switching shelves
+      ),
+    );
   }
 
   Future<void> _onCreateShelf(
@@ -197,11 +200,13 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
     final displayedBooks = _getBooksForShelf(updatedConfig, selectedShelf.id);
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      selectedShelf: selectedShelf,
-      displayedBooks: displayedBooks,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        selectedShelf: selectedShelf,
+        displayedBooks: displayedBooks,
+      ),
+    );
   }
 
   Future<void> _onRenameShelf(
@@ -241,10 +246,12 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         ? updatedShelves.firstWhere((s) => s.id == event.shelfId)
         : currentState.selectedShelf;
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      selectedShelf: selectedShelf,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        selectedShelf: selectedShelf,
+      ),
+    );
   }
 
   Future<void> _onAddBookToShelf(
@@ -267,12 +274,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
     await _saveLibrary(updatedConfig);
 
-    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+    final displayedBooks = _getBooksForShelf(
+      updatedConfig,
+      currentState.selectedShelf.id,
+    );
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      displayedBooks: displayedBooks,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        displayedBooks: displayedBooks,
+      ),
+    );
   }
 
   Future<void> _onRemoveBookFromShelf(
@@ -295,12 +307,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
     await _saveLibrary(updatedConfig);
 
-    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+    final displayedBooks = _getBooksForShelf(
+      updatedConfig,
+      currentState.selectedShelf.id,
+    );
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      displayedBooks: displayedBooks,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        displayedBooks: displayedBooks,
+      ),
+    );
   }
 
   Future<void> _onSearchBooks(
@@ -312,13 +329,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final currentState = state as LibraryLoaded;
 
     if (event.query.isEmpty) {
-      emit(currentState.copyWith(
-        clearSearch: true,
-        displayedBooks: _getBooksForShelf(
-          currentState.config,
-          currentState.selectedShelf.id,
+      emit(
+        currentState.copyWith(
+          clearSearch: true,
+          displayedBooks: _getBooksForShelf(
+            currentState.config,
+            currentState.selectedShelf.id,
+          ),
         ),
-      ));
+      );
       return;
     }
 
@@ -336,10 +355,12 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           book.fileName.toLowerCase().contains(query);
     }).toList();
 
-    emit(currentState.copyWith(
-      searchQuery: event.query,
-      displayedBooks: filteredBooks,
-    ));
+    emit(
+      currentState.copyWith(
+        searchQuery: event.query,
+        displayedBooks: filteredBooks,
+      ),
+    );
   }
 
   Future<void> _onClearSearch(
@@ -350,19 +371,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
     final currentState = state as LibraryLoaded;
 
-    emit(currentState.copyWith(
-      clearSearch: true,
-      displayedBooks: _getBooksForShelf(
-        currentState.config,
-        currentState.selectedShelf.id,
+    emit(
+      currentState.copyWith(
+        clearSearch: true,
+        displayedBooks: _getBooksForShelf(
+          currentState.config,
+          currentState.selectedShelf.id,
+        ),
       ),
-    ));
+    );
   }
 
-  Future<void> _onOpenBook(
-    OpenBook event,
-    Emitter<LibraryState> emit,
-  ) async {
+  Future<void> _onOpenBook(OpenBook event, Emitter<LibraryState> emit) async {
     try {
       await _openBook(event.book);
 
@@ -377,12 +397,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         final updatedConfig = currentState.config.copyWith(books: updatedBooks);
         await _saveLibrary(updatedConfig);
 
-        final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+        final displayedBooks = _getBooksForShelf(
+          updatedConfig,
+          currentState.selectedShelf.id,
+        );
 
-        emit(currentState.copyWith(
-          config: updatedConfig,
-          displayedBooks: displayedBooks,
-        ));
+        emit(
+          currentState.copyWith(
+            config: updatedConfig,
+            displayedBooks: displayedBooks,
+          ),
+        );
       }
     } catch (e) {
       // Don't emit error for book opening failures
@@ -428,10 +453,12 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         currentState.selectedShelf.id,
       );
 
-      emit(currentState.copyWith(
-        config: updatedConfig,
-        displayedBooks: displayedBooks,
-      ));
+      emit(
+        currentState.copyWith(
+          config: updatedConfig,
+          displayedBooks: displayedBooks,
+        ),
+      );
     } catch (e) {
       print('Error scanning for new books: $e');
     }
@@ -452,19 +479,26 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         }
       }
       // Return books that are not in any user shelf
-      return config.books.where((book) => !booksInShelves.contains(book.id)).toList();
+      return config.books
+          .where((book) => !booksInShelves.contains(book.id))
+          .toList();
     }
 
     final shelf = config.getShelf(shelfId);
     if (shelf == null) return [];
 
-    return config.books.where((book) => shelf.bookIds.contains(book.id)).toList();
+    return config.books
+        .where((book) => shelf.bookIds.contains(book.id))
+        .toList();
   }
 
   /// Generate unique shelf ID
   String _generateShelfId(String name) {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    return md5.convert(utf8.encode('$name$timestamp')).toString().substring(0, 8);
+    return md5
+        .convert(utf8.encode('$name$timestamp'))
+        .toString()
+        .substring(0, 8);
   }
 
   Future<void> _onToggleBookSelection(
@@ -492,7 +526,9 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     if (state is! LibraryLoaded) return;
 
     final currentState = state as LibraryLoaded;
-    final allBookIds = currentState.displayedBooks.map((book) => book.id).toSet();
+    final allBookIds = currentState.displayedBooks
+        .map((book) => book.id)
+        .toSet();
 
     emit(currentState.copyWith(selectedBookIds: allBookIds));
   }
@@ -523,7 +559,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     // Add books to target shelf (copy from All, move from custom)
     final updatedTargetShelf = event.bookIds.fold<Shelf>(
       targetShelf,
-      (shelf, bookId) => shelf.bookIds.contains(bookId) ? shelf : shelf.addBook(bookId),
+      (shelf, bookId) =>
+          shelf.bookIds.contains(bookId) ? shelf : shelf.addBook(bookId),
     );
 
     var updatedShelves = currentState.config.shelves
@@ -546,13 +583,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final updatedConfig = currentState.config.copyWith(shelves: updatedShelves);
     await _saveLibrary(updatedConfig);
 
-    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+    final displayedBooks = _getBooksForShelf(
+      updatedConfig,
+      currentState.selectedShelf.id,
+    );
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      displayedBooks: displayedBooks,
-      clearSelection: true,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        displayedBooks: displayedBooks,
+        clearSelection: true,
+      ),
+    );
   }
 
   Future<void> _onDeleteSelectedBooks(
@@ -579,13 +621,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final updatedConfig = currentState.config.copyWith(shelves: updatedShelves);
     await _saveLibrary(updatedConfig);
 
-    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+    final displayedBooks = _getBooksForShelf(
+      updatedConfig,
+      currentState.selectedShelf.id,
+    );
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      displayedBooks: displayedBooks,
-      clearSelection: true,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        displayedBooks: displayedBooks,
+        clearSelection: true,
+      ),
+    );
   }
 
   Future<void> _onUpdateBookAlias(
@@ -609,12 +656,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final updatedConfig = currentState.config.copyWith(books: updatedBooks);
     await _saveLibrary(updatedConfig);
 
-    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+    final displayedBooks = _getBooksForShelf(
+      updatedConfig,
+      currentState.selectedShelf.id,
+    );
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      displayedBooks: displayedBooks,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        displayedBooks: displayedBooks,
+      ),
+    );
   }
 
   Future<void> _onDeleteBookFromShelf(
@@ -639,12 +691,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final updatedConfig = currentState.config.copyWith(shelves: updatedShelves);
     await _saveLibrary(updatedConfig);
 
-    final displayedBooks = _getBooksForShelf(updatedConfig, currentState.selectedShelf.id);
+    final displayedBooks = _getBooksForShelf(
+      updatedConfig,
+      currentState.selectedShelf.id,
+    );
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-      displayedBooks: displayedBooks,
-    ));
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        displayedBooks: displayedBooks,
+      ),
+    );
   }
 
   Future<void> _onReorderShelves(
@@ -676,8 +733,6 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final updatedConfig = currentState.config.copyWith(shelves: shelves);
     await _saveLibrary(updatedConfig);
 
-    emit(currentState.copyWith(
-      config: updatedConfig,
-    ));
+    emit(currentState.copyWith(config: updatedConfig));
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:tabularium/features/welcome/domain/entities/directory_path.dart';
+import 'package:tabularium/features/welcome/domain/repositories/directory_repository.dart';
 import 'package:tabularium/features/welcome/domain/usecases/get_recent_directories.dart';
 import 'package:tabularium/features/welcome/domain/usecases/select_directory.dart';
 import 'package:tabularium/features/welcome/presentation/bloc/welcome_bloc.dart';
@@ -11,18 +12,21 @@ import 'package:tabularium/features/welcome/presentation/bloc/welcome_state.dart
 
 import 'welcome_bloc_test.mocks.dart';
 
-@GenerateMocks([GetRecentDirectories, SelectDirectory])
+@GenerateMocks([GetRecentDirectories, SelectDirectory, DirectoryRepository])
 void main() {
   late WelcomeBloc bloc;
   late MockGetRecentDirectories mockGetRecentDirectories;
   late MockSelectDirectory mockSelectDirectory;
+  late MockDirectoryRepository mockRepository;
 
   setUp(() {
     mockGetRecentDirectories = MockGetRecentDirectories();
     mockSelectDirectory = MockSelectDirectory();
+    mockRepository = MockDirectoryRepository();
     bloc = WelcomeBloc(
       getRecentDirectories: mockGetRecentDirectories,
       selectDirectory: mockSelectDirectory,
+      repository: mockRepository,
     );
   });
 
@@ -44,8 +48,9 @@ void main() {
             lastAccessed: DateTime(2025, 1, 1),
           ),
         ];
-        when(mockGetRecentDirectories.call())
-            .thenAnswer((_) async => directories);
+        when(
+          mockGetRecentDirectories.call(),
+        ).thenAnswer((_) async => directories);
         return bloc;
       },
       act: (bloc) => bloc.add(const LoadRecentDirectories()),
@@ -66,8 +71,9 @@ void main() {
     blocTest<WelcomeBloc, WelcomeState>(
       'emits [WelcomeLoading, WelcomeError] when LoadRecentDirectories fails',
       build: () {
-        when(mockGetRecentDirectories.call())
-            .thenThrow(Exception('Failed to load'));
+        when(
+          mockGetRecentDirectories.call(),
+        ).thenThrow(Exception('Failed to load'));
         return bloc;
       },
       act: (bloc) => bloc.add(const LoadRecentDirectories()),
@@ -80,8 +86,9 @@ void main() {
     blocTest<WelcomeBloc, WelcomeState>(
       'emits [DirectoryPicking, DirectorySelected] when PickDirectory is added and user selects a directory',
       build: () {
-        when(mockSelectDirectory.call())
-            .thenAnswer((_) async => '/home/user/books');
+        when(
+          mockSelectDirectory.call(),
+        ).thenAnswer((_) async => '/home/user/books');
         return bloc;
       },
       act: (bloc) => bloc.add(const PickDirectory()),
@@ -102,10 +109,7 @@ void main() {
         return bloc;
       },
       act: (bloc) => bloc.add(const PickDirectory()),
-      expect: () => [
-        const DirectoryPicking(),
-        const WelcomeLoaded([]),
-      ],
+      expect: () => [const DirectoryPicking(), const WelcomeLoaded([])],
       verify: (_) {
         verify(mockSelectDirectory.call()).called(1);
         verify(mockGetRecentDirectories.call()).called(1);
@@ -115,11 +119,8 @@ void main() {
     blocTest<WelcomeBloc, WelcomeState>(
       'emits [DirectorySelected] when SelectRecentDirectory is added',
       build: () => bloc,
-      act: (bloc) =>
-          bloc.add(const SelectRecentDirectory('/home/user/books')),
-      expect: () => [
-        const DirectorySelected('/home/user/books'),
-      ],
+      act: (bloc) => bloc.add(const SelectRecentDirectory('/home/user/books')),
+      expect: () => [const DirectorySelected('/home/user/books')],
     );
   });
 }

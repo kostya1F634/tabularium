@@ -14,10 +14,10 @@ class WelcomeBloc extends Bloc<WelcomeEvent, WelcomeState> {
     required GetRecentDirectories getRecentDirectories,
     required SelectDirectory selectDirectory,
     required DirectoryRepository repository,
-  })  : _getRecentDirectories = getRecentDirectories,
-        _selectDirectory = selectDirectory,
-        _repository = repository,
-        super(const WelcomeInitial()) {
+  }) : _getRecentDirectories = getRecentDirectories,
+       _selectDirectory = selectDirectory,
+       _repository = repository,
+       super(const WelcomeInitial()) {
     on<LoadRecentDirectories>(_onLoadRecentDirectories);
     on<PickDirectory>(_onPickDirectory);
     on<SelectRecentDirectory>(_onSelectRecentDirectory);

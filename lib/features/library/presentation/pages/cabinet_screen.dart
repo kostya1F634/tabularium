@@ -44,10 +44,7 @@ class CabinetScreen extends StatelessWidget {
                     .where((book) => shelf.bookIds.contains(book.id))
                     .toList();
 
-                return _ShelfView(
-                  shelf: shelf,
-                  books: shelfBooks,
-                );
+                return _ShelfView(shelf: shelf, books: shelfBooks);
               },
             );
           }
@@ -63,10 +60,7 @@ class _ShelfView extends StatelessWidget {
   final Shelf shelf;
   final List<Book> books;
 
-  const _ShelfView({
-    required this.shelf,
-    required this.books,
-  });
+  const _ShelfView({required this.shelf, required this.books});
 
   @override
   Widget build(BuildContext context) {
@@ -85,8 +79,8 @@ class _ShelfView extends StatelessWidget {
                   child: Text(
                     AppLocalizations.of(context)!.noBooks,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 )
               : ListView.builder(
@@ -104,7 +98,9 @@ class _ShelfView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(8),
+            ),
             border: Border(
               top: BorderSide(
                 color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
@@ -122,16 +118,16 @@ class _ShelfView extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 shelf.name,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               Text(
                 '${books.length}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -232,7 +228,9 @@ class _BookSpine extends StatelessWidget {
         child: Icon(
           Icons.menu_book,
           size: 48,
-          color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.3),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurfaceVariant.withOpacity(0.3),
         ),
       ),
     );

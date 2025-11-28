@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/app_settings.dart';
 import '../../domain/entities/directory_path.dart';
 import '../../domain/repositories/directory_repository.dart';
 import '../datasources/file_picker_datasource.dart';
@@ -6,18 +6,19 @@ import '../datasources/file_picker_datasource.dart';
 /// Implementation of repository for working with directories
 class DirectoryRepositoryImpl implements DirectoryRepository {
   static const String _recentDirsKey = 'recent_directories';
-  static const String _recentDirsTimestampsKey = 'recent_directories_timestamps';
+  static const String _recentDirsTimestampsKey =
+      'recent_directories_timestamps';
   static const String _lastOpenedDirKey = 'last_opened_directory';
   static const int _maxRecentDirs = 10;
 
-  final SharedPreferences _prefs;
+  final AppSettings _prefs;
   final FilePickerDataSource _filePicker;
 
   DirectoryRepositoryImpl({
-    required SharedPreferences prefs,
+    required AppSettings prefs,
     required FilePickerDataSource filePicker,
-  })  : _prefs = prefs,
-        _filePicker = filePicker;
+  }) : _prefs = prefs,
+       _filePicker = filePicker;
 
   @override
   Future<List<DirectoryPath>> getRecentDirectories() async {
@@ -36,10 +37,7 @@ class DirectoryRepositoryImpl implements DirectoryRepository {
       final timestamp = i < timestamps.length
           ? DateTime.tryParse(timestamps[i]) ?? now
           : now;
-      result.add(DirectoryPath(
-        path: paths[i],
-        lastAccessed: timestamp,
-      ));
+      result.add(DirectoryPath(path: paths[i], lastAccessed: timestamp));
     }
 
     return result;
@@ -48,7 +46,8 @@ class DirectoryRepositoryImpl implements DirectoryRepository {
   @override
   Future<void> addRecentDirectory(String path) async {
     List<String> recentDirs = _prefs.getStringList(_recentDirsKey) ?? [];
-    List<String> timestamps = _prefs.getStringList(_recentDirsTimestampsKey) ?? [];
+    List<String> timestamps =
+        _prefs.getStringList(_recentDirsTimestampsKey) ?? [];
 
     // Remove duplicates if path already exists
     final existingIndex = recentDirs.indexOf(path);

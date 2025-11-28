@@ -106,10 +106,14 @@ class LibraryConfig extends Equatable {
         .toList();
 
     // Ensure "Unsorted" shelf exists (for backwards compatibility)
-    final hasUnsortedShelf = shelves.any((shelf) => shelf.id == Shelf.unsortedShelfId);
+    final hasUnsortedShelf = shelves.any(
+      (shelf) => shelf.id == Shelf.unsortedShelfId,
+    );
     if (!hasUnsortedShelf) {
       // Insert Unsorted shelf after All shelf (at index 1)
-      final allShelfIndex = shelves.indexWhere((shelf) => shelf.id == Shelf.allShelfId);
+      final allShelfIndex = shelves.indexWhere(
+        (shelf) => shelf.id == Shelf.allShelfId,
+      );
       if (allShelfIndex >= 0) {
         shelves.insert(allShelfIndex + 1, Shelf.createUnsorted());
       } else {
@@ -133,12 +137,12 @@ class LibraryConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        directoryPath,
-        books,
-        shelves,
-        theme,
-        language,
-        lastScanDate,
-        lastSelectedShelfId,
-      ];
+    directoryPath,
+    books,
+    shelves,
+    theme,
+    language,
+    lastScanDate,
+    lastSelectedShelfId,
+  ];
 }
