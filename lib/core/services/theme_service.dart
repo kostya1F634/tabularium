@@ -26,18 +26,108 @@ class ThemeService extends ChangeNotifier {
 
   String getThemeName(AppThemeMode theme) {
     switch (theme) {
+      // Default
       case AppThemeMode.light:
         return 'Light';
       case AppThemeMode.dark:
         return 'Dark';
-      case AppThemeMode.githubLight:
-        return 'GitHub Light';
+
+      // Atom One
+      case AppThemeMode.atomOneDark:
+        return 'Atom One Dark';
+      case AppThemeMode.atomOneLight:
+        return 'Atom One Light';
+
+      // Ayu
+      case AppThemeMode.ayuDark:
+        return 'Ayu Dark';
+      case AppThemeMode.ayuLight:
+        return 'Ayu Light';
+
+      // Catppuccin
+      case AppThemeMode.catppuccinLatte:
+        return 'Catppuccin Latte';
+      case AppThemeMode.catppuccinMocha:
+        return 'Catppuccin Mocha';
+
+      // Dracula
+      case AppThemeMode.dracula:
+        return 'Dracula';
+
+      // Everforest
+      case AppThemeMode.everforestDark:
+        return 'Everforest Dark';
+      case AppThemeMode.everforestLight:
+        return 'Everforest Light';
+
+      // GitHub
       case AppThemeMode.githubDark:
         return 'GitHub Dark';
+      case AppThemeMode.githubDimmed:
+        return 'GitHub Dimmed';
+      case AppThemeMode.githubLight:
+        return 'GitHub Light';
+
+      // Gruber
+      case AppThemeMode.gruber:
+        return 'Gruber Darker';
+
+      // Gruvbox
+      case AppThemeMode.gruvboxDark:
+        return 'Gruvbox Dark';
+      case AppThemeMode.gruvboxLight:
+        return 'Gruvbox Light';
+
+      // Material
+      case AppThemeMode.materialDark:
+        return 'Material Dark';
+      case AppThemeMode.materialLight:
+        return 'Material Light';
+
+      // Monokai
+      case AppThemeMode.monokai:
+        return 'Monokai';
+
+      // Nord
+      case AppThemeMode.nordDark:
+        return 'Nord Dark';
+      case AppThemeMode.nordLight:
+        return 'Nord Light';
+
+      // Paper
+      case AppThemeMode.paper:
+        return 'Paper';
+
+      // Realistic
+      case AppThemeMode.realistic:
+        return 'Realistic';
+
+      // Rosé Pine
+      case AppThemeMode.rosePineDawn:
+        return 'Rosé Pine Dawn';
+      case AppThemeMode.rosePineMoon:
+        return 'Rosé Pine Moon';
+
+      // Solarized
+      case AppThemeMode.solarizedDark:
+        return 'Solarized Dark';
+      case AppThemeMode.solarizedLight:
+        return 'Solarized Light';
+
+      // Tokyo Night
       case AppThemeMode.tokyoNight:
         return 'Tokyo Night';
+
+      // Special
       case AppThemeMode.highContrast:
         return 'High Contrast';
     }
+  }
+
+  /// Get themes grouped by family and sorted
+  /// Returns a list of all themes in their enum order (already grouped)
+  List<AppThemeMode> getGroupedThemes() {
+    // The enum is already properly ordered by groups
+    return AppThemeMode.values;
   }
 }

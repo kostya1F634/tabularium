@@ -8,7 +8,7 @@ import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
 
 /// Sidebar showing list of shelves
-class ShelfsSidebar extends StatelessWidget {
+class ShelfsSidebar extends StatefulWidget {
   final List<Shelf> shelves;
   final String selectedShelfId;
   final int totalBooksCount;
@@ -25,8 +25,83 @@ class ShelfsSidebar extends StatelessWidget {
   });
 
   @override
+  State<ShelfsSidebar> createState() => _ShelfsSidebarState();
+}
+
+class _ShelfsSidebarState extends State<ShelfsSidebar> {
+  final TextEditingController _shelfSearchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  String _shelfSearchQuery = '';
+  bool _hasScrolledToSelected = false;
+
+  @override
+  void dispose() {
+    _shelfSearchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(ShelfsSidebar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Scroll to selected shelf when it changes (only for user shelves)
+    if (oldWidget.selectedShelfId != widget.selectedShelfId &&
+        !_hasScrolledToSelected) {
+      _hasScrolledToSelected = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToSelectedShelf();
+      });
+    }
+  }
+
+  void _scrollToSelectedShelf() {
+    if (!_scrollController.hasClients) return;
+
+    final selectedShelf = widget.shelves.firstWhere(
+      (s) => s.id == widget.selectedShelfId,
+      orElse: () => widget.shelves.first,
+    );
+
+    // Only scroll if it's a user shelf (not All Books or Unsorted)
+    if (selectedShelf.isDefault) return;
+
+    final userShelves = widget.shelves.where((s) => !s.isDefault).toList();
+    final index = userShelves.indexOf(selectedShelf);
+
+    if (index >= 0) {
+      // Each item is approximately 56 pixels high (ListTile default height)
+      const itemHeight = 56.0;
+      final offset = index * itemHeight;
+
+      // Scroll to show the selected shelf near the top
+      _scrollController.animateTo(
+        offset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    // Separate fixed shelves from user shelves
+    final allShelf = widget.shelves.firstWhere((s) => s.id == Shelf.allShelfId);
+    final unsortedShelf = widget.shelves.firstWhere(
+      (s) => s.id == Shelf.unsortedShelfId,
+    );
+    final userShelves = widget.shelves.where((s) => !s.isDefault).toList();
+
+    // Filter user shelves by search query
+    final filteredUserShelves = _shelfSearchQuery.isEmpty
+        ? userShelves
+        : userShelves.where((shelf) {
+            return shelf.name.toLowerCase().contains(
+              _shelfSearchQuery.toLowerCase(),
+            );
+          }).toList();
 
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -56,72 +131,95 @@ class ShelfsSidebar extends StatelessWidget {
           ),
           Container(
             height: 3,
-            color: isFocused
+            color: widget.isFocused
                 ? Theme.of(context).colorScheme.primary
                 : Theme.of(context).dividerColor,
           ),
-          // Shelves list
-          Expanded(
-            child: ReorderableListView.builder(
-              buildDefaultDragHandles: false,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: shelves.length,
-              onReorder: (oldIndex, newIndex) {
-                // Don't allow reordering "All" shelf (index 0) or "Unsorted" shelf (index 1)
-                if (oldIndex <= 1 || newIndex <= 1) return;
-
-                context.read<LibraryBloc>().add(
-                  ReorderShelves(
-                    oldIndex: oldIndex,
-                    newIndex: newIndex,
-                    fromDrag: true,
-                  ),
-                );
-              },
-              itemBuilder: (context, index) {
-                final shelf = shelves[index];
-                final isSelected = shelf.id == selectedShelfId;
-                final isAllShelf = shelf.id == Shelf.allShelfId;
-                final isUnsortedShelf = shelf.id == Shelf.unsortedShelfId;
-                final isDefaultShelf = shelf.isDefault;
-
-                // Calculate book count
-                int bookCount;
-                if (isAllShelf) {
-                  bookCount = totalBooksCount;
-                } else if (isUnsortedShelf) {
-                  // Count books that are not in any user shelf
-                  final Set<String> booksInShelves = {};
-                  for (final s in shelves) {
-                    if (!s.isDefault) {
-                      booksInShelves.addAll(s.bookIds);
-                    }
-                  }
-                  bookCount = allBooks
-                      .where((book) => !booksInShelves.contains(book.id))
-                      .length;
-                } else {
-                  bookCount = shelf.bookIds.length;
-                }
-
-                return _ShelfItem(
-                  key: ValueKey(shelf.id),
-                  index: index,
-                  shelf: shelf,
-                  isSelected: isSelected,
-                  isDefaultShelf: isDefaultShelf,
-                  bookCount: bookCount,
-                  onTap: () {
-                    context.read<LibraryBloc>().add(SelectShelf(shelf.id));
-                  },
-                  onDelete: isDefaultShelf
-                      ? null
-                      : () {
-                          _showDeleteDialog(context, shelf);
+          // Fixed shelves (All Books, Unsorted)
+          _buildShelfItem(context, allShelf, 0, isFixed: true),
+          _buildShelfItem(context, unsortedShelf, 1, isFixed: true),
+          // Search field for shelves
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: TextField(
+              controller: _shelfSearchController,
+              decoration: InputDecoration(
+                hintText: l10n.searchShelves,
+                prefixIcon: const Icon(Icons.search, size: 18),
+                suffixIcon: _shelfSearchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 18),
+                        onPressed: () {
+                          setState(() {
+                            _shelfSearchController.clear();
+                            _shelfSearchQuery = '';
+                          });
                         },
-                );
+                      )
+                    : null,
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 8,
+                ),
+                isDense: true,
+              ),
+              onChanged: (query) {
+                setState(() {
+                  _shelfSearchQuery = query;
+                });
               },
             ),
+          ),
+          // Scrollable user shelves
+          Expanded(
+            child: filteredUserShelves.isEmpty
+                ? Center(
+                    child: Text(
+                      _shelfSearchQuery.isEmpty
+                          ? l10n.noBooks
+                          : 'No matching shelves',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  )
+                : ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(
+                      context,
+                    ).copyWith(scrollbars: true),
+                    child: ReorderableListView.builder(
+                      buildDefaultDragHandles: false,
+                      padding: const EdgeInsets.only(bottom: 8),
+                      itemCount: filteredUserShelves.length,
+                      onReorder: (oldIndex, newIndex) {
+                        final actualOldIndex =
+                            userShelves.indexOf(filteredUserShelves[oldIndex]) +
+                            2;
+                        final actualNewIndex =
+                            userShelves.indexOf(filteredUserShelves[newIndex]) +
+                            2;
+
+                        context.read<LibraryBloc>().add(
+                          ReorderShelves(
+                            oldIndex: actualOldIndex,
+                            newIndex: actualNewIndex,
+                            fromDrag: true,
+                          ),
+                        );
+                      },
+                      itemBuilder: (context, index) {
+                        final shelf = filteredUserShelves[index];
+                        final actualIndex = widget.shelves.indexOf(shelf);
+                        return _buildShelfItem(
+                          context,
+                          shelf,
+                          actualIndex,
+                          isFixed: false,
+                        );
+                      },
+                    ),
+                  ),
           ),
           const Divider(height: 1),
           // Create shelf button
@@ -138,6 +236,54 @@ class ShelfsSidebar extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildShelfItem(
+    BuildContext context,
+    Shelf shelf,
+    int index, {
+    required bool isFixed,
+  }) {
+    final isSelected = shelf.id == widget.selectedShelfId;
+    final isAllShelf = shelf.id == Shelf.allShelfId;
+    final isUnsortedShelf = shelf.id == Shelf.unsortedShelfId;
+
+    // Calculate book count
+    int bookCount;
+    if (isAllShelf) {
+      bookCount = widget.totalBooksCount;
+    } else if (isUnsortedShelf) {
+      // Count books that are not in any user shelf
+      final Set<String> booksInShelves = {};
+      for (final s in widget.shelves) {
+        if (!s.isDefault) {
+          booksInShelves.addAll(s.bookIds);
+        }
+      }
+      bookCount = widget.allBooks
+          .where((book) => !booksInShelves.contains(book.id))
+          .length;
+    } else {
+      bookCount = shelf.bookIds.length;
+    }
+
+    return _ShelfItem(
+      key: ValueKey(shelf.id),
+      index: index,
+      shelf: shelf,
+      isSelected: isSelected,
+      isDefaultShelf: shelf.isDefault,
+      isFixed: isFixed,
+      bookCount: bookCount,
+      onTap: () {
+        context.read<LibraryBloc>().add(SelectShelf(shelf.id));
+      },
+      onDelete: shelf.isDefault
+          ? null
+          : () {
+              _showDeleteDialog(context, shelf);
+            },
     );
   }
 
@@ -217,6 +363,7 @@ class _ShelfItem extends StatelessWidget {
   final Shelf shelf;
   final bool isSelected;
   final bool isDefaultShelf;
+  final bool isFixed;
   final int bookCount;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
@@ -227,6 +374,7 @@ class _ShelfItem extends StatelessWidget {
     required this.shelf,
     required this.isSelected,
     required this.isDefaultShelf,
+    required this.isFixed,
     required this.bookCount,
     required this.onTap,
     this.onDelete,

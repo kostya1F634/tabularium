@@ -10,6 +10,7 @@ import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
 import '../bloc/library_state.dart';
 import 'book_properties_dialog.dart';
+import 'add_to_shelf_dialog.dart';
 
 /// Grid view displaying books with covers and titles
 class BooksGrid extends StatelessWidget {
@@ -279,12 +280,39 @@ class _BookCard extends StatelessWidget {
             ),
           ),
         PopupMenuItem<String>(
+          value: 'add',
+          child: Row(
+            children: [
+              const Icon(Icons.add_circle_outline, size: 18),
+              const SizedBox(width: 8),
+              Text(l10n.add),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
           value: 'properties',
           child: Row(
             children: [
               const Icon(Icons.info_outline, size: 18),
               const SizedBox(width: 8),
               Text(l10n.properties),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(
+                Icons.delete,
+                size: 18,
+                color: Theme.of(context).colorScheme.error,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                l10n.deleteBook,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ],
           ),
         ),
@@ -303,6 +331,54 @@ class _BookCard extends StatelessWidget {
               shelfId: state.selectedShelf.id,
             ),
           );
+          break;
+        case 'add':
+          // Determine which books to add: if selection exists, add selected books; otherwise, add clicked book
+          final booksToAdd = state.hasSelection
+              ? state.selectedBookIds
+              : [book.id];
+
+          // Show shelf selection dialog
+          final selectedShelfId = await showDialog<String>(
+            context: context,
+            builder: (context) =>
+                AddToShelfDialog(shelves: state.config.shelves),
+          );
+
+          if (selectedShelfId != null && context.mounted) {
+            // Add books to selected shelf
+            for (final bookId in booksToAdd) {
+              bloc.add(
+                AddBookToShelf(bookId: bookId, shelfId: selectedShelfId),
+              );
+            }
+          }
+          break;
+        case 'delete':
+          // Show confirmation dialog
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.confirmDeleteBook),
+              content: Text(l10n.confirmDeleteBookMessage),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(l10n.cancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  child: Text(l10n.delete),
+                ),
+              ],
+            ),
+          );
+          if (confirmed == true && context.mounted) {
+            bloc.add(DeleteBookPermanently(book.id));
+          }
           break;
         case 'properties':
           showDialog(

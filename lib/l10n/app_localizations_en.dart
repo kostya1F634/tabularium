@@ -21,6 +21,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentDirectories => 'Recent Directories';
 
   @override
+  String get favorites => 'Favorites';
+
+  @override
+  String get clearRecent => 'Clear Recent';
+
+  @override
+  String get clearFavorites => 'Clear Favorites';
+
+  @override
+  String get addToFavorites => 'Add to Favorites';
+
+  @override
+  String get removeFromFavorites => 'Remove from Favorites';
+
+  @override
+  String get directoryNotFound => 'Directory not found';
+
+  @override
+  String directoryNotFoundMessage(String path) {
+    return 'The directory \"$path\" no longer exists or is not accessible. It has been removed from your recent directories.';
+  }
+
+  @override
   String get mainScreen => 'Main Screen';
 
   @override
@@ -78,6 +101,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchBooks => 'Search books...';
+
+  @override
+  String get searchShelves => 'Search shelves...';
 
   @override
   String get noBooks => 'No books found';
@@ -177,4 +203,84 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keyboardShortcuts => 'Keyboard Shortcuts';
+
+  @override
+  String get deleteBook => 'Delete';
+
+  @override
+  String get deleteSelected => 'Delete Selected';
+
+  @override
+  String get deleteAll => 'Delete All';
+
+  @override
+  String get confirmDeleteBook => 'Delete Book?';
+
+  @override
+  String get confirmDeleteBookMessage =>
+      'This will permanently delete the book file from disk. This action cannot be undone.';
+
+  @override
+  String get confirmDeleteSelected => 'Delete Selected Books?';
+
+  @override
+  String confirmDeleteSelectedMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'book files',
+      one: 'book file',
+    );
+    return 'This will permanently delete $count $_temp0 from disk. This action cannot be undone.';
+  }
+
+  @override
+  String get confirmDeleteAll => 'Delete All Books?';
+
+  @override
+  String confirmDeleteAllMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'book files',
+      one: 'book file',
+    );
+    return 'This will permanently delete all $count $_temp0 from this shelf from disk. This action cannot be undone.';
+  }
+
+  @override
+  String get aboutTabularium => 'About Tabularium';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get toggleViewMode => 'Toggle View Mode';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get help => 'Help';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get resetSettings => 'Reset Settings';
+
+  @override
+  String get fontSize => 'Font Size';
+
+  @override
+  String get bookScaleGrid => 'Book Scale (Grid)';
+
+  @override
+  String get bookScaleCabinet => 'Book Scale (Cabinet)';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get selectShelf => 'Select Shelf';
 }

@@ -46,19 +46,21 @@ class AppMenuBar extends StatelessWidget {
     final packageInfo = await PackageInfo.fromPlatform();
     if (!context.mounted) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('About Tabularium'),
+        title: Text(l10n.aboutTabularium),
         content: Text(
-          'Tabularium - Your Personal Library\n\n'
+          'Tabularium - ${l10n.appSubtitle}\n\n'
           'Version: ${packageInfo.version}\n\n'
           'A modern PDF library manager built with Flutter.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+            child: Text(l10n.ok),
           ),
         ],
       ),
@@ -67,6 +69,7 @@ class AppMenuBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final themeService = ThemeProvider.of(context);
     final languageService = LanguageProvider.of(context);
     final uiSettings = UISettingsProvider.of(context);
@@ -75,9 +78,9 @@ class AppMenuBar extends StatelessWidget {
     // Calculate submenu offset based on font size to prevent overlap
     final double submenuOffset;
     if (uiSettings.fontSize >= 1.5) {
-      submenuOffset = 235.0; // Extra Large
+      submenuOffset = 285.0; // Extra Large
     } else {
-      submenuOffset = 180.0; // Large, Normal and below
+      submenuOffset = 230.0; // Large, Normal and below
     }
 
     return Row(
@@ -91,7 +94,7 @@ class AppMenuBar extends StatelessWidget {
               final canToggle = _canToggleView(context);
               return IconButton(
                 icon: const Icon(Icons.view_module, size: 16),
-                tooltip: 'Toggle View Mode',
+                tooltip: l10n.toggleViewMode,
                 onPressed: canToggle ? () => _toggleView(context) : null,
               );
             },
@@ -99,29 +102,45 @@ class AppMenuBar extends StatelessWidget {
         // Theme button
         PopupMenuButton<AppThemeMode>(
           icon: const Icon(Icons.palette, size: 16),
-          tooltip: 'Theme',
+          tooltip: l10n.theme,
           offset: const Offset(0, 30),
           onSelected: (theme) => themeService.setTheme(theme),
-          itemBuilder: (context) => AppThemeMode.values.map((theme) {
-            return PopupMenuItem(
-              value: theme,
-              child: Row(
-                children: [
-                  if (themeService.currentTheme == theme)
-                    const Icon(Icons.check, size: 16)
-                  else
-                    const SizedBox(width: 16),
-                  const SizedBox(width: 8),
-                  Text(themeService.getThemeName(theme)),
-                ],
-              ),
-            );
-          }).toList(),
+          itemBuilder: (context) {
+            final items = <PopupMenuEntry<AppThemeMode>>[];
+            final themes = themeService.getGroupedThemes();
+
+            for (int i = 0; i < themes.length; i++) {
+              final theme = themes[i];
+
+              // Add divider between theme families
+              if (i > 0 && _shouldAddDivider(themes[i - 1], theme)) {
+                items.add(const PopupMenuDivider());
+              }
+
+              items.add(
+                PopupMenuItem(
+                  value: theme,
+                  child: Row(
+                    children: [
+                      if (themeService.currentTheme == theme)
+                        const Icon(Icons.check, size: 16)
+                      else
+                        const SizedBox(width: 16),
+                      const SizedBox(width: 8),
+                      Text(themeService.getThemeName(theme)),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            return items;
+          },
         ),
         // Settings button
         PopupMenuButton<String>(
           icon: const Icon(Icons.settings, size: 16),
-          tooltip: 'Settings',
+          tooltip: l10n.settings,
           offset: const Offset(0, 30),
           itemBuilder: (context) => [
             // Language submenu
@@ -167,12 +186,12 @@ class AppMenuBar extends StatelessWidget {
                     vertical: 12,
                   ),
                   child: Row(
-                    children: const [
-                      Icon(Icons.language, size: 16),
-                      SizedBox(width: 8),
-                      Text('Language'),
-                      Spacer(),
-                      Icon(Icons.arrow_right, size: 16),
+                    children: [
+                      const Icon(Icons.language, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.language),
+                      const Spacer(),
+                      const Icon(Icons.arrow_right, size: 16),
                     ],
                   ),
                 ),
@@ -208,12 +227,12 @@ class AppMenuBar extends StatelessWidget {
                     vertical: 12,
                   ),
                   child: Row(
-                    children: const [
-                      Icon(Icons.text_fields, size: 16),
-                      SizedBox(width: 8),
-                      Text('Font Size'),
-                      Spacer(),
-                      Icon(Icons.arrow_right, size: 16),
+                    children: [
+                      const Icon(Icons.text_fields, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.fontSize),
+                      const Spacer(),
+                      const Icon(Icons.arrow_right, size: 16),
                     ],
                   ),
                 ),
@@ -250,10 +269,52 @@ class AppMenuBar extends StatelessWidget {
                     vertical: 12,
                   ),
                   child: Row(
+                    children: [
+                      const Icon(Icons.photo_size_select_large, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.bookScaleGrid),
+                      const Spacer(),
+                      const Icon(Icons.arrow_right, size: 16),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Book Scale (Cabinet) submenu
+            PopupMenuItem(
+              padding: EdgeInsets.zero,
+              child: PopupMenuButton<double>(
+                offset: Offset(submenuOffset, -90),
+                onSelected: (scale) {
+                  uiSettings.setBookScaleCabinet(scale);
+                  Navigator.pop(context); // Close parent menu
+                },
+                itemBuilder: (context) =>
+                    [0.7, 0.85, 1.0, 1.25, 1.5, 2.0].map((scale) {
+                      return PopupMenuItem(
+                        value: scale,
+                        child: Row(
+                          children: [
+                            if (uiSettings.bookScaleCabinet == scale)
+                              const Icon(Icons.check, size: 16)
+                            else
+                              const SizedBox(width: 16),
+                            const SizedBox(width: 8),
+                            Text(uiSettings.getBookScaleLabel(scale)),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
                     children: const [
-                      Icon(Icons.photo_size_select_large, size: 16),
+                      Icon(Icons.shelves, size: 16),
                       SizedBox(width: 8),
-                      Text('Book Scale'),
+                      Text('Book Scale (Cabinet)'),
                       Spacer(),
                       Icon(Icons.arrow_right, size: 16),
                     ],
@@ -272,6 +333,7 @@ class AppMenuBar extends StatelessWidget {
             if (value == 'reset') {
               uiSettings.setFontSize(1.0);
               uiSettings.setBookScale(1.0);
+              uiSettings.setBookScaleCabinet(1.0);
               themeService.setTheme(AppThemeMode.light);
               languageService.changeLanguage(const Locale('en'));
               windowSettings.resetWindowSettings();
@@ -329,5 +391,34 @@ class AppMenuBar extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  /// Determines if a divider should be added between two themes
+  /// Returns true if themes belong to different families
+  static bool _shouldAddDivider(AppThemeMode prev, AppThemeMode current) {
+    // Define theme family boundaries
+    // A divider is added when switching from one family to another
+    final familyStarts = [
+      AppThemeMode.light, // Default
+      AppThemeMode.atomOneDark, // Atom One
+      AppThemeMode.ayuDark, // Ayu
+      AppThemeMode.catppuccinLatte, // Catppuccin
+      AppThemeMode.dracula, // Dracula
+      AppThemeMode.everforestDark, // Everforest
+      AppThemeMode.githubDark, // GitHub
+      AppThemeMode.gruber, // Gruber
+      AppThemeMode.gruvboxDark, // Gruvbox
+      AppThemeMode.materialDark, // Material
+      AppThemeMode.monokai, // Monokai
+      AppThemeMode.nordDark, // Nord
+      AppThemeMode.paper, // Paper
+      AppThemeMode.realistic, // Realistic
+      AppThemeMode.rosePineDawn, // Rosé Pine
+      AppThemeMode.solarizedDark, // Solarized
+      AppThemeMode.tokyoNight, // Tokyo Night
+      AppThemeMode.highContrast, // Special
+    ];
+
+    return familyStarts.contains(current);
   }
 }

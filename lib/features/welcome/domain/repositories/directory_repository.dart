@@ -11,6 +11,21 @@ abstract class DirectoryRepository {
   /// Clear recent directories list
   Future<void> clearRecentDirectories();
 
+  /// Remove specific directory from recent list
+  Future<void> removeRecentDirectory(String path);
+
+  /// Get list of favorite directories
+  Future<List<DirectoryPath>> getFavoriteDirectories();
+
+  /// Add directory to favorites list
+  Future<void> addFavoriteDirectory(String path);
+
+  /// Remove directory from favorites list
+  Future<void> removeFavoriteDirectory(String path);
+
+  /// Clear favorite directories list
+  Future<void> clearFavoriteDirectories();
+
   /// Pick directory using system dialog
   Future<String?> pickDirectory();
 

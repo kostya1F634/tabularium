@@ -8,6 +8,9 @@ class DirectoryRepositoryImpl implements DirectoryRepository {
   static const String _recentDirsKey = 'recent_directories';
   static const String _recentDirsTimestampsKey =
       'recent_directories_timestamps';
+  static const String _favoriteDirsKey = 'favorite_directories';
+  static const String _favoriteDirsTimestampsKey =
+      'favorite_directories_timestamps';
   static const String _lastOpenedDirKey = 'last_opened_directory';
   static const int _maxRecentDirs = 10;
 
@@ -77,6 +80,90 @@ class DirectoryRepositoryImpl implements DirectoryRepository {
   Future<void> clearRecentDirectories() async {
     await _prefs.remove(_recentDirsKey);
     await _prefs.remove(_recentDirsTimestampsKey);
+  }
+
+  @override
+  Future<void> removeRecentDirectory(String path) async {
+    List<String> recentDirs = _prefs.getStringList(_recentDirsKey) ?? [];
+    List<String> timestamps =
+        _prefs.getStringList(_recentDirsTimestampsKey) ?? [];
+
+    final index = recentDirs.indexOf(path);
+    if (index != -1) {
+      recentDirs.removeAt(index);
+      if (index < timestamps.length) {
+        timestamps.removeAt(index);
+      }
+
+      await _prefs.setStringList(_recentDirsKey, recentDirs);
+      await _prefs.setStringList(_recentDirsTimestampsKey, timestamps);
+    }
+  }
+
+  @override
+  Future<List<DirectoryPath>> getFavoriteDirectories() async {
+    final paths = _prefs.getStringList(_favoriteDirsKey) ?? [];
+    final timestamps = _prefs.getStringList(_favoriteDirsTimestampsKey) ?? [];
+
+    if (paths.isEmpty) {
+      return [];
+    }
+
+    final now = DateTime.now();
+    final result = <DirectoryPath>[];
+
+    for (int i = 0; i < paths.length; i++) {
+      final timestamp = i < timestamps.length
+          ? DateTime.tryParse(timestamps[i]) ?? now
+          : now;
+      result.add(DirectoryPath(path: paths[i], lastAccessed: timestamp));
+    }
+
+    return result;
+  }
+
+  @override
+  Future<void> addFavoriteDirectory(String path) async {
+    List<String> favoriteDirs = _prefs.getStringList(_favoriteDirsKey) ?? [];
+    List<String> timestamps =
+        _prefs.getStringList(_favoriteDirsTimestampsKey) ?? [];
+
+    // Check if already in favorites
+    if (favoriteDirs.contains(path)) {
+      return;
+    }
+
+    // Add to favorites
+    final now = DateTime.now();
+    favoriteDirs.add(path);
+    timestamps.add(now.toIso8601String());
+
+    await _prefs.setStringList(_favoriteDirsKey, favoriteDirs);
+    await _prefs.setStringList(_favoriteDirsTimestampsKey, timestamps);
+  }
+
+  @override
+  Future<void> removeFavoriteDirectory(String path) async {
+    List<String> favoriteDirs = _prefs.getStringList(_favoriteDirsKey) ?? [];
+    List<String> timestamps =
+        _prefs.getStringList(_favoriteDirsTimestampsKey) ?? [];
+
+    final index = favoriteDirs.indexOf(path);
+    if (index != -1) {
+      favoriteDirs.removeAt(index);
+      if (index < timestamps.length) {
+        timestamps.removeAt(index);
+      }
+
+      await _prefs.setStringList(_favoriteDirsKey, favoriteDirs);
+      await _prefs.setStringList(_favoriteDirsTimestampsKey, timestamps);
+    }
+  }
+
+  @override
+  Future<void> clearFavoriteDirectories() async {
+    await _prefs.remove(_favoriteDirsKey);
+    await _prefs.remove(_favoriteDirsTimestampsKey);
   }
 
   @override

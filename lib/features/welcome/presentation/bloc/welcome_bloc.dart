@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/directory_repository.dart';
 import '../../domain/usecases/get_recent_directories.dart';
@@ -21,6 +22,12 @@ class WelcomeBloc extends Bloc<WelcomeEvent, WelcomeState> {
     on<LoadRecentDirectories>(_onLoadRecentDirectories);
     on<PickDirectory>(_onPickDirectory);
     on<SelectRecentDirectory>(_onSelectRecentDirectory);
+    on<ClearRecentDirectories>(_onClearRecentDirectories);
+    on<RemoveRecentDirectory>(_onRemoveRecentDirectory);
+    on<LoadFavoriteDirectories>(_onLoadFavoriteDirectories);
+    on<AddToFavorites>(_onAddToFavorites);
+    on<RemoveFromFavorites>(_onRemoveFromFavorites);
+    on<ClearFavorites>(_onClearFavorites);
   }
 
   Future<void> _onLoadRecentDirectories(
@@ -29,8 +36,15 @@ class WelcomeBloc extends Bloc<WelcomeEvent, WelcomeState> {
   ) async {
     try {
       emit(const WelcomeLoading());
-      final directories = await _getRecentDirectories();
-      emit(WelcomeLoaded(directories));
+
+      final recentDirs = await _getRecentDirectories();
+      final favoriteDirs = await _repository.getFavoriteDirectories();
+      emit(
+        WelcomeLoaded(
+          recentDirectories: recentDirs,
+          favoriteDirectories: favoriteDirs,
+        ),
+      );
     } catch (e) {
       emit(WelcomeError(e.toString()));
     }
@@ -47,8 +61,14 @@ class WelcomeBloc extends Bloc<WelcomeEvent, WelcomeState> {
         emit(DirectorySelected(path));
       } else {
         // Пользователь отменил выбор, возвращаемся к списку
-        final directories = await _getRecentDirectories();
-        emit(WelcomeLoaded(directories));
+        final recentDirs = await _getRecentDirectories();
+        final favoriteDirs = await _repository.getFavoriteDirectories();
+        emit(
+          WelcomeLoaded(
+            recentDirectories: recentDirs,
+            favoriteDirectories: favoriteDirs,
+          ),
+        );
       }
     } catch (e) {
       emit(WelcomeError(e.toString()));
@@ -60,11 +80,130 @@ class WelcomeBloc extends Bloc<WelcomeEvent, WelcomeState> {
     Emitter<WelcomeState> emit,
   ) async {
     try {
+      // Check if directory exists
+      final directory = Directory(event.path);
+      if (!await directory.exists()) {
+        // Remove from recent directories
+        await _repository.removeRecentDirectory(event.path);
+        // Reload lists
+        final recentDirs = await _getRecentDirectories();
+        final favoriteDirs = await _repository.getFavoriteDirectories();
+        emit(
+          WelcomeLoaded(
+            recentDirectories: recentDirs,
+            favoriteDirectories: favoriteDirs,
+          ),
+        );
+        emit(WelcomeError('Directory not found: ${event.path}'));
+        return;
+      }
+
       // Update recent directories list (moves selected to top)
       await _repository.addRecentDirectory(event.path);
       // Save as last opened directory
       await _repository.setLastOpenedDirectory(event.path);
       emit(DirectorySelected(event.path));
+    } catch (e) {
+      emit(WelcomeError(e.toString()));
+    }
+  }
+
+  Future<void> _onClearRecentDirectories(
+    ClearRecentDirectories event,
+    Emitter<WelcomeState> emit,
+  ) async {
+    try {
+      await _repository.clearRecentDirectories();
+      final recentDirs = await _getRecentDirectories();
+
+      if (state is WelcomeLoaded) {
+        final currentState = state as WelcomeLoaded;
+        emit(currentState.copyWith(recentDirectories: recentDirs));
+      }
+    } catch (e) {
+      emit(WelcomeError(e.toString()));
+    }
+  }
+
+  Future<void> _onRemoveRecentDirectory(
+    RemoveRecentDirectory event,
+    Emitter<WelcomeState> emit,
+  ) async {
+    try {
+      await _repository.removeRecentDirectory(event.path);
+      final recentDirs = await _getRecentDirectories();
+
+      if (state is WelcomeLoaded) {
+        final currentState = state as WelcomeLoaded;
+        emit(currentState.copyWith(recentDirectories: recentDirs));
+      }
+    } catch (e) {
+      emit(WelcomeError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadFavoriteDirectories(
+    LoadFavoriteDirectories event,
+    Emitter<WelcomeState> emit,
+  ) async {
+    try {
+      final favoriteDirs = await _repository.getFavoriteDirectories();
+
+      if (state is WelcomeLoaded) {
+        final currentState = state as WelcomeLoaded;
+        emit(currentState.copyWith(favoriteDirectories: favoriteDirs));
+      }
+    } catch (e) {
+      emit(WelcomeError(e.toString()));
+    }
+  }
+
+  Future<void> _onAddToFavorites(
+    AddToFavorites event,
+    Emitter<WelcomeState> emit,
+  ) async {
+    try {
+      await _repository.addFavoriteDirectory(event.path);
+      final favoriteDirs = await _repository.getFavoriteDirectories();
+
+      if (state is WelcomeLoaded) {
+        final currentState = state as WelcomeLoaded;
+        emit(currentState.copyWith(favoriteDirectories: favoriteDirs));
+      }
+    } catch (e) {
+      emit(WelcomeError(e.toString()));
+    }
+  }
+
+  Future<void> _onRemoveFromFavorites(
+    RemoveFromFavorites event,
+    Emitter<WelcomeState> emit,
+  ) async {
+    try {
+      await _repository.removeFavoriteDirectory(event.path);
+      final favoriteDirs = await _repository.getFavoriteDirectories();
+
+      if (state is WelcomeLoaded) {
+        final currentState = state as WelcomeLoaded;
+        emit(currentState.copyWith(favoriteDirectories: favoriteDirs));
+      }
+    } catch (e) {
+      emit(WelcomeError(e.toString()));
+    }
+  }
+
+  Future<void> _onClearFavorites(
+    ClearFavorites event,
+    Emitter<WelcomeState> emit,
+  ) async {
+    try {
+      await _repository.clearFavoriteDirectories();
+      final favoriteDirs = await _repository.getFavoriteDirectories();
+
+      if (state is WelcomeLoaded) {
+        final currentState = state as WelcomeLoaded;
+        emit(currentState.copyWith(favoriteDirectories: favoriteDirs));
+      }
     } catch (e) {
       emit(WelcomeError(e.toString()));
     }

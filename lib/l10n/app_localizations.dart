@@ -122,6 +122,48 @@ abstract class AppLocalizations {
   /// **'Recent Directories'**
   String get recentDirectories;
 
+  /// Title for favorites directories list
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
+
+  /// Button to clear recent directories
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Recent'**
+  String get clearRecent;
+
+  /// Button to clear favorite directories
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Favorites'**
+  String get clearFavorites;
+
+  /// Button to add directory to favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Favorites'**
+  String get addToFavorites;
+
+  /// Button to remove directory from favorites
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from Favorites'**
+  String get removeFromFavorites;
+
+  /// Error title when directory doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'Directory not found'**
+  String get directoryNotFound;
+
+  /// Error message when directory doesn't exist
+  ///
+  /// In en, this message translates to:
+  /// **'The directory \"{path}\" no longer exists or is not accessible. It has been removed from your recent directories.'**
+  String directoryNotFoundMessage(String path);
+
   /// Main screen title
   ///
   /// In en, this message translates to:
@@ -235,6 +277,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search books...'**
   String get searchBooks;
+
+  /// Placeholder for shelf search input
+  ///
+  /// In en, this message translates to:
+  /// **'Search shelves...'**
+  String get searchShelves;
 
   /// Message when no books are in the library
   ///
@@ -415,6 +463,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keyboard Shortcuts'**
   String get keyboardShortcuts;
+
+  /// Menu item to delete book
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteBook;
+
+  /// Button to delete selected books
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Selected'**
+  String get deleteSelected;
+
+  /// Button to delete all books from current shelf
+  ///
+  /// In en, this message translates to:
+  /// **'Delete All'**
+  String get deleteAll;
+
+  /// Confirmation dialog title for deleting a book
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Book?'**
+  String get confirmDeleteBook;
+
+  /// Confirmation message for deleting a book
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete the book file from disk. This action cannot be undone.'**
+  String get confirmDeleteBookMessage;
+
+  /// Confirmation dialog title for deleting selected books
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Selected Books?'**
+  String get confirmDeleteSelected;
+
+  /// Confirmation message for deleting selected books
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete {count} {count, plural, =1{book file} other{book files}} from disk. This action cannot be undone.'**
+  String confirmDeleteSelectedMessage(int count);
+
+  /// Confirmation dialog title for deleting all books from current shelf
+  ///
+  /// In en, this message translates to:
+  /// **'Delete All Books?'**
+  String get confirmDeleteAll;
+
+  /// Confirmation message for deleting all books from current shelf
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete all {count} {count, plural, =1{book file} other{book files}} from this shelf from disk. This action cannot be undone.'**
+  String confirmDeleteAllMessage(int count);
+
+  /// About dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'About Tabularium'**
+  String get aboutTabularium;
+
+  /// OK button text
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// Tooltip for toggle view mode button
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle View Mode'**
+  String get toggleViewMode;
+
+  /// Theme menu tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// Help menu tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get help;
+
+  /// About menu item
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// Reset settings menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Settings'**
+  String get resetSettings;
+
+  /// Font size setting label
+  ///
+  /// In en, this message translates to:
+  /// **'Font Size'**
+  String get fontSize;
+
+  /// Book scale for grid view setting label
+  ///
+  /// In en, this message translates to:
+  /// **'Book Scale (Grid)'**
+  String get bookScaleGrid;
+
+  /// Book scale for cabinet view setting label
+  ///
+  /// In en, this message translates to:
+  /// **'Book Scale (Cabinet)'**
+  String get bookScaleCabinet;
+
+  /// Add to shelf menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// Select shelf dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Shelf'**
+  String get selectShelf;
 }
 
 class _AppLocalizationsDelegate

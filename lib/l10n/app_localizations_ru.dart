@@ -21,6 +21,29 @@ class AppLocalizationsRu extends AppLocalizations {
   String get recentDirectories => 'Недавние директории';
 
   @override
+  String get favorites => 'Избранное';
+
+  @override
+  String get clearRecent => 'Очистить недавние';
+
+  @override
+  String get clearFavorites => 'Очистить избранное';
+
+  @override
+  String get addToFavorites => 'Добавить в избранное';
+
+  @override
+  String get removeFromFavorites => 'Убрать из избранного';
+
+  @override
+  String get directoryNotFound => 'Директория не найдена';
+
+  @override
+  String directoryNotFoundMessage(String path) {
+    return 'Директория \"$path\" больше не существует или недоступна. Она была удалена из списка недавних.';
+  }
+
+  @override
   String get mainScreen => 'Главный экран';
 
   @override
@@ -78,6 +101,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get searchBooks => 'Поиск книг...';
+
+  @override
+  String get searchShelves => 'Поиск полок...';
 
   @override
   String get noBooks => 'Книги не найдены';
@@ -178,4 +204,86 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get keyboardShortcuts => 'Горячие клавиши';
+
+  @override
+  String get deleteBook => 'Удалить';
+
+  @override
+  String get deleteSelected => 'Удалить выбранные';
+
+  @override
+  String get deleteAll => 'Удалить всё';
+
+  @override
+  String get confirmDeleteBook => 'Удалить книгу?';
+
+  @override
+  String get confirmDeleteBookMessage =>
+      'Файл книги будет удалён с диска навсегда. Это действие нельзя отменить.';
+
+  @override
+  String get confirmDeleteSelected => 'Удалить выбранные книги?';
+
+  @override
+  String confirmDeleteSelectedMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'файлов книг',
+      few: 'файла книг',
+      one: 'файл книги',
+    );
+    return '$count $_temp0 будут удалены с диска навсегда. Это действие нельзя отменить.';
+  }
+
+  @override
+  String get confirmDeleteAll => 'Удалить все книги?';
+
+  @override
+  String confirmDeleteAllMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'файлов книг',
+      few: 'файла книг',
+      one: 'файл книги',
+    );
+    return 'Все $count $_temp0 с этой полки будут удалены с диска навсегда. Это действие нельзя отменить.';
+  }
+
+  @override
+  String get aboutTabularium => 'О программе Tabularium';
+
+  @override
+  String get ok => 'ОК';
+
+  @override
+  String get toggleViewMode => 'Переключить режим просмотра';
+
+  @override
+  String get theme => 'Тема';
+
+  @override
+  String get help => 'Справка';
+
+  @override
+  String get about => 'О программе';
+
+  @override
+  String get resetSettings => 'Сбросить настройки';
+
+  @override
+  String get fontSize => 'Размер шрифта';
+
+  @override
+  String get bookScaleGrid => 'Масштаб книг (Сетка)';
+
+  @override
+  String get bookScaleCabinet => 'Масштаб книг (Шкаф)';
+
+  @override
+  String get add => 'Добавить';
+
+  @override
+  String get selectShelf => 'Выбрать полку';
 }

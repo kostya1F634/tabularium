@@ -21,6 +21,47 @@
     "description": "Title for recent directories list"
   },
 
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "Title for favorites directories list"
+  },
+
+  "clearRecent": "Clear Recent",
+  "@clearRecent": {
+    "description": "Button to clear recent directories"
+  },
+
+  "clearFavorites": "Clear Favorites",
+  "@clearFavorites": {
+    "description": "Button to clear favorite directories"
+  },
+
+  "addToFavorites": "Add to Favorites",
+  "@addToFavorites": {
+    "description": "Button to add directory to favorites"
+  },
+
+  "removeFromFavorites": "Remove from Favorites",
+  "@removeFromFavorites": {
+    "description": "Button to remove directory from favorites"
+  },
+
+  "directoryNotFound": "Directory not found",
+  "@directoryNotFound": {
+    "description": "Error title when directory doesn't exist"
+  },
+
+  "directoryNotFoundMessage": "The directory \"{path}\" no longer exists or is not accessible. It has been removed from your recent directories.",
+  "@directoryNotFoundMessage": {
+    "description": "Error message when directory doesn't exist",
+    "placeholders": {
+      "path": {
+        "type": "String",
+        "example": "/home/user/books"
+      }
+    }
+  },
+
   "mainScreen": "Main Screen",
   "@mainScreen": {
     "description": "Main screen title"
@@ -120,6 +161,11 @@
   "searchBooks": "Search books...",
   "@searchBooks": {
     "description": "Placeholder for search input"
+  },
+
+  "searchShelves": "Search shelves...",
+  "@searchShelves": {
+    "description": "Placeholder for shelf search input"
   },
 
   "noBooks": "No books found",
@@ -281,5 +327,122 @@
   "keyboardShortcuts": "Keyboard Shortcuts",
   "@keyboardShortcuts": {
     "description": "Dialog title for keyboard shortcuts"
+  },
+
+  "deleteBook": "Delete",
+  "@deleteBook": {
+    "description": "Menu item to delete book"
+  },
+
+  "deleteSelected": "Delete Selected",
+  "@deleteSelected": {
+    "description": "Button to delete selected books"
+  },
+
+  "deleteAll": "Delete All",
+  "@deleteAll": {
+    "description": "Button to delete all books from current shelf"
+  },
+
+  "confirmDeleteBook": "Delete Book?",
+  "@confirmDeleteBook": {
+    "description": "Confirmation dialog title for deleting a book"
+  },
+
+  "confirmDeleteBookMessage": "This will permanently delete the book file from disk. This action cannot be undone.",
+  "@confirmDeleteBookMessage": {
+    "description": "Confirmation message for deleting a book"
+  },
+
+  "confirmDeleteSelected": "Delete Selected Books?",
+  "@confirmDeleteSelected": {
+    "description": "Confirmation dialog title for deleting selected books"
+  },
+
+  "confirmDeleteSelectedMessage": "This will permanently delete {count} {count, plural, =1{book file} other{book files}} from disk. This action cannot be undone.",
+  "@confirmDeleteSelectedMessage": {
+    "description": "Confirmation message for deleting selected books",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+
+  "confirmDeleteAll": "Delete All Books?",
+  "@confirmDeleteAll": {
+    "description": "Confirmation dialog title for deleting all books from current shelf"
+  },
+
+  "confirmDeleteAllMessage": "This will permanently delete all {count} {count, plural, =1{book file} other{book files}} from this shelf from disk. This action cannot be undone.",
+  "@confirmDeleteAllMessage": {
+    "description": "Confirmation message for deleting all books from current shelf",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+
+  "aboutTabularium": "About Tabularium",
+  "@aboutTabularium": {
+    "description": "About dialog title"
+  },
+
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+
+  "toggleViewMode": "Toggle View Mode",
+  "@toggleViewMode": {
+    "description": "Tooltip for toggle view mode button"
+  },
+
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme menu tooltip"
+  },
+
+  "help": "Help",
+  "@help": {
+    "description": "Help menu tooltip"
+  },
+
+  "about": "About",
+  "@about": {
+    "description": "About menu item"
+  },
+
+  "resetSettings": "Reset Settings",
+  "@resetSettings": {
+    "description": "Reset settings menu item"
+  },
+
+  "fontSize": "Font Size",
+  "@fontSize": {
+    "description": "Font size setting label"
+  },
+
+  "bookScaleGrid": "Book Scale (Grid)",
+  "@bookScaleGrid": {
+    "description": "Book scale for grid view setting label"
+  },
+
+  "bookScaleCabinet": "Book Scale (Cabinet)",
+  "@bookScaleCabinet": {
+    "description": "Book scale for cabinet view setting label"
+  },
+
+  "add": "Add",
+  "@add": {
+    "description": "Add to shelf menu item"
+  },
+
+  "selectShelf": "Select Shelf",
+  "@selectShelf": {
+    "description": "Select shelf dialog title"
   }
 }

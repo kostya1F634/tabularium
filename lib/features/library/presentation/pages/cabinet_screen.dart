@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import '../../../../core/services/ui_settings_provider.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
@@ -44,7 +45,13 @@ class CabinetScreen extends StatelessWidget {
                     .where((book) => shelf.bookIds.contains(book.id))
                     .toList();
 
-                return _ShelfView(shelf: shelf, books: shelfBooks);
+                return _ShelfView(
+                  shelf: shelf,
+                  books: shelfBooks,
+                  index: index,
+                  totalShelves: userShelves.length,
+                  allShelves: state.config.shelves,
+                );
               },
             );
           }
@@ -59,92 +66,177 @@ class CabinetScreen extends StatelessWidget {
 class _ShelfView extends StatelessWidget {
   final Shelf shelf;
   final List<Book> books;
+  final int index;
+  final int totalShelves;
+  final List<Shelf> allShelves;
 
-  const _ShelfView({required this.shelf, required this.books});
+  const _ShelfView({
+    required this.shelf,
+    required this.books,
+    required this.index,
+    required this.totalShelves,
+    required this.allShelves,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Books row
-        Container(
-          height: 200,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-          ),
-          child: books.isEmpty
-              ? Center(
-                  child: Text(
-                    AppLocalizations.of(context)!.noBooks,
+    final uiSettings = UISettingsProvider.of(context);
+
+    return ListenableBuilder(
+      listenable: uiSettings,
+      builder: (context, _) {
+        final scale = uiSettings.bookScaleCabinet;
+        final shelfHeight = 200.0 * scale;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Books row
+            Container(
+              height: shelfHeight,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(8),
+                ),
+              ),
+              child: books.isEmpty
+                  ? Center(
+                      child: Text(
+                        AppLocalizations.of(context)!.noBooks,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: books.length,
+                      itemBuilder: (context, index) {
+                        return _BookSpine(book: books[index], scale: scale);
+                      },
+                    ),
+            ),
+            // Shelf bar with name
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(8),
+                ),
+                border: Border(
+                  top: BorderSide(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withOpacity(0.2),
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.bookmark,
+                    size: 16,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    shelf.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  // Open all books button
+                  if (books.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.play_arrow, size: 16),
+                      tooltip: AppLocalizations.of(context)!.openAllBooks,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      onPressed: () {
+                        for (final book in books) {
+                          context.read<LibraryBloc>().add(OpenBook(book));
+                        }
+                      },
+                    ),
+                  const SizedBox(width: 4),
+                  // Reorder buttons
+                  if (index > 0)
+                    IconButton(
+                      icon: const Icon(Icons.arrow_upward, size: 16),
+                      tooltip: 'Move up',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      onPressed: () {
+                        final actualOldIndex = allShelves.indexOf(shelf);
+                        context.read<LibraryBloc>().add(
+                          ReorderShelves(
+                            oldIndex: actualOldIndex,
+                            newIndex: actualOldIndex - 1,
+                            fromDrag: false,
+                          ),
+                        );
+                      },
+                    ),
+                  if (index < totalShelves - 1)
+                    IconButton(
+                      icon: const Icon(Icons.arrow_downward, size: 16),
+                      tooltip: 'Move down',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      onPressed: () {
+                        final actualOldIndex = allShelves.indexOf(shelf);
+                        context.read<LibraryBloc>().add(
+                          ReorderShelves(
+                            oldIndex: actualOldIndex,
+                            newIndex: actualOldIndex + 1,
+                            fromDrag: false,
+                          ),
+                        );
+                      },
+                    ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${books.length}',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
-                )
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: books.length,
-                  itemBuilder: (context, index) {
-                    return _BookSpine(book: books[index]);
-                  },
-                ),
-        ),
-        // Shelf bar with name
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: const BorderRadius.vertical(
-              bottom: Radius.circular(8),
-            ),
-            border: Border(
-              top: BorderSide(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
-                width: 2,
+                ],
               ),
             ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.bookmark,
-                size: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                shelf.name,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const Spacer(),
-              Text(
-                '${books.length}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-      ],
+            const SizedBox(height: 24),
+          ],
+        );
+      },
     );
   }
 }
 
 class _BookSpine extends StatelessWidget {
   final Book book;
+  final double scale;
 
-  const _BookSpine({required this.book});
+  const _BookSpine({required this.book, required this.scale});
 
   @override
   Widget build(BuildContext context) {
+    final bookWidth = 120.0 * scale;
+
     return Padding(
       padding: const EdgeInsets.only(right: 4),
       child: InkWell(
@@ -152,7 +244,7 @@ class _BookSpine extends StatelessWidget {
           context.read<LibraryBloc>().add(OpenBook(book));
         },
         child: Container(
-          width: 120,
+          width: bookWidth,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(4),
@@ -172,7 +264,7 @@ class _BookSpine extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                   child: Image.file(
                     File(book.thumbnailPath!),
-                    width: 120,
+                    width: bookWidth,
                     height: double.infinity,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
@@ -204,9 +296,9 @@ class _BookSpine extends StatelessWidget {
                   ),
                   child: Text(
                     book.displayTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 11,
+                      fontSize: 11 * scale,
                       fontWeight: FontWeight.w500,
                     ),
                     maxLines: 3,
@@ -222,12 +314,14 @@ class _BookSpine extends StatelessWidget {
   }
 
   Widget _buildPlaceholder(BuildContext context) {
+    final iconSize = 48.0 * scale;
+
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Center(
         child: Icon(
           Icons.menu_book,
-          size: 48,
+          size: iconSize,
           color: Theme.of(
             context,
           ).colorScheme.onSurfaceVariant.withOpacity(0.3),

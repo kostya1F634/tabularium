@@ -205,3 +205,33 @@ class ReorderShelves extends LibraryEvent {
   @override
   List<Object?> get props => [oldIndex, newIndex, fromDrag];
 }
+
+/// Event to permanently delete a book (physically delete file)
+class DeleteBookPermanently extends LibraryEvent {
+  final String bookId;
+
+  const DeleteBookPermanently(this.bookId);
+
+  @override
+  List<Object?> get props => [bookId];
+}
+
+/// Event to permanently delete selected books (physically delete files)
+class DeleteSelectedBooksPermanently extends LibraryEvent {
+  const DeleteSelectedBooksPermanently();
+}
+
+/// Event to permanently delete all books (physically delete all files)
+class DeleteAllBooksPermanently extends LibraryEvent {
+  const DeleteAllBooksPermanently();
+}
+
+/// Event to permanently delete all books from current shelf
+class DeleteAllBooksFromShelf extends LibraryEvent {
+  final String shelfId;
+
+  const DeleteAllBooksFromShelf(this.shelfId);
+
+  @override
+  List<Object?> get props => [shelfId];
+}

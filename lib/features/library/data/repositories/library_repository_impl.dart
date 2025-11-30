@@ -35,11 +35,53 @@ class LibraryRepositoryImpl implements LibraryRepository {
     print('[LibraryRepository] Initializing library for: $directoryPath');
 
     // Try to load existing config first
-    final existingConfig = await loadLibrary(directoryPath);
+    var existingConfig = await loadLibrary(directoryPath);
     if (existingConfig != null) {
       print(
         '[LibraryRepository] Found existing config with ${existingConfig.books.length} books',
       );
+
+      // Check if directory path has changed (directory was moved/renamed/copied)
+      final oldDirectoryPath = existingConfig.directoryPath;
+      if (oldDirectoryPath != directoryPath) {
+        print(
+          '[LibraryRepository] Directory path changed from $oldDirectoryPath to $directoryPath',
+        );
+        print('[LibraryRepository] Updating all book and thumbnail paths...');
+
+        // Update all book paths
+        final updatedBooks = existingConfig.books.map((book) {
+          // Replace old directory path with new one
+          final newFilePath = book.filePath.replaceFirst(
+            oldDirectoryPath,
+            directoryPath,
+          );
+
+          final newThumbnailPath = book.thumbnailPath?.replaceFirst(
+            oldDirectoryPath,
+            directoryPath,
+          );
+
+          return book.copyWith(
+            filePath: newFilePath,
+            thumbnailPath: newThumbnailPath,
+          );
+        }).toList();
+
+        // Update config with new paths
+        existingConfig = existingConfig.copyWith(
+          directoryPath: directoryPath,
+          books: updatedBooks,
+        );
+
+        // Save updated config immediately
+        print('[LibraryRepository] Saving updated config with new paths...');
+        await saveLibrary(existingConfig);
+        print('[LibraryRepository] ✓ Config updated and saved');
+      } else {
+        // Just update directoryPath to be safe
+        existingConfig = existingConfig.copyWith(directoryPath: directoryPath);
+      }
 
       // Check if any books are missing thumbnails
       final booksNeedingThumbnails = existingConfig.books

@@ -89,6 +89,7 @@ class WelcomeScreen extends StatelessWidget {
                       if (state is WelcomeLoaded) {
                         return WelcomeContent(
                           recentDirectories: state.recentDirectories,
+                          favoriteDirectories: state.favoriteDirectories,
                           onPickDirectory: () {
                             context.read<WelcomeBloc>().add(
                               const PickDirectory(),
@@ -97,6 +98,31 @@ class WelcomeScreen extends StatelessWidget {
                           onSelectDirectory: (path) {
                             context.read<WelcomeBloc>().add(
                               SelectRecentDirectory(path),
+                            );
+                          },
+                          onClearRecent: () {
+                            context.read<WelcomeBloc>().add(
+                              const ClearRecentDirectories(),
+                            );
+                          },
+                          onRemoveRecent: (path) {
+                            context.read<WelcomeBloc>().add(
+                              RemoveRecentDirectory(path),
+                            );
+                          },
+                          onAddToFavorites: (path) {
+                            context.read<WelcomeBloc>().add(
+                              AddToFavorites(path),
+                            );
+                          },
+                          onRemoveFromFavorites: (path) {
+                            context.read<WelcomeBloc>().add(
+                              RemoveFromFavorites(path),
+                            );
+                          },
+                          onClearFavorites: () {
+                            context.read<WelcomeBloc>().add(
+                              const ClearFavorites(),
                             );
                           },
                         );

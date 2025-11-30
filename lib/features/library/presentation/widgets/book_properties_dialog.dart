@@ -19,16 +19,24 @@ class BookPropertiesDialog extends StatefulWidget {
 
 class _BookPropertiesDialogState extends State<BookPropertiesDialog> {
   late final TextEditingController _aliasController;
+  late final FocusNode _aliasFocusNode;
 
   @override
   void initState() {
     super.initState();
     _aliasController = TextEditingController(text: widget.book.alias);
+    _aliasFocusNode = FocusNode();
+
+    // Request focus on the alias field after the dialog is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _aliasFocusNode.requestFocus();
+    });
   }
 
   @override
   void dispose() {
     _aliasController.dispose();
+    _aliasFocusNode.dispose();
     super.dispose();
   }
 
@@ -116,11 +124,13 @@ class _BookPropertiesDialogState extends State<BookPropertiesDialog> {
                             const SizedBox(height: 4),
                             TextField(
                               controller: _aliasController,
+                              focusNode: _aliasFocusNode,
                               decoration: InputDecoration(
                                 hintText: widget.book.fileName,
                                 border: const OutlineInputBorder(),
                                 isDense: true,
                               ),
+                              onSubmitted: (_) => _saveAlias(),
                             ),
                             const SizedBox(height: 16),
 

@@ -18,14 +18,28 @@ class WelcomeLoading extends WelcomeState {
   const WelcomeLoading();
 }
 
-/// State with loaded recent directories
+/// State with loaded recent directories and favorites
 class WelcomeLoaded extends WelcomeState {
   final List<DirectoryPath> recentDirectories;
+  final List<DirectoryPath> favoriteDirectories;
 
-  const WelcomeLoaded(this.recentDirectories);
+  const WelcomeLoaded({
+    required this.recentDirectories,
+    this.favoriteDirectories = const [],
+  });
+
+  WelcomeLoaded copyWith({
+    List<DirectoryPath>? recentDirectories,
+    List<DirectoryPath>? favoriteDirectories,
+  }) {
+    return WelcomeLoaded(
+      recentDirectories: recentDirectories ?? this.recentDirectories,
+      favoriteDirectories: favoriteDirectories ?? this.favoriteDirectories,
+    );
+  }
 
   @override
-  List<Object?> get props => [recentDirectories];
+  List<Object?> get props => [recentDirectories, favoriteDirectories];
 }
 
 /// Directory picking state

@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'dart:io';
 
 import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
@@ -54,6 +55,10 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<UpdateBookAlias>(_onUpdateBookAlias);
     on<DeleteBookFromShelf>(_onDeleteBookFromShelf);
     on<ReorderShelves>(_onReorderShelves);
+    on<DeleteBookPermanently>(_onDeleteBookPermanently);
+    on<DeleteSelectedBooksPermanently>(_onDeleteSelectedBooksPermanently);
+    on<DeleteAllBooksPermanently>(_onDeleteAllBooksPermanently);
+    on<DeleteAllBooksFromShelf>(_onDeleteAllBooksFromShelf);
   }
 
   Future<void> _onInitializeLibrary(
@@ -734,5 +739,262 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     await _saveLibrary(updatedConfig);
 
     emit(currentState.copyWith(config: updatedConfig));
+  }
+
+  Future<void> _onDeleteBookPermanently(
+    DeleteBookPermanently event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+
+    // Find the book
+    final book = currentState.config.books.firstWhere(
+      (b) => b.id == event.bookId,
+      orElse: () => throw Exception('Book not found'),
+    );
+
+    try {
+      // Delete the physical file
+      final file = File(book.filePath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      // Delete thumbnail if exists
+      if (book.thumbnailPath != null) {
+        final thumbnail = File(book.thumbnailPath!);
+        if (await thumbnail.exists()) {
+          await thumbnail.delete();
+        }
+      }
+
+      // Remove book from config
+      final updatedBooks = currentState.config.books
+          .where((b) => b.id != event.bookId)
+          .toList();
+
+      // Remove book from all shelves
+      final updatedShelves = currentState.config.shelves.map((shelf) {
+        return shelf.removeBook(event.bookId);
+      }).toList();
+
+      final updatedConfig = currentState.config.copyWith(
+        books: updatedBooks,
+        shelves: updatedShelves,
+      );
+
+      await _saveLibrary(updatedConfig);
+
+      final displayedBooks = _getBooksForShelf(
+        updatedConfig,
+        currentState.selectedShelf.id,
+      );
+
+      emit(
+        currentState.copyWith(
+          config: updatedConfig,
+          displayedBooks: displayedBooks,
+        ),
+      );
+    } catch (e) {
+      // Error handling - could emit an error state
+      print('Error deleting book: $e');
+    }
+  }
+
+  Future<void> _onDeleteSelectedBooksPermanently(
+    DeleteSelectedBooksPermanently event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+    final selectedBookIds = currentState.selectedBookIds.toList();
+
+    if (selectedBookIds.isEmpty) return;
+
+    try {
+      // Delete physical files for all selected books
+      for (final bookId in selectedBookIds) {
+        final book = currentState.config.books.firstWhere(
+          (b) => b.id == bookId,
+          orElse: () => throw Exception('Book not found'),
+        );
+
+        // Delete the file
+        final file = File(book.filePath);
+        if (await file.exists()) {
+          await file.delete();
+        }
+
+        // Delete thumbnail if exists
+        if (book.thumbnailPath != null) {
+          final thumbnail = File(book.thumbnailPath!);
+          if (await thumbnail.exists()) {
+            await thumbnail.delete();
+          }
+        }
+      }
+
+      // Remove books from config
+      final updatedBooks = currentState.config.books
+          .where((b) => !selectedBookIds.contains(b.id))
+          .toList();
+
+      // Remove books from all shelves
+      final updatedShelves = currentState.config.shelves.map((shelf) {
+        var updatedShelf = shelf;
+        for (final bookId in selectedBookIds) {
+          updatedShelf = updatedShelf.removeBook(bookId);
+        }
+        return updatedShelf;
+      }).toList();
+
+      final updatedConfig = currentState.config.copyWith(
+        books: updatedBooks,
+        shelves: updatedShelves,
+      );
+
+      await _saveLibrary(updatedConfig);
+
+      final displayedBooks = _getBooksForShelf(
+        updatedConfig,
+        currentState.selectedShelf.id,
+      );
+
+      emit(
+        currentState.copyWith(
+          config: updatedConfig,
+          displayedBooks: displayedBooks,
+          selectedBookIds: const {},
+        ),
+      );
+    } catch (e) {
+      print('Error deleting selected books: $e');
+    }
+  }
+
+  Future<void> _onDeleteAllBooksPermanently(
+    DeleteAllBooksPermanently event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+
+    try {
+      // Delete all physical files
+      for (final book in currentState.config.books) {
+        // Delete the file
+        final file = File(book.filePath);
+        if (await file.exists()) {
+          await file.delete();
+        }
+
+        // Delete thumbnail if exists
+        if (book.thumbnailPath != null) {
+          final thumbnail = File(book.thumbnailPath!);
+          if (await thumbnail.exists()) {
+            await thumbnail.delete();
+          }
+        }
+      }
+
+      // Clear all books and reset shelves
+      final updatedShelves = currentState.config.shelves.map((shelf) {
+        return shelf.copyWith(bookIds: []);
+      }).toList();
+
+      final updatedConfig = currentState.config.copyWith(
+        books: [],
+        shelves: updatedShelves,
+      );
+
+      await _saveLibrary(updatedConfig);
+
+      emit(
+        currentState.copyWith(
+          config: updatedConfig,
+          displayedBooks: [],
+          selectedBookIds: const {},
+        ),
+      );
+    } catch (e) {
+      print('Error deleting all books: $e');
+    }
+  }
+
+  Future<void> _onDeleteAllBooksFromShelf(
+    DeleteAllBooksFromShelf event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+
+    // Get books from the specified shelf
+    final booksToDelete = _getBooksForShelf(currentState.config, event.shelfId);
+
+    if (booksToDelete.isEmpty) return;
+
+    try {
+      // Delete all physical files from this shelf
+      for (final book in booksToDelete) {
+        // Delete the file
+        final file = File(book.filePath);
+        if (await file.exists()) {
+          await file.delete();
+        }
+
+        // Delete thumbnail if exists
+        if (book.thumbnailPath != null) {
+          final thumbnail = File(book.thumbnailPath!);
+          if (await thumbnail.exists()) {
+            await thumbnail.delete();
+          }
+        }
+      }
+
+      // Get IDs of deleted books
+      final deletedBookIds = booksToDelete.map((b) => b.id).toSet();
+
+      // Remove books from config
+      final updatedBooks = currentState.config.books
+          .where((b) => !deletedBookIds.contains(b.id))
+          .toList();
+
+      // Remove books from all shelves
+      final updatedShelves = currentState.config.shelves.map((shelf) {
+        var updatedShelf = shelf;
+        for (final bookId in deletedBookIds) {
+          updatedShelf = updatedShelf.removeBook(bookId);
+        }
+        return updatedShelf;
+      }).toList();
+
+      final updatedConfig = currentState.config.copyWith(
+        books: updatedBooks,
+        shelves: updatedShelves,
+      );
+
+      await _saveLibrary(updatedConfig);
+
+      final displayedBooks = _getBooksForShelf(
+        updatedConfig,
+        currentState.selectedShelf.id,
+      );
+
+      emit(
+        currentState.copyWith(
+          config: updatedConfig,
+          displayedBooks: displayedBooks,
+          selectedBookIds: const {},
+        ),
+      );
+    } catch (e) {
+      print('Error deleting books from shelf: $e');
+    }
   }
 }

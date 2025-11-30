@@ -5,20 +5,26 @@ import 'app_settings.dart';
 class UISettingsService extends ChangeNotifier {
   static const String _fontSizeKey = 'ui_font_size';
   static const String _bookScaleKey = 'ui_book_scale';
+  static const String _bookScaleCabinetKey = 'ui_book_scale_cabinet';
 
   final AppSettings _prefs;
   double _fontSize;
   double _bookScale;
+  double _bookScaleCabinet;
 
   UISettingsService(this._prefs)
     : _fontSize = _prefs.getDouble(_fontSizeKey) ?? 1.0,
-      _bookScale = _prefs.getDouble(_bookScaleKey) ?? 1.0;
+      _bookScale = _prefs.getDouble(_bookScaleKey) ?? 1.0,
+      _bookScaleCabinet = _prefs.getDouble(_bookScaleCabinetKey) ?? 1.0;
 
   /// Current font size multiplier (0.8 to 1.5)
   double get fontSize => _fontSize;
 
-  /// Current book scale multiplier (0.7 to 1.5)
+  /// Current book scale multiplier for grid mode (0.7 to 1.5)
   double get bookScale => _bookScale;
+
+  /// Current book scale multiplier for cabinet mode (0.7 to 1.5)
+  double get bookScaleCabinet => _bookScaleCabinet;
 
   /// Set font size multiplier
   Future<void> setFontSize(double size) async {
@@ -28,11 +34,19 @@ class UISettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Set book scale multiplier
+  /// Set book scale multiplier for grid mode
   Future<void> setBookScale(double scale) async {
     if (_bookScale == scale) return;
     _bookScale = scale;
     await _prefs.setDouble(_bookScaleKey, scale);
+    notifyListeners();
+  }
+
+  /// Set book scale multiplier for cabinet mode
+  Future<void> setBookScaleCabinet(double scale) async {
+    if (_bookScaleCabinet == scale) return;
+    _bookScaleCabinet = scale;
+    await _prefs.setDouble(_bookScaleCabinetKey, scale);
     notifyListeners();
   }
 
