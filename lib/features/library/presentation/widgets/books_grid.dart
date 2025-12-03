@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
 import '../../../../core/services/ui_settings_provider.dart';
+import '../../../../core/widgets/dialog_shortcuts_wrapper.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
@@ -16,8 +17,14 @@ import 'add_to_shelf_dialog.dart';
 class BooksGrid extends StatelessWidget {
   final List<Book> books;
   final List<Shelf> shelves;
+  final String? focusedBookId;
 
-  const BooksGrid({super.key, required this.books, required this.shelves});
+  const BooksGrid({
+    super.key,
+    required this.books,
+    required this.shelves,
+    this.focusedBookId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +69,12 @@ class BooksGrid extends StatelessWidget {
           ),
           itemCount: books.length,
           itemBuilder: (context, index) {
+            final book = books[index];
             return _BookCard(
-              book: books[index],
+              book: book,
               shelves: shelves,
               bookScale: bookScale,
+              isFocused: book.id == focusedBookId,
             );
           },
         );
@@ -78,11 +87,13 @@ class _BookCard extends StatelessWidget {
   final Book book;
   final List<Shelf> shelves;
   final double bookScale;
+  final bool isFocused;
 
   const _BookCard({
     required this.book,
     required this.shelves,
     required this.bookScale,
+    this.isFocused = false,
   });
 
   @override
@@ -128,7 +139,7 @@ class _BookCard extends StatelessWidget {
   Widget _buildCardContent(BuildContext context, bool isSelected) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      elevation: isSelected ? 4 : 1,
+      elevation: isSelected || isFocused ? 4 : 1,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: isSelected
@@ -226,6 +237,21 @@ class _BookCard extends StatelessWidget {
                 ),
               ),
             ),
+          // Focus border overlay (on top of everything)
+          if (isFocused)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      width: 3,
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -261,24 +287,6 @@ class _BookCard extends StatelessWidget {
             ],
           ),
         ),
-        if (!isDefaultShelf)
-          PopupMenuItem<String>(
-            value: 'remove',
-            child: Row(
-              children: [
-                Icon(
-                  Icons.remove_circle_outline,
-                  size: 18,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.remove,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ),
-              ],
-            ),
-          ),
         PopupMenuItem<String>(
           value: 'add',
           child: Row(
@@ -299,6 +307,24 @@ class _BookCard extends StatelessWidget {
             ],
           ),
         ),
+        if (!isDefaultShelf)
+          PopupMenuItem<String>(
+            value: 'remove',
+            child: Row(
+              children: [
+                Icon(
+                  Icons.remove_circle_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.remove,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ],
+            ),
+          ),
         PopupMenuItem<String>(
           value: 'delete',
           child: Row(
@@ -339,18 +365,47 @@ class _BookCard extends StatelessWidget {
               : [book.id];
 
           // Show shelf selection dialog
-          final selectedShelfId = await showDialog<String>(
+          final result = await showDialog<String>(
             context: context,
             builder: (context) =>
                 AddToShelfDialog(shelves: state.config.shelves),
           );
 
-          if (selectedShelfId != null && context.mounted) {
-            // Add books to selected shelf
+          if (result != null && context.mounted) {
+            String shelfId;
+
+            // Check if user wants to create a new shelf
+            if (result.startsWith('create:')) {
+              final shelfName = result.substring(7); // Remove 'create:' prefix
+
+              // Create new shelf
+              bloc.add(CreateShelf(shelfName));
+
+              // Wait for the new shelf to be created
+              await Future.delayed(const Duration(milliseconds: 100));
+
+              // Get the newly created shelf ID
+              final updatedState = bloc.state;
+              if (updatedState is LibraryLoaded) {
+                final newShelf = updatedState.config.shelves.lastWhere(
+                  (shelf) => shelf.name == shelfName && !shelf.isDefault,
+                );
+                shelfId = newShelf.id;
+              } else {
+                return; // State is not loaded, cancel operation
+              }
+            } else {
+              shelfId = result;
+            }
+
+            // Add books to selected or newly created shelf
             for (final bookId in booksToAdd) {
-              bloc.add(
-                AddBookToShelf(bookId: bookId, shelfId: selectedShelfId),
-              );
+              bloc.add(AddBookToShelf(bookId: bookId, shelfId: shelfId));
+            }
+
+            // Clear selection after adding
+            if (state.hasSelection && context.mounted) {
+              bloc.add(const ClearBookSelection());
             }
           }
           break;
@@ -358,22 +413,27 @@ class _BookCard extends StatelessWidget {
           // Show confirmation dialog
           final confirmed = await showDialog<bool>(
             context: context,
-            builder: (context) => AlertDialog(
-              title: Text(l10n.confirmDeleteBook),
-              content: Text(l10n.confirmDeleteBookMessage),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(l10n.cancel),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.error,
+            builder: (dialogContext) => DialogShortcutsWrapper(
+              onEnterKey: () => Navigator.of(dialogContext).pop(true),
+              dialog: AlertDialog(
+                title: Text(l10n.confirmDeleteBook),
+                content: Text(l10n.confirmDeleteBookMessage),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                    child: Text(l10n.cancel),
                   ),
-                  child: Text(l10n.delete),
-                ),
-              ],
+                  TextButton(
+                    onPressed: () => Navigator.of(dialogContext).pop(true),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(
+                        dialogContext,
+                      ).colorScheme.error,
+                    ),
+                    child: Text(l10n.delete),
+                  ),
+                ],
+              ),
             ),
           );
           if (confirmed == true && context.mounted) {

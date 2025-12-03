@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/services/app_settings.dart';
 
@@ -52,6 +53,20 @@ class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
     _viewModeService?.setViewMode(_viewMode);
   }
 
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.ignored;
+
+    final isCtrlPressed = HardwareKeyboard.instance.isControlPressed;
+
+    // Handle Ctrl+T for toggling view mode
+    if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyT) {
+      _toggleViewMode();
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Wrap both screens with BLoC provider
@@ -64,10 +79,14 @@ class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
             child: const CabinetScreen(),
           );
 
-    return ViewModeProviderWidget(
-      viewMode: _viewMode,
-      onToggle: _toggleViewMode,
-      child: screen,
+    return Focus(
+      onKeyEvent: _handleKeyEvent,
+      autofocus: true,
+      child: ViewModeProviderWidget(
+        viewMode: _viewMode,
+        onToggle: _toggleViewMode,
+        child: screen,
+      ),
     );
   }
 }

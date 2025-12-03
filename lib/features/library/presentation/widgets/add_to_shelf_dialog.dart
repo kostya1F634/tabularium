@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import '../../../../core/widgets/dialog_shortcuts_wrapper.dart';
 import '../../domain/entities/shelf.dart';
 
 /// Dialog for selecting a shelf to add books to
@@ -21,6 +22,37 @@ class _AddToShelfDialogState extends State<AddToShelfDialog> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _createNewShelf(String shelfName) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => DialogShortcutsWrapper(
+        onEnterKey: () => Navigator.of(dialogContext).pop(true),
+        dialog: AlertDialog(
+          title: Text(l10n.createShelf),
+          content: Text('${l10n.create} "$shelfName"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.create),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      // Return special marker to indicate shelf creation
+      Navigator.of(context).pop('create:$shelfName');
+    }
   }
 
   @override
@@ -85,6 +117,15 @@ class _AddToShelfDialogState extends State<AddToShelfDialog> {
                     _searchQuery = query;
                   });
                 },
+                onSubmitted: (query) {
+                  // If there are filtered shelves, select the first one
+                  if (filteredShelves.isNotEmpty) {
+                    Navigator.of(context).pop(filteredShelves.first.id);
+                  } else if (query.trim().isNotEmpty) {
+                    // If no shelves found, create new shelf with search query
+                    _createNewShelf(query.trim());
+                  }
+                },
                 autofocus: true,
               ),
             ),
@@ -121,8 +162,15 @@ class _AddToShelfDialogState extends State<AddToShelfDialog> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  if (_searchQuery.isNotEmpty && filteredShelves.isEmpty)
+                    ElevatedButton.icon(
+                      onPressed: () => _createNewShelf(_searchQuery.trim()),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.createShelf),
+                    ),
+                  const Spacer(),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(l10n.cancel),

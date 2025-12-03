@@ -302,6 +302,12 @@ abstract class AppLocalizations {
   /// **'Scan for New Books'**
   String get scanForNewBooks;
 
+  /// Menu item to scan for new books
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get scan;
+
   /// Message during library initialization
   ///
   /// In en, this message translates to:

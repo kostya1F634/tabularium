@@ -115,6 +115,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanForNewBooks => 'Scan for New Books';
 
   @override
+  String get scan => 'Scan';
+
+  @override
   String get initializingLibrary => 'Initializing library...';
 
   @override

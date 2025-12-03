@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/services/app_settings.dart';
+import '../../../../core/services/ui_settings_provider.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import '../../../../core/widgets/dialog_shortcuts_wrapper.dart';
 import '../../di/library_dependencies.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
@@ -14,6 +16,8 @@ import '../widgets/shelves_sidebar.dart';
 import '../widgets/books_grid.dart';
 import '../widgets/library_header.dart';
 import '../widgets/book_properties_dialog.dart';
+import '../widgets/add_to_shelf_dialog.dart';
+import 'library_view_wrapper.dart';
 
 enum FocusArea { shelves, books }
 
@@ -51,6 +55,7 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
   bool _isResizing = false;
   FocusArea _currentFocus = FocusArea.shelves;
   final FocusNode _focusNode = FocusNode();
+  double _booksAreaWidth = 800.0; // Will be updated via LayoutBuilder
 
   @override
   void initState() {
@@ -141,9 +146,15 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
         // Edit shelf name
         _showEditShelfDialog(context, bloc, state.selectedShelf);
       } else {
-        // Show book properties if exactly one book is selected
-        if (state.selectedBookIds.length == 1) {
-          final bookId = state.selectedBookIds.first;
+        // Show book properties for focused book (or first selected if has selection)
+        String? bookId;
+        if (state.hasSelection) {
+          bookId = state.selectedBookIds.first;
+        } else if (state.focusedBookId != null) {
+          bookId = state.focusedBookId;
+        }
+
+        if (bookId != null) {
           final book = state.config.books.firstWhere((b) => b.id == bookId);
           showDialog(
             context: context,
@@ -157,8 +168,68 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       return KeyEventResult.handled;
     }
 
-    // Handle focus switching with Left/Right arrows or H/L (only without Ctrl)
-    if (!isCtrlPressed) {
+    // Handle Ctrl+T for toggling view mode
+    if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyT) {
+      // Toggle view mode
+      final provider = context
+          .findAncestorWidgetOfExactType<ViewModeProviderWidget>();
+      provider?.onToggle();
+      return KeyEventResult.handled;
+    }
+
+    // Handle Ctrl+A for Add to shelf
+    if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyA) {
+      // Show add to shelf dialog for selected books, focused book, or all books
+      if (state.displayedBooks.isNotEmpty) {
+        final Set<String> booksToAdd;
+        if (state.hasSelection) {
+          booksToAdd = state.selectedBookIds;
+        } else if (state.focusedBookId != null) {
+          booksToAdd = {state.focusedBookId!};
+        } else {
+          booksToAdd = state.displayedBooks.map((b) => b.id).toSet();
+        }
+
+        showDialog<String>(
+          context: context,
+          builder: (context) => AddToShelfDialog(shelves: state.config.shelves),
+        ).then((result) {
+          if (result != null && context.mounted) {
+            if (result.startsWith('create:')) {
+              final shelfName = result.substring(7);
+              bloc.add(CreateShelf(shelfName));
+              Future.delayed(const Duration(milliseconds: 100), () {
+                final updatedState = bloc.state;
+                if (updatedState is LibraryLoaded) {
+                  final newShelf = updatedState.config.shelves.lastWhere(
+                    (shelf) => shelf.name == shelfName && !shelf.isDefault,
+                  );
+                  for (final bookId in booksToAdd) {
+                    bloc.add(
+                      AddBookToShelf(bookId: bookId, shelfId: newShelf.id),
+                    );
+                  }
+                  if (state.hasSelection) {
+                    bloc.add(const ClearBookSelection());
+                  }
+                }
+              });
+            } else {
+              for (final bookId in booksToAdd) {
+                bloc.add(AddBookToShelf(bookId: bookId, shelfId: result));
+              }
+              if (state.hasSelection) {
+                bloc.add(const ClearBookSelection());
+              }
+            }
+          }
+        });
+      }
+      return KeyEventResult.handled;
+    }
+
+    // Handle focus switching with Ctrl+Left/Right or Ctrl+H/L
+    if (isCtrlPressed) {
       if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
           event.logicalKey == LogicalKeyboardKey.keyH) {
         setState(() => _currentFocus = FocusArea.shelves);
@@ -167,6 +238,14 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       if (event.logicalKey == LogicalKeyboardKey.arrowRight ||
           event.logicalKey == LogicalKeyboardKey.keyL) {
         setState(() => _currentFocus = FocusArea.books);
+        // Restore focused book from state (loaded from config)
+        if (state.focusedBookId != null &&
+            state.displayedBooks.any((b) => b.id == state.focusedBookId)) {
+          // Focus is already set in state, just switched area
+        } else if (state.displayedBooks.isNotEmpty) {
+          // No previous focus or previous book not available, focus first book
+          bloc.add(MoveFocusToBook(state.displayedBooks.first.id));
+        }
         return KeyEventResult.handled;
       }
     }
@@ -241,11 +320,72 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     return KeyEventResult.ignored;
   }
 
+  int _calculateColumnsCount(double bookScale) {
+    // Calculate columns based on grid parameters from BooksGrid
+    // This mimics SliverGridDelegateWithMaxCrossAxisExtent logic
+    final maxCrossAxisExtent = 200 * bookScale;
+    final crossAxisSpacing = 16.0;
+    final padding = 32.0; // 16 on each side
+    final availableWidth = _booksAreaWidth - padding;
+
+    // Flutter's logic from SliverGridDelegateWithMaxCrossAxisExtent:
+    // Simply divide availableWidth by maxCrossAxisExtent and round up
+    // The actual item width will be smaller to fit the spacing
+    final columns = (availableWidth / maxCrossAxisExtent).ceil();
+
+    // Debug output
+    debugPrint(
+      'COLUMNS: booksAreaWidth=$_booksAreaWidth, availableWidth=$availableWidth, '
+      'maxCrossAxisExtent=$maxCrossAxisExtent, bookScale=$bookScale, columns=$columns',
+    );
+
+    return columns.clamp(1, 100);
+  }
+
   KeyEventResult _handleBooksKeyEvent(
     KeyEvent event,
     LibraryBloc bloc,
     LibraryLoaded state,
   ) {
+    final uiSettings = UISettingsProvider.of(context);
+    final columnsCount = _calculateColumnsCount(uiSettings.bookScale);
+
+    // Navigation with hjkl or arrows
+    if (event.logicalKey == LogicalKeyboardKey.keyH ||
+        event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      bloc.add(
+        MoveFocusInDirection(FocusDirection.left, columnsCount: columnsCount),
+      );
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.keyJ ||
+        event.logicalKey == LogicalKeyboardKey.arrowDown) {
+      bloc.add(
+        MoveFocusInDirection(FocusDirection.down, columnsCount: columnsCount),
+      );
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.keyK ||
+        event.logicalKey == LogicalKeyboardKey.arrowUp) {
+      bloc.add(
+        MoveFocusInDirection(FocusDirection.up, columnsCount: columnsCount),
+      );
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.keyL ||
+        event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      bloc.add(
+        MoveFocusInDirection(FocusDirection.right, columnsCount: columnsCount),
+      );
+      return KeyEventResult.handled;
+    }
+
+    // Space to toggle selection of focused book
+    if (event.logicalKey == LogicalKeyboardKey.space) {
+      bloc.add(const ToggleFocusedBookSelection());
+      return KeyEventResult.handled;
+    }
+
     // Delete book from shelf
     if (event.logicalKey == LogicalKeyboardKey.delete) {
       final isDefaultShelf = state.selectedShelf.isDefault;
@@ -264,40 +404,41 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController();
 
+    void createShelf() {
+      final name = controller.text.trim();
+      if (name.isNotEmpty) {
+        bloc.add(CreateShelf(name));
+        Navigator.of(context).pop();
+      }
+    }
+
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.createShelf),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: l10n.shelfName,
-            border: const OutlineInputBorder(),
-          ),
-          autofocus: true,
-          onSubmitted: (value) {
-            if (value.trim().isNotEmpty) {
-              bloc.add(CreateShelf(value.trim()));
-              Navigator.of(dialogContext).pop();
-            }
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              if (name.isNotEmpty) {
-                bloc.add(CreateShelf(name));
-                Navigator.of(dialogContext).pop();
+      builder: (dialogContext) => DialogShortcutsWrapper(
+        onEnterKey: createShelf,
+        dialog: AlertDialog(
+          title: Text(l10n.createShelf),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: l10n.shelfName,
+              border: const OutlineInputBorder(),
+            ),
+            autofocus: true,
+            onSubmitted: (value) {
+              if (value.trim().isNotEmpty) {
+                createShelf();
               }
             },
-            child: Text(l10n.create),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(onPressed: createShelf, child: Text(l10n.create)),
+          ],
+        ),
       ),
     );
   }
@@ -314,40 +455,41 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
 
     final controller = TextEditingController(text: shelf.name);
 
+    void saveShelf() {
+      final name = controller.text.trim();
+      if (name.isNotEmpty && name != shelf.name) {
+        bloc.add(RenameShelf(shelfId: shelf.id, newName: name));
+        Navigator.of(context).pop();
+      }
+    }
+
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.editShelf),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: l10n.shelfName,
-            border: const OutlineInputBorder(),
-          ),
-          autofocus: true,
-          onSubmitted: (value) {
-            if (value.trim().isNotEmpty && value.trim() != shelf.name) {
-              bloc.add(RenameShelf(shelfId: shelf.id, newName: value.trim()));
-              Navigator.of(dialogContext).pop();
-            }
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              if (name.isNotEmpty && name != shelf.name) {
-                bloc.add(RenameShelf(shelfId: shelf.id, newName: name));
-                Navigator.of(dialogContext).pop();
+      builder: (dialogContext) => DialogShortcutsWrapper(
+        onEnterKey: saveShelf,
+        dialog: AlertDialog(
+          title: Text(l10n.editShelf),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: l10n.shelfName,
+              border: const OutlineInputBorder(),
+            ),
+            autofocus: true,
+            onSubmitted: (value) {
+              if (value.trim().isNotEmpty && value.trim() != shelf.name) {
+                saveShelf();
               }
             },
-            child: Text(l10n.save),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(onPressed: saveShelf, child: Text(l10n.save)),
+          ],
+        ),
       ),
     );
   }
@@ -471,28 +613,42 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                   ),
                   // Main content area
                   Expanded(
-                    child: Column(
-                      children: [
-                        // Header with action buttons
-                        LibraryHeader(
-                          selectedShelf: state.selectedShelf,
-                          bookCount: state.displayedBooks.length,
-                          isFocused: _currentFocus == FocusArea.books,
-                        ),
-                        Container(
-                          height: 3,
-                          color: _currentFocus == FocusArea.books
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).dividerColor,
-                        ),
-                        // Books grid
-                        Expanded(
-                          child: BooksGrid(
-                            books: state.displayedBooks,
-                            shelves: state.config.shelves,
-                          ),
-                        ),
-                      ],
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // Update books area width for column calculation
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_booksAreaWidth != constraints.maxWidth) {
+                            setState(() {
+                              _booksAreaWidth = constraints.maxWidth;
+                            });
+                          }
+                        });
+
+                        return Column(
+                          children: [
+                            // Header with action buttons
+                            LibraryHeader(
+                              selectedShelf: state.selectedShelf,
+                              bookCount: state.displayedBooks.length,
+                              isFocused: _currentFocus == FocusArea.books,
+                            ),
+                            Container(
+                              height: 1,
+                              color: Theme.of(context).dividerColor,
+                            ),
+                            // Books grid
+                            Expanded(
+                              child: BooksGrid(
+                                books: state.displayedBooks,
+                                shelves: state.config.shelves,
+                                focusedBookId: _currentFocus == FocusArea.books
+                                    ? state.focusedBookId
+                                    : null,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ],

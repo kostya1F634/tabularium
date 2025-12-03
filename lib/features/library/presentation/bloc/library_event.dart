@@ -107,6 +107,26 @@ class ClearSearch extends LibraryEvent {
   const ClearSearch();
 }
 
+/// Sort options for books
+enum BookSortOption {
+  dateAddedNewest,
+  dateAddedOldest,
+  dateOpenedNewest,
+  dateOpenedOldest,
+  titleAZ,
+  titleZA,
+}
+
+/// Event to sort books
+class SortBooks extends LibraryEvent {
+  final BookSortOption sortOption;
+
+  const SortBooks(this.sortOption);
+
+  @override
+  List<Object?> get props => [sortOption];
+}
+
 /// Event to open a book
 class OpenBook extends LibraryEvent {
   final Book book;
@@ -234,4 +254,38 @@ class DeleteAllBooksFromShelf extends LibraryEvent {
 
   @override
   List<Object?> get props => [shelfId];
+}
+
+/// Event to move focus to specific book
+class MoveFocusToBook extends LibraryEvent {
+  final String? bookId;
+
+  const MoveFocusToBook(this.bookId);
+
+  @override
+  List<Object?> get props => [bookId];
+}
+
+/// Event to move focus in direction (hjkl or arrows)
+class MoveFocusInDirection extends LibraryEvent {
+  final FocusDirection direction;
+  final int? columnsCount;
+
+  const MoveFocusInDirection(this.direction, {this.columnsCount});
+
+  @override
+  List<Object?> get props => [direction, columnsCount];
+}
+
+/// Direction for focus movement
+enum FocusDirection {
+  left, // h or left arrow
+  down, // j or down arrow
+  up, // k or up arrow
+  right, // l or right arrow
+}
+
+/// Event to toggle selection of focused book
+class ToggleFocusedBookSelection extends LibraryEvent {
+  const ToggleFocusedBookSelection();
 }

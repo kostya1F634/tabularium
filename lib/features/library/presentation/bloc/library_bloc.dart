@@ -44,6 +44,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<RemoveBookFromShelf>(_onRemoveBookFromShelf);
     on<SearchBooks>(_onSearchBooks);
     on<ClearSearch>(_onClearSearch);
+    on<SortBooks>(_onSortBooks);
     on<OpenBook>(_onOpenBook);
     on<OpenAllBooks>(_onOpenAllBooks);
     on<ScanForNewBooks>(_onScanForNewBooks);
@@ -59,6 +60,9 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<DeleteSelectedBooksPermanently>(_onDeleteSelectedBooksPermanently);
     on<DeleteAllBooksPermanently>(_onDeleteAllBooksPermanently);
     on<DeleteAllBooksFromShelf>(_onDeleteAllBooksFromShelf);
+    on<MoveFocusToBook>(_onMoveFocusToBook);
+    on<MoveFocusInDirection>(_onMoveFocusInDirection);
+    on<ToggleFocusedBookSelection>(_onToggleFocusedBookSelection);
   }
 
   Future<void> _onInitializeLibrary(
@@ -80,13 +84,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           ? config.getShelf(config.lastSelectedShelfId!) ?? config.allShelf
           : config.allShelf;
 
-      final displayedBooks = _getBooksForShelf(config, selectedShelf.id);
+      final displayedBooks = _getSortedBooks(
+        _getBooksForShelf(config, selectedShelf.id),
+        BookSortOption.dateAddedNewest,
+        null,
+      );
 
       emit(
         LibraryLoaded(
           config: config,
           selectedShelf: selectedShelf,
           displayedBooks: displayedBooks,
+          focusedBookId: config.lastFocusedBookId,
         ),
       );
     } catch (e) {
@@ -108,13 +117,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       }
 
       final allShelf = config.allShelf;
-      final displayedBooks = _getBooksForShelf(config, allShelf.id);
+      final displayedBooks = _getSortedBooks(
+        _getBooksForShelf(config, allShelf.id),
+        BookSortOption.dateAddedNewest,
+        null,
+      );
 
       emit(
         LibraryLoaded(
           config: config,
           selectedShelf: allShelf,
           displayedBooks: displayedBooks,
+          focusedBookId: config.lastFocusedBookId,
         ),
       );
     } catch (e) {
@@ -337,33 +351,30 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       emit(
         currentState.copyWith(
           clearSearch: true,
-          displayedBooks: _getBooksForShelf(
-            currentState.config,
-            currentState.selectedShelf.id,
+          displayedBooks: _getSortedBooks(
+            _getBooksForShelf(
+              currentState.config,
+              currentState.selectedShelf.id,
+            ),
+            currentState.sortOption,
+            null,
           ),
         ),
       );
       return;
     }
 
-    // Get books for current shelf
-    final shelfBooks = _getBooksForShelf(
-      currentState.config,
-      currentState.selectedShelf.id,
+    // Get books for current shelf and apply search + sort
+    final displayedBooks = _getSortedBooks(
+      _getBooksForShelf(currentState.config, currentState.selectedShelf.id),
+      currentState.sortOption,
+      event.query,
     );
-
-    // Filter books by search query
-    final query = event.query.toLowerCase();
-    final filteredBooks = shelfBooks.where((book) {
-      return book.displayTitle.toLowerCase().contains(query) ||
-          (book.author?.toLowerCase().contains(query) ?? false) ||
-          book.fileName.toLowerCase().contains(query);
-    }).toList();
 
     emit(
       currentState.copyWith(
         searchQuery: event.query,
-        displayedBooks: filteredBooks,
+        displayedBooks: displayedBooks,
       ),
     );
   }
@@ -379,9 +390,27 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     emit(
       currentState.copyWith(
         clearSearch: true,
-        displayedBooks: _getBooksForShelf(
-          currentState.config,
-          currentState.selectedShelf.id,
+        displayedBooks: _getSortedBooks(
+          _getBooksForShelf(currentState.config, currentState.selectedShelf.id),
+          currentState.sortOption,
+          null,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onSortBooks(SortBooks event, Emitter<LibraryState> emit) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+
+    emit(
+      currentState.copyWith(
+        sortOption: event.sortOption,
+        displayedBooks: _getSortedBooks(
+          _getBooksForShelf(currentState.config, currentState.selectedShelf.id),
+          event.sortOption,
+          currentState.searchQuery,
         ),
       ),
     );
@@ -448,14 +477,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final currentState = state as LibraryLoaded;
 
     try {
-      // Re-initialize library to scan for new books
+      // Re-initialize library to scan for new books with progress callback
       final updatedConfig = await _initializeLibrary(
         currentState.config.directoryPath,
+        onProgress: (current, total) {
+          emit(LibraryInitializing(currentBook: current, totalBooks: total));
+        },
       );
 
-      final displayedBooks = _getBooksForShelf(
-        updatedConfig,
-        currentState.selectedShelf.id,
+      final displayedBooks = _getSortedBooks(
+        _getBooksForShelf(updatedConfig, currentState.selectedShelf.id),
+        currentState.sortOption,
+        currentState.searchQuery,
       );
 
       emit(
@@ -495,6 +528,65 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     return config.books
         .where((book) => shelf.bookIds.contains(book.id))
         .toList();
+  }
+
+  /// Sort books based on sort option and search query
+  List<Book> _getSortedBooks(
+    List<Book> books,
+    BookSortOption sortOption,
+    String? searchQuery,
+  ) {
+    // Apply search filter if exists
+    var filteredBooks = books;
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      final query = searchQuery.toLowerCase();
+      filteredBooks = books.where((book) {
+        return book.displayTitle.toLowerCase().contains(query) ||
+            (book.author?.toLowerCase().contains(query) ?? false);
+      }).toList();
+    }
+
+    // Sort books
+    switch (sortOption) {
+      case BookSortOption.dateAddedNewest:
+        filteredBooks.sort((a, b) => b.addedDate.compareTo(a.addedDate));
+        break;
+      case BookSortOption.dateAddedOldest:
+        filteredBooks.sort((a, b) => a.addedDate.compareTo(b.addedDate));
+        break;
+      case BookSortOption.dateOpenedNewest:
+        filteredBooks.sort((a, b) {
+          if (a.lastOpenedDate == null && b.lastOpenedDate == null) return 0;
+          if (a.lastOpenedDate == null) return 1;
+          if (b.lastOpenedDate == null) return -1;
+          return b.lastOpenedDate!.compareTo(a.lastOpenedDate!);
+        });
+        break;
+      case BookSortOption.dateOpenedOldest:
+        filteredBooks.sort((a, b) {
+          if (a.lastOpenedDate == null && b.lastOpenedDate == null) return 0;
+          if (a.lastOpenedDate == null) return 1;
+          if (b.lastOpenedDate == null) return -1;
+          return a.lastOpenedDate!.compareTo(b.lastOpenedDate!);
+        });
+        break;
+      case BookSortOption.titleAZ:
+        filteredBooks.sort(
+          (a, b) => a.displayTitle.toLowerCase().compareTo(
+            b.displayTitle.toLowerCase(),
+          ),
+        );
+        break;
+      case BookSortOption.titleZA:
+        filteredBooks.sort(
+          (a, b) => b.displayTitle.toLowerCase().compareTo(
+            a.displayTitle.toLowerCase(),
+          ),
+        );
+        break;
+    }
+
+    return filteredBooks;
   }
 
   /// Generate unique shelf ID
@@ -996,5 +1088,146 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     } catch (e) {
       print('Error deleting books from shelf: $e');
     }
+  }
+
+  /// Move focus to specific book
+  Future<void> _onMoveFocusToBook(
+    MoveFocusToBook event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+    final currentState = state as LibraryLoaded;
+
+    // Update config with new focused book
+    final updatedConfig = currentState.config.copyWith(
+      lastFocusedBookId: event.bookId,
+    );
+    await _saveLibrary(updatedConfig);
+
+    emit(
+      currentState.copyWith(focusedBookId: event.bookId, config: updatedConfig),
+    );
+  }
+
+  /// Move focus in direction (hjkl or arrows)
+  Future<void> _onMoveFocusInDirection(
+    MoveFocusInDirection event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+    final currentState = state as LibraryLoaded;
+
+    if (currentState.displayedBooks.isEmpty) return;
+
+    // If no focus yet, focus first book
+    if (currentState.focusedBookId == null) {
+      await _updateFocusAndSave(
+        currentState.displayedBooks.first.id,
+        currentState,
+        emit,
+      );
+      return;
+    }
+
+    // Find current focused book index
+    final currentIndex = currentState.displayedBooks.indexWhere(
+      (book) => book.id == currentState.focusedBookId,
+    );
+
+    if (currentIndex == -1) {
+      // Focused book not found, focus first
+      await _updateFocusAndSave(
+        currentState.displayedBooks.first.id,
+        currentState,
+        emit,
+      );
+      return;
+    }
+
+    // Calculate grid parameters (use provided columnsCount or default to 6)
+    final columnsCount = event.columnsCount ?? 6;
+    final totalBooks = currentState.displayedBooks.length;
+    final currentRow = currentIndex ~/ columnsCount;
+    final currentCol = currentIndex % columnsCount;
+
+    int? newIndex;
+
+    switch (event.direction) {
+      case FocusDirection.left:
+        if (currentCol > 0) {
+          newIndex = currentIndex - 1;
+        }
+        break;
+      case FocusDirection.right:
+        if (currentCol < columnsCount - 1 && currentIndex + 1 < totalBooks) {
+          newIndex = currentIndex + 1;
+        }
+        break;
+      case FocusDirection.up:
+        if (currentRow > 0) {
+          newIndex = currentIndex - columnsCount;
+          if (newIndex < 0) newIndex = null;
+        }
+        break;
+      case FocusDirection.down:
+        final potentialIndex = currentIndex + columnsCount;
+        if (potentialIndex < totalBooks) {
+          // Direct move down to same column in next row
+          newIndex = potentialIndex;
+        } else {
+          // No book directly below, but check if next row exists
+          final nextRowStartIndex = ((currentRow + 1) * columnsCount);
+          if (nextRowStartIndex < totalBooks) {
+            // Next row exists, move to last book in that row
+            final nextRowEndIndex = ((currentRow + 2) * columnsCount) - 1;
+            newIndex = nextRowEndIndex < totalBooks
+                ? nextRowEndIndex
+                : totalBooks - 1;
+          }
+        }
+        break;
+    }
+
+    if (newIndex != null) {
+      await _updateFocusAndSave(
+        currentState.displayedBooks[newIndex].id,
+        currentState,
+        emit,
+      );
+    }
+  }
+
+  /// Helper method to update focus and save to config
+  Future<void> _updateFocusAndSave(
+    String bookId,
+    LibraryLoaded currentState,
+    Emitter<LibraryState> emit,
+  ) async {
+    final updatedConfig = currentState.config.copyWith(
+      lastFocusedBookId: bookId,
+    );
+    await _saveLibrary(updatedConfig);
+
+    emit(currentState.copyWith(focusedBookId: bookId, config: updatedConfig));
+  }
+
+  /// Toggle selection of focused book
+  Future<void> _onToggleFocusedBookSelection(
+    ToggleFocusedBookSelection event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+    final currentState = state as LibraryLoaded;
+
+    if (currentState.focusedBookId == null) return;
+
+    final selectedBookIds = Set<String>.from(currentState.selectedBookIds);
+    if (selectedBookIds.contains(currentState.focusedBookId)) {
+      selectedBookIds.remove(currentState.focusedBookId);
+    } else {
+      selectedBookIds.add(currentState.focusedBookId!);
+    }
+
+    emit(currentState.copyWith(selectedBookIds: selectedBookIds));
   }
 }

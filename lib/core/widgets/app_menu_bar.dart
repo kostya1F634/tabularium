@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/app_settings.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../features/library/presentation/pages/library_view_wrapper.dart';
+import '../../features/library/presentation/bloc/library_bloc.dart';
+import '../../features/library/presentation/bloc/library_event.dart';
 import '../services/language_provider.dart';
 import '../services/theme_provider.dart';
 import '../services/ui_settings_provider.dart';
 import '../services/window_settings_provider.dart';
 import '../theme/app_theme.dart';
+import 'dialog_shortcuts_wrapper.dart';
 import 'shortcuts_dialog.dart';
 
 /// Reusable menu bar widget with theme and language settings
@@ -50,19 +54,22 @@ class AppMenuBar extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.aboutTabularium),
-        content: Text(
-          'Tabularium - ${l10n.appSubtitle}\n\n'
-          'Version: ${packageInfo.version}\n\n'
-          'A modern PDF library manager built with Flutter.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.ok),
+      builder: (dialogContext) => DialogShortcutsWrapper(
+        onEnterKey: () => Navigator.of(dialogContext).pop(),
+        dialog: AlertDialog(
+          title: Text(l10n.aboutTabularium),
+          content: Text(
+            'Tabularium - ${l10n.appSubtitle}\n\n'
+            'Version: ${packageInfo.version}\n\n'
+            'A modern PDF library manager built with Flutter.',
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.ok),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -330,7 +337,12 @@ class AppMenuBar extends StatelessWidget {
           tooltip: 'Help',
           offset: const Offset(0, 30),
           onSelected: (value) async {
-            if (value == 'reset') {
+            if (value == 'scan') {
+              // Trigger scan for new books
+              if (_isInLibraryScreen(context)) {
+                context.read<LibraryBloc>().add(const ScanForNewBooks());
+              }
+            } else if (value == 'reset') {
               uiSettings.setFontSize(1.0);
               uiSettings.setBookScale(1.0);
               uiSettings.setBookScaleCabinet(1.0);
@@ -353,6 +365,19 @@ class AppMenuBar extends StatelessWidget {
           itemBuilder: (context) {
             final l10n = AppLocalizations.of(context)!;
             return [
+              // Scan (only in library screen)
+              if (_isInLibraryScreen(context))
+                PopupMenuItem(
+                  value: 'scan',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.refresh, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.scan),
+                    ],
+                  ),
+                ),
+              if (_isInLibraryScreen(context)) const PopupMenuDivider(),
               PopupMenuItem(
                 value: 'shortcuts',
                 child: Row(

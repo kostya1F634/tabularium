@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import '../../../../core/widgets/dialog_shortcuts_wrapper.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_event.dart';
@@ -108,26 +109,32 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                     onPressed: () async {
                       final confirmed = await showDialog<bool>(
                         context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(l10n.confirmDeleteSelected),
-                          content: Text(
-                            l10n.confirmDeleteSelectedMessage(selectedCount),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(false),
-                              child: Text(l10n.cancel),
+                        builder: (dialogContext) => DialogShortcutsWrapper(
+                          onEnterKey: () =>
+                              Navigator.of(dialogContext).pop(true),
+                          dialog: AlertDialog(
+                            title: Text(l10n.confirmDeleteSelected),
+                            content: Text(
+                              l10n.confirmDeleteSelectedMessage(selectedCount),
                             ),
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(true),
-                              style: TextButton.styleFrom(
-                                foregroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.error,
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(dialogContext).pop(false),
+                                child: Text(l10n.cancel),
                               ),
-                              child: Text(l10n.delete),
-                            ),
-                          ],
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.of(dialogContext).pop(true),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Theme.of(
+                                    dialogContext,
+                                  ).colorScheme.error,
+                                ),
+                                child: Text(l10n.delete),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                       if (confirmed == true && context.mounted) {
@@ -155,43 +162,42 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                   ),
                   const SizedBox(width: 16),
                   OutlinedButton.icon(
-                    onPressed: () => context.read<LibraryBloc>().add(
-                      const ScanForNewBooks(),
-                    ),
-                    icon: const Icon(Icons.refresh, size: 18),
-                    label: Text(l10n.scanForNewBooks),
-                  ),
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
                     onPressed: widget.bookCount > 0
                         ? () async {
                             final confirmed = await showDialog<bool>(
                               context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text(l10n.confirmDeleteAll),
-                                content: Text(
-                                  l10n.confirmDeleteAllMessage(
-                                    widget.bookCount,
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: Text(l10n.cancel),
-                                  ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(true),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Theme.of(
-                                        context,
-                                      ).colorScheme.error,
+                              builder: (dialogContext) =>
+                                  DialogShortcutsWrapper(
+                                    onEnterKey: () =>
+                                        Navigator.of(dialogContext).pop(true),
+                                    dialog: AlertDialog(
+                                      title: Text(l10n.confirmDeleteAll),
+                                      content: Text(
+                                        l10n.confirmDeleteAllMessage(
+                                          widget.bookCount,
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(
+                                            dialogContext,
+                                          ).pop(false),
+                                          child: Text(l10n.cancel),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.of(
+                                            dialogContext,
+                                          ).pop(true),
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: Theme.of(
+                                              dialogContext,
+                                            ).colorScheme.error,
+                                          ),
+                                          child: Text(l10n.delete),
+                                        ),
+                                      ],
                                     ),
-                                    child: Text(l10n.delete),
                                   ),
-                                ],
-                              ),
                             );
                             if (confirmed == true && context.mounted) {
                               context.read<LibraryBloc>().add(
@@ -212,6 +218,54 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                 // Search field (always visible when not in selection mode, aligned to the right)
                 if (!hasSelection) ...[
                   const Spacer(),
+                  // Sort dropdown
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).dividerColor,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButton<BookSortOption>(
+                      value: state.sortOption,
+                      icon: const Icon(Icons.arrow_drop_down, size: 20),
+                      underline: Container(),
+                      onChanged: (BookSortOption? newValue) {
+                        if (newValue != null) {
+                          context.read<LibraryBloc>().add(SortBooks(newValue));
+                        }
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: BookSortOption.dateAddedNewest,
+                          child: Text('Date Added ↓'),
+                        ),
+                        DropdownMenuItem(
+                          value: BookSortOption.dateAddedOldest,
+                          child: Text('Date Added ↑'),
+                        ),
+                        DropdownMenuItem(
+                          value: BookSortOption.dateOpenedNewest,
+                          child: Text('Date Opened ↓'),
+                        ),
+                        DropdownMenuItem(
+                          value: BookSortOption.dateOpenedOldest,
+                          child: Text('Date Opened ↑'),
+                        ),
+                        DropdownMenuItem(
+                          value: BookSortOption.titleAZ,
+                          child: Text('Title A-Z'),
+                        ),
+                        DropdownMenuItem(
+                          value: BookSortOption.titleZA,
+                          child: Text('Title Z-A'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
                   SizedBox(
                     width: 300,
                     child: TextField(

@@ -183,6 +183,11 @@
     "description": "Button to scan directory for new books"
   },
 
+  "scan": "Scan",
+  "@scan": {
+    "description": "Menu item to scan for new books"
+  },
+
   "initializingLibrary": "Initializing library...",
   "@initializingLibrary": {
     "description": "Message during library initialization"

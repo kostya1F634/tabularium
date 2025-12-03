@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import 'dialog_shortcuts_wrapper.dart';
+
 class ShortcutsDialog extends StatelessWidget {
   const ShortcutsDialog({super.key});
 
@@ -8,49 +10,52 @@ class ShortcutsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return AlertDialog(
-      title: Text(l10n.keyboardShortcuts),
-      content: SizedBox(
-        width: 500,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildSection(context, 'General', [
-                _ShortcutItem('Ctrl+N', 'Create new shelf'),
-                _ShortcutItem('Ctrl+O', 'Open books (all or selected)'),
-                _ShortcutItem('Ctrl+E', 'Edit shelf / Book properties'),
-                _ShortcutItem('Ctrl+S', 'Select all books'),
-                _ShortcutItem('Ctrl+D', 'Clear selection'),
-              ]),
-              const SizedBox(height: 16),
-              _buildSection(context, 'Navigation', [
-                _ShortcutItem('H / ←', 'Focus on shelves'),
-                _ShortcutItem('L / →', 'Focus on books'),
-                _ShortcutItem('J / ↓', 'Move down (in shelves)'),
-                _ShortcutItem('K / ↑', 'Move up (in shelves)'),
-              ]),
-              const SizedBox(height: 16),
-              _buildSection(context, 'Shelves', [
-                _ShortcutItem('Ctrl+J / Ctrl+↓', 'Move shelf down'),
-                _ShortcutItem('Ctrl+K / Ctrl+↑', 'Move shelf up'),
-                _ShortcutItem('Delete', 'Delete shelf'),
-              ]),
-              const SizedBox(height: 16),
-              _buildSection(context, 'Books', [
-                _ShortcutItem('Delete', 'Remove book from shelf'),
-              ]),
-            ],
+    return DialogShortcutsWrapper(
+      onEnterKey: () => Navigator.of(context).pop(),
+      dialog: AlertDialog(
+        title: Text(l10n.keyboardShortcuts),
+        content: SizedBox(
+          width: 500,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildSection(context, 'General', [
+                  _ShortcutItem('Ctrl+N', 'Create new shelf'),
+                  _ShortcutItem('Ctrl+O', 'Open books (all or selected)'),
+                  _ShortcutItem('Ctrl+E', 'Edit shelf / Book properties'),
+                  _ShortcutItem('Ctrl+S', 'Select all books'),
+                  _ShortcutItem('Ctrl+D', 'Clear selection'),
+                ]),
+                const SizedBox(height: 16),
+                _buildSection(context, 'Navigation', [
+                  _ShortcutItem('H / ←', 'Focus on shelves'),
+                  _ShortcutItem('L / →', 'Focus on books'),
+                  _ShortcutItem('J / ↓', 'Move down (in shelves)'),
+                  _ShortcutItem('K / ↑', 'Move up (in shelves)'),
+                ]),
+                const SizedBox(height: 16),
+                _buildSection(context, 'Shelves', [
+                  _ShortcutItem('Ctrl+J / Ctrl+↓', 'Move shelf down'),
+                  _ShortcutItem('Ctrl+K / Ctrl+↑', 'Move shelf up'),
+                  _ShortcutItem('Delete', 'Delete shelf'),
+                ]),
+                const SizedBox(height: 16),
+                _buildSection(context, 'Books', [
+                  _ShortcutItem('Delete', 'Remove book from shelf'),
+                ]),
+              ],
+            ),
           ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
-        ),
-      ],
     );
   }
 

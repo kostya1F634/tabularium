@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
+import '../../../../core/widgets/dialog_shortcuts_wrapper.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
@@ -30,9 +31,24 @@ class ShelfsSidebar extends StatefulWidget {
 
 class _ShelfsSidebarState extends State<ShelfsSidebar> {
   final TextEditingController _shelfSearchController = TextEditingController();
+  final Map<String, GlobalKey> _shelfKeys = {};
   final ScrollController _scrollController = ScrollController();
   String _shelfSearchQuery = '';
   bool _hasScrolledToSelected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Scroll to selected shelf on initial build with delay to ensure layout is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          _scrollToSelectedShelf();
+          _hasScrolledToSelected = true;
+        }
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -56,8 +72,6 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
   }
 
   void _scrollToSelectedShelf() {
-    if (!_scrollController.hasClients) return;
-
     final selectedShelf = widget.shelves.firstWhere(
       (s) => s.id == widget.selectedShelfId,
       orElse: () => widget.shelves.first,
@@ -66,20 +80,35 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
     // Only scroll if it's a user shelf (not All Books or Unsorted)
     if (selectedShelf.isDefault) return;
 
+    // Get or create key for selected shelf
+    if (!_shelfKeys.containsKey(selectedShelf.id)) {
+      _shelfKeys[selectedShelf.id] = GlobalKey();
+    }
+
+    final key = _shelfKeys[selectedShelf.id];
     final userShelves = widget.shelves.where((s) => !s.isDefault).toList();
-    final index = userShelves.indexOf(selectedShelf);
+    final shelfIndex = userShelves.indexWhere((s) => s.id == selectedShelf.id);
 
-    if (index >= 0) {
-      // Each item is approximately 56 pixels high (ListTile default height)
-      const itemHeight = 56.0;
-      final offset = index * itemHeight;
-
-      // Scroll to show the selected shelf near the top
+    // For last 2 shelves, scroll to bottom using ScrollController
+    if (shelfIndex >= userShelves.length - 2 && _scrollController.hasClients) {
+      final maxScroll = _scrollController.position.maxScrollExtent;
       _scrollController.animateTo(
-        offset,
-        duration: const Duration(milliseconds: 300),
+        maxScroll,
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
+    } else if (key != null && key.currentContext != null) {
+      // For other shelves, use ensureVisible with center alignment
+      try {
+        Scrollable.ensureVisible(
+          key.currentContext!,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+          alignment: 0.5,
+        );
+      } catch (e) {
+        // Silently catch any scroll errors
+      }
     }
   }
 
@@ -189,6 +218,7 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
                       context,
                     ).copyWith(scrollbars: true),
                     child: ReorderableListView.builder(
+                      scrollController: _scrollController,
                       buildDefaultDragHandles: false,
                       padding: const EdgeInsets.only(bottom: 8),
                       itemCount: filteredUserShelves.length,
@@ -268,16 +298,60 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
       bookCount = shelf.bookIds.length;
     }
 
+    // Get or create GlobalKey for this shelf (only for user shelves)
+    GlobalKey? shelfKey;
+    if (!shelf.isDefault) {
+      if (!_shelfKeys.containsKey(shelf.id)) {
+        _shelfKeys[shelf.id] = GlobalKey();
+      }
+      shelfKey = _shelfKeys[shelf.id];
+    }
+
     return _ShelfItem(
-      key: ValueKey(shelf.id),
+      key: shelfKey ?? ValueKey(shelf.id),
       index: index,
       shelf: shelf,
       isSelected: isSelected,
       isDefaultShelf: shelf.isDefault,
       isFixed: isFixed,
       bookCount: bookCount,
+      isFocused: widget.isFocused && isSelected,
       onTap: () {
         context.read<LibraryBloc>().add(SelectShelf(shelf.id));
+
+        // Scroll to shelf if it's a user shelf
+        if (!shelf.isDefault) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final userShelves = widget.shelves
+                .where((s) => !s.isDefault)
+                .toList();
+            final shelfIndex = userShelves.indexWhere((s) => s.id == shelf.id);
+
+            if (shelfIndex == -1) return;
+
+            // For last 2 shelves, scroll to bottom using ScrollController
+            if (shelfIndex >= userShelves.length - 2 &&
+                _scrollController.hasClients) {
+              final maxScroll = _scrollController.position.maxScrollExtent;
+              _scrollController.animateTo(
+                maxScroll,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            } else {
+              // For other shelves, use ensureVisible
+              final ctx = shelfKey?.currentContext;
+              if (ctx != null) {
+                Scrollable.ensureVisible(
+                  ctx,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  alignment: 0.5,
+                );
+              }
+            }
+          });
+        }
       },
       onDelete: shelf.isDefault
           ? null
@@ -291,40 +365,41 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
     final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController();
 
+    void createShelf() {
+      final name = controller.text.trim();
+      if (name.isNotEmpty) {
+        context.read<LibraryBloc>().add(CreateShelf(name));
+        Navigator.of(context).pop();
+      }
+    }
+
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.createShelf),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: l10n.shelfName,
-            border: const OutlineInputBorder(),
-          ),
-          autofocus: true,
-          onSubmitted: (value) {
-            if (value.trim().isNotEmpty) {
-              context.read<LibraryBloc>().add(CreateShelf(value.trim()));
-              Navigator.of(dialogContext).pop();
-            }
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final name = controller.text.trim();
-              if (name.isNotEmpty) {
-                context.read<LibraryBloc>().add(CreateShelf(name));
-                Navigator.of(dialogContext).pop();
+      builder: (dialogContext) => DialogShortcutsWrapper(
+        onEnterKey: createShelf,
+        dialog: AlertDialog(
+          title: Text(l10n.createShelf),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: l10n.shelfName,
+              border: const OutlineInputBorder(),
+            ),
+            autofocus: true,
+            onSubmitted: (value) {
+              if (value.trim().isNotEmpty) {
+                createShelf();
               }
             },
-            child: Text(l10n.create),
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(onPressed: createShelf, child: Text(l10n.create)),
+          ],
+        ),
       ),
     );
   }
@@ -332,27 +407,32 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
   void _showDeleteDialog(BuildContext context, Shelf shelf) {
     final l10n = AppLocalizations.of(context)!;
 
+    void deleteShelf() {
+      context.read<LibraryBloc>().add(DeleteShelf(shelf.id));
+      Navigator.of(context).pop();
+    }
+
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.deleteShelf),
-        content: Text('${l10n.delete} "${shelf.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              context.read<LibraryBloc>().add(DeleteShelf(shelf.id));
-              Navigator.of(dialogContext).pop();
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
+      builder: (dialogContext) => DialogShortcutsWrapper(
+        onEnterKey: deleteShelf,
+        dialog: AlertDialog(
+          title: Text(l10n.deleteShelf),
+          content: Text('${l10n.delete} "${shelf.name}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.cancel),
             ),
-            child: Text(l10n.delete),
-          ),
-        ],
+            FilledButton(
+              onPressed: deleteShelf,
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: Text(l10n.delete),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -367,6 +447,7 @@ class _ShelfItem extends StatelessWidget {
   final int bookCount;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+  final bool isFocused;
 
   const _ShelfItem({
     super.key,
@@ -378,6 +459,7 @@ class _ShelfItem extends StatelessWidget {
     required this.bookCount,
     required this.onTap,
     this.onDelete,
+    this.isFocused = false,
   });
 
   @override
@@ -405,18 +487,31 @@ class _ShelfItem extends StatelessWidget {
       builder: (context, candidateData, rejectedData) {
         final isHovering = candidateData.isNotEmpty;
 
+        // Determine decoration based on focus and hover states
+        BoxDecoration? decoration;
+        if (isFocused) {
+          // Focus border (tertiary color, same as books)
+          decoration = BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).colorScheme.tertiary,
+              width: 3,
+            ),
+          );
+        } else if (isHovering) {
+          // Drop target hover border
+          decoration = BoxDecoration(
+            color: Theme.of(
+              context,
+            ).colorScheme.primaryContainer.withOpacity(0.5),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
+          );
+        }
+
         return Container(
-          decoration: isHovering
-              ? BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer.withOpacity(0.5),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2,
-                  ),
-                )
-              : null,
+          decoration: decoration,
           child: _buildListTile(context, l10n),
         );
       },

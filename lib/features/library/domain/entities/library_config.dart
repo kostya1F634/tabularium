@@ -11,6 +11,7 @@ class LibraryConfig extends Equatable {
   final String language;
   final DateTime lastScanDate;
   final String? lastSelectedShelfId;
+  final String? lastFocusedBookId;
 
   const LibraryConfig({
     required this.directoryPath,
@@ -20,6 +21,7 @@ class LibraryConfig extends Equatable {
     this.language = 'en',
     required this.lastScanDate,
     this.lastSelectedShelfId,
+    this.lastFocusedBookId,
   });
 
   /// Create empty config
@@ -40,6 +42,7 @@ class LibraryConfig extends Equatable {
     String? language,
     DateTime? lastScanDate,
     String? lastSelectedShelfId,
+    String? lastFocusedBookId,
   }) {
     return LibraryConfig(
       directoryPath: directoryPath ?? this.directoryPath,
@@ -49,6 +52,7 @@ class LibraryConfig extends Equatable {
       language: language ?? this.language,
       lastScanDate: lastScanDate ?? this.lastScanDate,
       lastSelectedShelfId: lastSelectedShelfId ?? this.lastSelectedShelfId,
+      lastFocusedBookId: lastFocusedBookId ?? this.lastFocusedBookId,
     );
   }
 
@@ -96,6 +100,7 @@ class LibraryConfig extends Equatable {
       'language': language,
       'lastScanDate': lastScanDate.toIso8601String(),
       'lastSelectedShelfId': lastSelectedShelfId,
+      'lastFocusedBookId': lastFocusedBookId,
     };
   }
 
@@ -132,6 +137,7 @@ class LibraryConfig extends Equatable {
       language: json['language'] as String? ?? 'en',
       lastScanDate: DateTime.parse(json['lastScanDate'] as String),
       lastSelectedShelfId: json['lastSelectedShelfId'] as String?,
+      lastFocusedBookId: json['lastFocusedBookId'] as String?,
     );
   }
 
@@ -144,5 +150,6 @@ class LibraryConfig extends Equatable {
     language,
     lastScanDate,
     lastSelectedShelfId,
+    lastFocusedBookId,
   ];
 }

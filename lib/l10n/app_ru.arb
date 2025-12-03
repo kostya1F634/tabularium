@@ -35,6 +35,7 @@
   "noBooks": "Книги не найдены",
   "noBooksInShelf": "На этой полке нет книг",
   "scanForNewBooks": "Сканировать новые книги",
+  "scan": "Сканировать",
   "initializingLibrary": "Инициализация библиотеки...",
   "loadingLibrary": "Загрузка библиотеки...",
   "backToWelcome": "Вернуться к приветствию",
