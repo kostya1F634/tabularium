@@ -235,6 +235,8 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                       onChanged: (BookSortOption? newValue) {
                         if (newValue != null) {
                           context.read<LibraryBloc>().add(SortBooks(newValue));
+                          // Remove focus from dropdown after selection
+                          FocusScope.of(context).unfocus();
                         }
                       },
                       items: [

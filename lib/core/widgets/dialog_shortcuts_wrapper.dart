@@ -24,7 +24,7 @@ class DialogShortcutsWrapper extends StatelessWidget {
         if (onEnterKey != null)
           const SingleActivator(LogicalKeyboardKey.enter): onEnterKey!,
       },
-      child: Focus(autofocus: true, child: dialog),
+      child: dialog,
     );
   }
 }

@@ -15,6 +15,7 @@ class ShelfsSidebar extends StatefulWidget {
   final int totalBooksCount;
   final List<Book> allBooks;
   final bool isFocused;
+  final void Function(List<Shelf>)? onFilteredShelvesChanged;
 
   const ShelfsSidebar({
     super.key,
@@ -23,6 +24,7 @@ class ShelfsSidebar extends StatefulWidget {
     required this.totalBooksCount,
     required this.allBooks,
     this.isFocused = false,
+    this.onFilteredShelvesChanged,
   });
 
   @override
@@ -61,10 +63,8 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
   void didUpdateWidget(ShelfsSidebar oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Scroll to selected shelf when it changes (only for user shelves)
-    if (oldWidget.selectedShelfId != widget.selectedShelfId &&
-        !_hasScrolledToSelected) {
-      _hasScrolledToSelected = true;
+    // Scroll to selected shelf when it changes (keyboard navigation or click)
+    if (oldWidget.selectedShelfId != widget.selectedShelfId) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollToSelectedShelf();
       });
@@ -131,6 +131,16 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
               _shelfSearchQuery.toLowerCase(),
             );
           }).toList();
+
+    // Notify parent about filtered shelves (including default shelves)
+    final filteredAllShelves = [
+      allShelf,
+      unsortedShelf,
+      ...filteredUserShelves,
+    ];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onFilteredShelvesChanged?.call(filteredAllShelves);
+    });
 
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -213,42 +223,40 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
                       ),
                     ),
                   )
-                : ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(
-                      context,
-                    ).copyWith(scrollbars: true),
-                    child: ReorderableListView.builder(
-                      scrollController: _scrollController,
-                      buildDefaultDragHandles: false,
-                      padding: const EdgeInsets.only(bottom: 8),
-                      itemCount: filteredUserShelves.length,
-                      onReorder: (oldIndex, newIndex) {
-                        final actualOldIndex =
-                            userShelves.indexOf(filteredUserShelves[oldIndex]) +
-                            2;
-                        final actualNewIndex =
-                            userShelves.indexOf(filteredUserShelves[newIndex]) +
-                            2;
-
-                        context.read<LibraryBloc>().add(
-                          ReorderShelves(
-                            oldIndex: actualOldIndex,
-                            newIndex: actualNewIndex,
-                            fromDrag: true,
-                          ),
-                        );
-                      },
-                      itemBuilder: (context, index) {
-                        final shelf = filteredUserShelves[index];
-                        final actualIndex = widget.shelves.indexOf(shelf);
-                        return _buildShelfItem(
-                          context,
-                          shelf,
-                          actualIndex,
-                          isFixed: false,
-                        );
-                      },
+                : ReorderableListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
                     ),
+                    scrollController: _scrollController,
+                    buildDefaultDragHandles: false,
+                    padding: const EdgeInsets.only(bottom: 8),
+                    itemCount: filteredUserShelves.length,
+                    onReorder: (oldIndex, newIndex) {
+                      final actualOldIndex =
+                          userShelves.indexOf(filteredUserShelves[oldIndex]) +
+                          2;
+                      final actualNewIndex =
+                          userShelves.indexOf(filteredUserShelves[newIndex]) +
+                          2;
+
+                      context.read<LibraryBloc>().add(
+                        ReorderShelves(
+                          oldIndex: actualOldIndex,
+                          newIndex: actualNewIndex,
+                          fromDrag: true,
+                        ),
+                      );
+                    },
+                    itemBuilder: (context, index) {
+                      final shelf = filteredUserShelves[index];
+                      final actualIndex = widget.shelves.indexOf(shelf);
+                      return _buildShelfItem(
+                        context,
+                        shelf,
+                        actualIndex,
+                        isFixed: false,
+                      );
+                    },
                   ),
           ),
           const Divider(height: 1),

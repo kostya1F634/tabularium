@@ -41,6 +41,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<DeleteShelf>(_onDeleteShelf);
     on<RenameShelf>(_onRenameShelf);
     on<AddBookToShelf>(_onAddBookToShelf);
+    on<AddBooksToShelf>(_onAddBooksToShelf);
     on<RemoveBookFromShelf>(_onRemoveBookFromShelf);
     on<SearchBooks>(_onSearchBooks);
     on<ClearSearch>(_onClearSearch);
@@ -63,6 +64,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<MoveFocusToBook>(_onMoveFocusToBook);
     on<MoveFocusInDirection>(_onMoveFocusInDirection);
     on<ToggleFocusedBookSelection>(_onToggleFocusedBookSelection);
+    on<SaveFocusArea>(_onSaveFocusArea);
   }
 
   Future<void> _onInitializeLibrary(
@@ -84,9 +86,12 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           ? config.getShelf(config.lastSelectedShelfId!) ?? config.allShelf
           : config.allShelf;
 
+      // Restore sort option
+      final sortOption = _parseSortOption(config.lastSortOption);
+
       final displayedBooks = _getSortedBooks(
         _getBooksForShelf(config, selectedShelf.id),
-        BookSortOption.dateAddedNewest,
+        sortOption,
         null,
       );
 
@@ -96,6 +101,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           selectedShelf: selectedShelf,
           displayedBooks: displayedBooks,
           focusedBookId: config.lastFocusedBookId,
+          sortOption: sortOption,
         ),
       );
     } catch (e) {
@@ -117,9 +123,13 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       }
 
       final allShelf = config.allShelf;
+
+      // Restore sort option
+      final sortOption = _parseSortOption(config.lastSortOption);
+
       final displayedBooks = _getSortedBooks(
         _getBooksForShelf(config, allShelf.id),
-        BookSortOption.dateAddedNewest,
+        sortOption,
         null,
       );
 
@@ -129,6 +139,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           selectedShelf: allShelf,
           displayedBooks: displayedBooks,
           focusedBookId: config.lastFocusedBookId,
+          sortOption: sortOption,
         ),
       );
     } catch (e) {
@@ -162,6 +173,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         displayedBooks: displayedBooks,
         clearSearch: true,
         selectedBookIds: const {}, // Clear selection when switching shelves
+        clearFocus: true, // Clear focus when switching shelves
       ),
     );
   }
@@ -306,6 +318,39 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     );
   }
 
+  Future<void> _onAddBooksToShelf(
+    AddBooksToShelf event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+
+    final currentState = state as LibraryLoaded;
+    final shelf = currentState.config.getShelf(event.shelfId);
+
+    if (shelf == null || shelf.id == Shelf.allShelfId) return;
+
+    final updatedShelf = shelf.addBooks(event.bookIds);
+    final updatedShelves = currentState.config.shelves
+        .map((s) => s.id == event.shelfId ? updatedShelf : s)
+        .toList();
+
+    final updatedConfig = currentState.config.copyWith(shelves: updatedShelves);
+
+    await _saveLibrary(updatedConfig);
+
+    final displayedBooks = _getBooksForShelf(
+      updatedConfig,
+      currentState.selectedShelf.id,
+    );
+
+    emit(
+      currentState.copyWith(
+        config: updatedConfig,
+        displayedBooks: displayedBooks,
+      ),
+    );
+  }
+
   Future<void> _onRemoveBookFromShelf(
     RemoveBookFromShelf event,
     Emitter<LibraryState> emit,
@@ -404,8 +449,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
     final currentState = state as LibraryLoaded;
 
+    // Save sort option to config
+    final updatedConfig = currentState.config.copyWith(
+      lastSortOption: event.sortOption.name,
+    );
+    await _saveLibrary(updatedConfig);
+
     emit(
       currentState.copyWith(
+        config: updatedConfig,
         sortOption: event.sortOption,
         displayedBooks: _getSortedBooks(
           _getBooksForShelf(currentState.config, currentState.selectedShelf.id),
@@ -1229,5 +1281,33 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     }
 
     emit(currentState.copyWith(selectedBookIds: selectedBookIds));
+  }
+
+  /// Save current focus area
+  Future<void> _onSaveFocusArea(
+    SaveFocusArea event,
+    Emitter<LibraryState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! LibraryLoaded) return;
+
+    final updatedConfig = currentState.config.copyWith(
+      lastFocusArea: event.focusArea,
+    );
+
+    await _saveLibrary(updatedConfig);
+    emit(currentState.copyWith(config: updatedConfig));
+  }
+
+  /// Parse sort option from string
+  BookSortOption _parseSortOption(String? sortOptionString) {
+    if (sortOptionString == null) return BookSortOption.dateAddedNewest;
+    try {
+      return BookSortOption.values.firstWhere(
+        (e) => e.name == sortOptionString,
+      );
+    } catch (_) {
+      return BookSortOption.dateAddedNewest;
+    }
   }
 }

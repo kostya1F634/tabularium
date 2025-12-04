@@ -12,6 +12,8 @@ class LibraryConfig extends Equatable {
   final DateTime lastScanDate;
   final String? lastSelectedShelfId;
   final String? lastFocusedBookId;
+  final String? lastSortOption;
+  final String? lastFocusArea; // 'shelves' or 'books'
 
   const LibraryConfig({
     required this.directoryPath,
@@ -22,6 +24,8 @@ class LibraryConfig extends Equatable {
     required this.lastScanDate,
     this.lastSelectedShelfId,
     this.lastFocusedBookId,
+    this.lastSortOption,
+    this.lastFocusArea,
   });
 
   /// Create empty config
@@ -43,6 +47,8 @@ class LibraryConfig extends Equatable {
     DateTime? lastScanDate,
     String? lastSelectedShelfId,
     String? lastFocusedBookId,
+    String? lastSortOption,
+    String? lastFocusArea,
   }) {
     return LibraryConfig(
       directoryPath: directoryPath ?? this.directoryPath,
@@ -53,6 +59,8 @@ class LibraryConfig extends Equatable {
       lastScanDate: lastScanDate ?? this.lastScanDate,
       lastSelectedShelfId: lastSelectedShelfId ?? this.lastSelectedShelfId,
       lastFocusedBookId: lastFocusedBookId ?? this.lastFocusedBookId,
+      lastSortOption: lastSortOption ?? this.lastSortOption,
+      lastFocusArea: lastFocusArea ?? this.lastFocusArea,
     );
   }
 
@@ -101,6 +109,8 @@ class LibraryConfig extends Equatable {
       'lastScanDate': lastScanDate.toIso8601String(),
       'lastSelectedShelfId': lastSelectedShelfId,
       'lastFocusedBookId': lastFocusedBookId,
+      'lastSortOption': lastSortOption,
+      'lastFocusArea': lastFocusArea,
     };
   }
 
@@ -138,6 +148,8 @@ class LibraryConfig extends Equatable {
       lastScanDate: DateTime.parse(json['lastScanDate'] as String),
       lastSelectedShelfId: json['lastSelectedShelfId'] as String?,
       lastFocusedBookId: json['lastFocusedBookId'] as String?,
+      lastSortOption: json['lastSortOption'] as String?,
+      lastFocusArea: json['lastFocusArea'] as String?,
     );
   }
 
@@ -151,5 +163,7 @@ class LibraryConfig extends Equatable {
     lastScanDate,
     lastSelectedShelfId,
     lastFocusedBookId,
+    lastSortOption,
+    lastFocusArea,
   ];
 }

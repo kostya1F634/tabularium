@@ -68,6 +68,12 @@ class Shelf extends Equatable {
     return copyWith(bookIds: [...bookIds, bookId]);
   }
 
+  /// Add multiple books to shelf
+  Shelf addBooks(List<String> newBookIds) {
+    final uniqueBookIds = <String>{...bookIds, ...newBookIds}.toList();
+    return copyWith(bookIds: uniqueBookIds);
+  }
+
   /// Remove book from shelf
   Shelf removeBook(String bookId) {
     return copyWith(bookIds: bookIds.where((id) => id != bookId).toList());

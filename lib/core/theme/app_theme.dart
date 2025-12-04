@@ -199,7 +199,7 @@ class AppTheme {
   static ThemeData _githubLightTheme() {
     const background = Color(0xFFFFFFFF);
     const surface = Color(0xFFF6F8FA);
-    const primary = Color(0xFF0969DA);
+    const primary = Color(0xFF08872B); // GitHub Green 4
     const secondary = Color(0xFF6E7781);
 
     return ThemeData(
@@ -538,7 +538,7 @@ class AppTheme {
   static ThemeData _githubDarkTheme() {
     const background = Color(0xFF0D1117);
     const surface = Color(0xFF161B22);
-    const primary = Color(0xFF58A6FF);
+    const primary = Color(0xFF5FED83); // GitHub Green 3
     const secondary = Color(0xFF8B949E);
 
     return ThemeData(
@@ -921,7 +921,7 @@ class AppTheme {
   static ThemeData _githubDimmedTheme() {
     const background = Color(0xFF22272E);
     const surface = Color(0xFF2D333B);
-    const primary = Color(0xFF539BF5);
+    const primary = Color(0xFF5FED83); // GitHub Green 3
     const secondary = Color(0xFF768390);
 
     return ThemeData(

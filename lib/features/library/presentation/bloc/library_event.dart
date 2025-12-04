@@ -81,6 +81,17 @@ class AddBookToShelf extends LibraryEvent {
   List<Object?> get props => [bookId, shelfId];
 }
 
+/// Event to add multiple books to shelf
+class AddBooksToShelf extends LibraryEvent {
+  final List<String> bookIds;
+  final String shelfId;
+
+  const AddBooksToShelf({required this.bookIds, required this.shelfId});
+
+  @override
+  List<Object?> get props => [bookIds, shelfId];
+}
+
 /// Event to remove book from shelf
 class RemoveBookFromShelf extends LibraryEvent {
   final String bookId;
@@ -288,4 +299,14 @@ enum FocusDirection {
 /// Event to toggle selection of focused book
 class ToggleFocusedBookSelection extends LibraryEvent {
   const ToggleFocusedBookSelection();
+}
+
+/// Event to save current focus area
+class SaveFocusArea extends LibraryEvent {
+  final String focusArea; // 'shelves' or 'books'
+
+  const SaveFocusArea(this.focusArea);
+
+  @override
+  List<Object?> get props => [focusArea];
 }

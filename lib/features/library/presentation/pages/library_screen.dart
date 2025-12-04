@@ -56,6 +56,9 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
   FocusArea _currentFocus = FocusArea.shelves;
   final FocusNode _focusNode = FocusNode();
   double _booksAreaWidth = 800.0; // Will be updated via LayoutBuilder
+  String? Function()? _getCenterVisibleBookId;
+  List<Shelf> _filteredShelves = []; // Shelves after applying search filter
+  bool _hasRestoredFocus = false; // Track if focus was restored from config
 
   @override
   void initState() {
@@ -184,10 +187,15 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
         final Set<String> booksToAdd;
         if (state.hasSelection) {
           booksToAdd = state.selectedBookIds;
+          print(
+            'DEBUG: Adding ${booksToAdd.length} selected books: $booksToAdd',
+          );
         } else if (state.focusedBookId != null) {
           booksToAdd = {state.focusedBookId!};
+          print('DEBUG: Adding focused book: $booksToAdd');
         } else {
           booksToAdd = state.displayedBooks.map((b) => b.id).toSet();
+          print('DEBUG: Adding all ${booksToAdd.length} books');
         }
 
         showDialog<String>(
@@ -195,8 +203,10 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
           builder: (context) => AddToShelfDialog(shelves: state.config.shelves),
         ).then((result) {
           if (result != null && context.mounted) {
+            print('DEBUG: Dialog result: $result');
             if (result.startsWith('create:')) {
               final shelfName = result.substring(7);
+              print('DEBUG: Creating new shelf: $shelfName');
               bloc.add(CreateShelf(shelfName));
               Future.delayed(const Duration(milliseconds: 100), () {
                 final updatedState = bloc.state;
@@ -204,21 +214,30 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                   final newShelf = updatedState.config.shelves.lastWhere(
                     (shelf) => shelf.name == shelfName && !shelf.isDefault,
                   );
-                  for (final bookId in booksToAdd) {
-                    bloc.add(
-                      AddBookToShelf(bookId: bookId, shelfId: newShelf.id),
-                    );
-                  }
+                  print(
+                    'DEBUG: New shelf ID: ${newShelf.id}, adding ${booksToAdd.length} books',
+                  );
+                  bloc.add(
+                    AddBooksToShelf(
+                      bookIds: booksToAdd.toList(),
+                      shelfId: newShelf.id,
+                    ),
+                  );
                   if (state.hasSelection) {
+                    print('DEBUG: Clearing selection after add');
                     bloc.add(const ClearBookSelection());
                   }
                 }
               });
             } else {
-              for (final bookId in booksToAdd) {
-                bloc.add(AddBookToShelf(bookId: bookId, shelfId: result));
-              }
+              print(
+                'DEBUG: Adding ${booksToAdd.length} books to shelf: $result',
+              );
+              bloc.add(
+                AddBooksToShelf(bookIds: booksToAdd.toList(), shelfId: result),
+              );
               if (state.hasSelection) {
+                print('DEBUG: Clearing selection after add');
                 bloc.add(const ClearBookSelection());
               }
             }
@@ -228,26 +247,51 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       return KeyEventResult.handled;
     }
 
-    // Handle focus switching with Ctrl+Left/Right or Ctrl+H/L
-    if (isCtrlPressed) {
-      if (event.logicalKey == LogicalKeyboardKey.arrowLeft ||
-          event.logicalKey == LogicalKeyboardKey.keyH) {
-        setState(() => _currentFocus = FocusArea.shelves);
-        return KeyEventResult.handled;
-      }
-      if (event.logicalKey == LogicalKeyboardKey.arrowRight ||
-          event.logicalKey == LogicalKeyboardKey.keyL) {
+    // Handle Ctrl+F to focus on center visible book
+    if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyF) {
+      if (state.displayedBooks.isNotEmpty) {
         setState(() => _currentFocus = FocusArea.books);
-        // Restore focused book from state (loaded from config)
-        if (state.focusedBookId != null &&
-            state.displayedBooks.any((b) => b.id == state.focusedBookId)) {
-          // Focus is already set in state, just switched area
-        } else if (state.displayedBooks.isNotEmpty) {
-          // No previous focus or previous book not available, focus first book
+        bloc.add(const SaveFocusArea('books'));
+
+        // Get center visible book from BooksGrid
+        final centerBookId = _getCenterVisibleBookId?.call();
+        if (centerBookId != null) {
+          bloc.add(MoveFocusToBook(centerBookId));
+        } else {
+          // Fallback to middle of collection if grid not ready
+          final centerIndex = (state.displayedBooks.length / 2).floor();
+          bloc.add(MoveFocusToBook(state.displayedBooks[centerIndex].id));
+        }
+      }
+      return KeyEventResult.handled;
+    }
+
+    // Handle focus switching with Tab
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      if (_currentFocus == FocusArea.shelves) {
+        setState(() => _currentFocus = FocusArea.books);
+        bloc.add(const SaveFocusArea('books'));
+
+        if (state.displayedBooks.isEmpty) {
+          // No books to focus on
+          return KeyEventResult.handled;
+        }
+
+        // Check if focused book exists in current displayed books
+        final focusedBookExists =
+            state.focusedBookId != null &&
+            state.displayedBooks.any((b) => b.id == state.focusedBookId);
+
+        if (!focusedBookExists) {
+          // If focused book doesn't exist or is null, focus first book
           bloc.add(MoveFocusToBook(state.displayedBooks.first.id));
         }
-        return KeyEventResult.handled;
+        // If focused book exists, it's already focused in state - no action needed
+      } else {
+        setState(() => _currentFocus = FocusArea.shelves);
+        bloc.add(const SaveFocusArea('shelves'));
       }
+      return KeyEventResult.handled;
     }
 
     if (_currentFocus == FocusArea.shelves) {
@@ -263,7 +307,10 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     LibraryLoaded state,
     bool isCtrlPressed,
   ) {
-    final shelves = state.config.shelves;
+    // Use filtered shelves for navigation (respects search)
+    final shelves = _filteredShelves.isNotEmpty
+        ? _filteredShelves
+        : state.config.shelves;
     final currentIndex = shelves.indexWhere(
       (s) => s.id == state.selectedShelf.id,
     );
@@ -332,12 +379,6 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     // Simply divide availableWidth by maxCrossAxisExtent and round up
     // The actual item width will be smaller to fit the spacing
     final columns = (availableWidth / maxCrossAxisExtent).ceil();
-
-    // Debug output
-    debugPrint(
-      'COLUMNS: booksAreaWidth=$_booksAreaWidth, availableWidth=$availableWidth, '
-      'maxCrossAxisExtent=$maxCrossAxisExtent, bookScale=$bookScale, columns=$columns',
-    );
 
     return columns.clamp(1, 100);
   }
@@ -503,160 +544,185 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
         appBar: const LibraryAppBar(),
-        body: BlocBuilder<LibraryBloc, LibraryState>(
-          builder: (context, state) {
-            if (state is LibraryLoading) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.initializingLibrary,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ],
-                ),
-              );
+        body: BlocListener<LibraryBloc, LibraryState>(
+          listener: (context, state) {
+            // Restore focus area when library loads (only once)
+            if (state is LibraryLoaded && !_hasRestoredFocus) {
+              _hasRestoredFocus = true;
+              final lastFocusArea = state.config.lastFocusArea;
+              if (lastFocusArea == 'books' && state.displayedBooks.isNotEmpty) {
+                setState(() => _currentFocus = FocusArea.books);
+              } else if (lastFocusArea == 'shelves' || lastFocusArea == null) {
+                setState(() => _currentFocus = FocusArea.shelves);
+              }
             }
-
-            if (state is LibraryInitializing) {
-              final progress = state.currentBook / state.totalBooks;
-              return Center(
-                child: Container(
-                  padding: const EdgeInsets.all(32),
-                  constraints: const BoxConstraints(maxWidth: 500),
+          },
+          child: BlocBuilder<LibraryBloc, LibraryState>(
+            builder: (context, state) {
+              if (state is LibraryLoading) {
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        l10n.initializingLibrary,
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 32),
-                      LinearProgressIndicator(value: progress, minHeight: 8),
+                      const CircularProgressIndicator(),
                       const SizedBox(height: 16),
                       Text(
-                        '${state.currentBook} / ${state.totalBooks}',
-                        style: Theme.of(context).textTheme.titleMedium,
+                        l10n.initializingLibrary,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
                   ),
-                ),
-              );
-            }
+                );
+              }
 
-            if (state is LibraryError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      state.message,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () =>
-                          Navigator.of(context).pushReplacementNamed('/'),
-                      child: Text(l10n.backToWelcome),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            if (state is LibraryLoaded) {
-              return Row(
-                children: [
-                  // Left sidebar with shelves
-                  SizedBox(
-                    width: _sidebarWidth,
-                    child: ShelfsSidebar(
-                      shelves: state.config.shelves,
-                      selectedShelfId: state.selectedShelf.id,
-                      totalBooksCount: state.config.books.length,
-                      allBooks: state.config.books,
-                      isFocused: _currentFocus == FocusArea.shelves,
+              if (state is LibraryInitializing) {
+                final progress = state.currentBook / state.totalBooks;
+                return Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(32),
+                    constraints: const BoxConstraints(maxWidth: 500),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          l10n.initializingLibrary,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 32),
+                        LinearProgressIndicator(value: progress, minHeight: 8),
+                        const SizedBox(height: 16),
+                        Text(
+                          '${state.currentBook} / ${state.totalBooks}',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ],
                     ),
                   ),
-                  // Resize handle
-                  MouseRegion(
-                    cursor: SystemMouseCursors.resizeColumn,
-                    child: GestureDetector(
-                      onHorizontalDragStart: _onHorizontalDragStart,
-                      onHorizontalDragUpdate: _onHorizontalDragUpdate,
-                      onHorizontalDragEnd: _onHorizontalDragEnd,
-                      child: Container(
-                        width: 8,
-                        color: _isResizing
-                            ? Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(0.2)
-                            : Colors.transparent,
-                        child: Center(
-                          child: Container(
-                            width: 1,
-                            color: Theme.of(context).dividerColor,
+                );
+              }
+
+              if (state is LibraryError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        state.message,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () =>
+                            Navigator.of(context).pushReplacementNamed('/'),
+                        child: Text(l10n.backToWelcome),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              if (state is LibraryLoaded) {
+                return Row(
+                  children: [
+                    // Left sidebar with shelves
+                    SizedBox(
+                      width: _sidebarWidth,
+                      child: ShelfsSidebar(
+                        shelves: state.config.shelves,
+                        selectedShelfId: state.selectedShelf.id,
+                        totalBooksCount: state.config.books.length,
+                        allBooks: state.config.books,
+                        isFocused: _currentFocus == FocusArea.shelves,
+                        onFilteredShelvesChanged: (filtered) {
+                          setState(() {
+                            _filteredShelves = filtered;
+                          });
+                        },
+                      ),
+                    ),
+                    // Resize handle
+                    MouseRegion(
+                      cursor: SystemMouseCursors.resizeColumn,
+                      child: GestureDetector(
+                        onHorizontalDragStart: _onHorizontalDragStart,
+                        onHorizontalDragUpdate: _onHorizontalDragUpdate,
+                        onHorizontalDragEnd: _onHorizontalDragEnd,
+                        child: Container(
+                          width: 8,
+                          color: _isResizing
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.2)
+                              : Colors.transparent,
+                          child: Center(
+                            child: Container(
+                              width: 1,
+                              color: Theme.of(context).dividerColor,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  // Main content area
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Update books area width for column calculation
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (_booksAreaWidth != constraints.maxWidth) {
-                            setState(() {
-                              _booksAreaWidth = constraints.maxWidth;
-                            });
-                          }
-                        });
+                    // Main content area
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Update books area width for column calculation
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (_booksAreaWidth != constraints.maxWidth) {
+                              setState(() {
+                                _booksAreaWidth = constraints.maxWidth;
+                              });
+                            }
+                          });
 
-                        return Column(
-                          children: [
-                            // Header with action buttons
-                            LibraryHeader(
-                              selectedShelf: state.selectedShelf,
-                              bookCount: state.displayedBooks.length,
-                              isFocused: _currentFocus == FocusArea.books,
-                            ),
-                            Container(
-                              height: 1,
-                              color: Theme.of(context).dividerColor,
-                            ),
-                            // Books grid
-                            Expanded(
-                              child: BooksGrid(
-                                books: state.displayedBooks,
-                                shelves: state.config.shelves,
-                                focusedBookId: _currentFocus == FocusArea.books
-                                    ? state.focusedBookId
-                                    : null,
+                          return Column(
+                            children: [
+                              // Header with action buttons
+                              LibraryHeader(
+                                selectedShelf: state.selectedShelf,
+                                bookCount: state.displayedBooks.length,
+                                isFocused: _currentFocus == FocusArea.books,
                               ),
-                            ),
-                          ],
-                        );
-                      },
+                              Container(
+                                height: 3,
+                                color: _currentFocus == FocusArea.books
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).dividerColor,
+                              ),
+                              // Books grid
+                              Expanded(
+                                child: BooksGrid(
+                                  books: state.displayedBooks,
+                                  shelves: state.config.shelves,
+                                  focusedBookId:
+                                      _currentFocus == FocusArea.books
+                                      ? state.focusedBookId
+                                      : null,
+                                  onRegisterCenterBookCallback: (callback) {
+                                    _getCenterVisibleBookId = callback;
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }
+                  ],
+                );
+              }
 
-            return const SizedBox.shrink();
-          },
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       ),
     );

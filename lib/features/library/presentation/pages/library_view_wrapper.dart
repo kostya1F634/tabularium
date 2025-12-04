@@ -23,6 +23,7 @@ class LibraryViewWrapper extends StatefulWidget {
 
 class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
   LibraryViewMode _viewMode = LibraryViewMode.grid;
+  LibraryViewMode _previousViewMode = LibraryViewMode.grid;
   ViewModeService? _viewModeService;
 
   @override
@@ -38,15 +39,22 @@ class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
     if (mounted) {
       setState(() {
         _viewMode = _viewModeService!.getViewMode();
+        // Always set previous to grid (so we can return from cabinet)
+        _previousViewMode = LibraryViewMode.grid;
       });
     }
   }
 
   void _toggleViewMode() {
     setState(() {
-      _viewMode = _viewMode == LibraryViewMode.grid
-          ? LibraryViewMode.cabinet
-          : LibraryViewMode.grid;
+      if (_viewMode == LibraryViewMode.cabinet) {
+        // If in cabinet mode, return to previous mode (grid)
+        _viewMode = _previousViewMode;
+      } else {
+        // If in any other mode, save it and switch to cabinet
+        _previousViewMode = _viewMode;
+        _viewMode = LibraryViewMode.cabinet;
+      }
     });
 
     // Save the new view mode
@@ -79,9 +87,8 @@ class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
             child: const CabinetScreen(),
           );
 
-    return Focus(
+    return FocusScope(
       onKeyEvent: _handleKeyEvent,
-      autofocus: true,
       child: ViewModeProviderWidget(
         viewMode: _viewMode,
         onToggle: _toggleViewMode,
