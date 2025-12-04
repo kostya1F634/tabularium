@@ -475,6 +475,18 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       return KeyEventResult.handled;
     }
 
+    // Enter to open focused book
+    if (event.logicalKey == LogicalKeyboardKey.enter) {
+      if (state.focusedBookId != null) {
+        final focusedBook = state.displayedBooks.firstWhere(
+          (book) => book.id == state.focusedBookId,
+          orElse: () => state.displayedBooks.first,
+        );
+        bloc.add(OpenBook(focusedBook));
+      }
+      return KeyEventResult.handled;
+    }
+
     // Space to toggle selection of focused book
     if (event.logicalKey == LogicalKeyboardKey.space) {
       bloc.add(const ToggleFocusedBookSelection());

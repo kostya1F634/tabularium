@@ -82,13 +82,6 @@ class _LibraryHeaderState extends State<LibraryHeader> {
               children: [
                 if (hasSelection) ...[
                   // Selection mode actions
-                  Text(
-                    '$selectedCount ${l10n.selected}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
                   ElevatedButton.icon(
                     onPressed: () =>
                         context.read<LibraryBloc>().add(const OpenAllBooks()),
@@ -166,6 +159,13 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                     label: Text(l10n.deleteSelected),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '$selectedCount ${l10n.selected}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ] else ...[
@@ -288,7 +288,7 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                   ),
                   const SizedBox(width: 16),
                   SizedBox(
-                    width: 300,
+                    width: 200,
                     child: TextField(
                       controller: _searchController,
                       focusNode: _searchFocusNode,
