@@ -1159,11 +1159,14 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final updatedConfig = currentState.config.copyWith(
       lastFocusedBookId: event.bookId,
     );
-    await _saveLibrary(updatedConfig);
 
+    // Emit state immediately for instant UI update
     emit(
       currentState.copyWith(focusedBookId: event.bookId, config: updatedConfig),
     );
+
+    // Save in background (non-blocking)
+    await _saveLibrary(updatedConfig);
   }
 
   /// Move focus in direction (hjkl or arrows)

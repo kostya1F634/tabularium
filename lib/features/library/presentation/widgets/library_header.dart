@@ -13,12 +13,16 @@ class LibraryHeader extends StatefulWidget {
   final Shelf selectedShelf;
   final int bookCount;
   final bool isFocused;
+  final void Function(void Function())? onRegisterFocusCallback;
+  final void Function(bool Function())? onRegisterCheckFocusCallback;
 
   const LibraryHeader({
     super.key,
     required this.selectedShelf,
     required this.bookCount,
     this.isFocused = false,
+    this.onRegisterFocusCallback,
+    this.onRegisterCheckFocusCallback,
   });
 
   @override
@@ -27,9 +31,24 @@ class LibraryHeader extends StatefulWidget {
 
 class _LibraryHeaderState extends State<LibraryHeader> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Register callback to focus search field
+    widget.onRegisterFocusCallback?.call(() {
+      _searchFocusNode.requestFocus();
+    });
+    // Register callback to check if search has focus
+    widget.onRegisterCheckFocusCallback?.call(() {
+      return _searchFocusNode.hasFocus;
+    });
+  }
 
   @override
   void dispose() {
+    _searchFocusNode.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -272,6 +291,7 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                     width: 300,
                     child: TextField(
                       controller: _searchController,
+                      focusNode: _searchFocusNode,
                       decoration: InputDecoration(
                         hintText: l10n.searchBooks,
                         prefixIcon: const Icon(Icons.search, size: 20),
@@ -300,6 +320,10 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                         } else {
                           context.read<LibraryBloc>().add(SearchBooks(query));
                         }
+                      },
+                      onSubmitted: (_) {
+                        // Pressing Enter in search should unfocus
+                        _searchFocusNode.unfocus();
                       },
                     ),
                   ),

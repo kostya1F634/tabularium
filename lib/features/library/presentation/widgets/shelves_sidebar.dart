@@ -16,6 +16,8 @@ class ShelfsSidebar extends StatefulWidget {
   final List<Book> allBooks;
   final bool isFocused;
   final void Function(List<Shelf>)? onFilteredShelvesChanged;
+  final void Function(void Function())? onRegisterShelfSearchFocusCallback;
+  final void Function(bool Function())? onRegisterCheckShelfSearchFocusCallback;
 
   const ShelfsSidebar({
     super.key,
@@ -25,6 +27,8 @@ class ShelfsSidebar extends StatefulWidget {
     required this.allBooks,
     this.isFocused = false,
     this.onFilteredShelvesChanged,
+    this.onRegisterShelfSearchFocusCallback,
+    this.onRegisterCheckShelfSearchFocusCallback,
   });
 
   @override
@@ -33,6 +37,7 @@ class ShelfsSidebar extends StatefulWidget {
 
 class _ShelfsSidebarState extends State<ShelfsSidebar> {
   final TextEditingController _shelfSearchController = TextEditingController();
+  final FocusNode _shelfSearchFocusNode = FocusNode();
   final Map<String, GlobalKey> _shelfKeys = {};
   final ScrollController _scrollController = ScrollController();
   String _shelfSearchQuery = '';
@@ -41,6 +46,14 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
   @override
   void initState() {
     super.initState();
+    // Register callbacks for shelf search focus control
+    widget.onRegisterShelfSearchFocusCallback?.call(() {
+      _shelfSearchFocusNode.requestFocus();
+    });
+    widget.onRegisterCheckShelfSearchFocusCallback?.call(() {
+      return _shelfSearchFocusNode.hasFocus;
+    });
+
     // Scroll to selected shelf on initial build with delay to ensure layout is complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 300), () {
@@ -55,6 +68,7 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
   @override
   void dispose() {
     _shelfSearchController.dispose();
+    _shelfSearchFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -182,6 +196,7 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: TextField(
               controller: _shelfSearchController,
+              focusNode: _shelfSearchFocusNode,
               decoration: InputDecoration(
                 hintText: l10n.searchShelves,
                 prefixIcon: const Icon(Icons.search, size: 18),
@@ -216,7 +231,7 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
                 ? Center(
                     child: Text(
                       _shelfSearchQuery.isEmpty
-                          ? l10n.noBooks
+                          ? 'No shelves found'
                           : 'No matching shelves',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,

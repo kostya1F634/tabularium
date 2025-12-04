@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
@@ -18,6 +19,7 @@ class BooksGrid extends StatefulWidget {
   final List<Book> books;
   final List<Shelf> shelves;
   final String? focusedBookId;
+  final bool showFocus;
   final void Function(String? Function())? onRegisterCenterBookCallback;
 
   const BooksGrid({
@@ -25,6 +27,7 @@ class BooksGrid extends StatefulWidget {
     required this.books,
     required this.shelves,
     this.focusedBookId,
+    this.showFocus = true,
     this.onRegisterCenterBookCallback,
   });
 
@@ -36,6 +39,8 @@ class _BooksGridState extends State<BooksGrid> {
   final Map<String, GlobalKey> _bookKeys = {};
   final ScrollController _scrollController = ScrollController();
   String? _lastScrolledBookId;
+  double _lastBookScale = 1.0;
+  double _lastViewportWidth = 0.0;
 
   @override
   void initState() {
@@ -54,12 +59,42 @@ class _BooksGridState extends State<BooksGrid> {
   void didUpdateWidget(BooksGrid oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Scroll to focused book when focus changes or when initially set
-    if (widget.focusedBookId != null &&
-        widget.focusedBookId != _lastScrolledBookId) {
+    // Reset last scrolled book when focus is hidden to allow re-scrolling on next show
+    if (!widget.showFocus && oldWidget.showFocus) {
+      _lastScrolledBookId = null;
+    }
+
+    // Get current viewport and scale
+    final uiSettings = UISettingsProvider.of(context);
+    final currentBookScale = uiSettings.bookScale;
+    final renderBox = context.findRenderObject() as RenderBox?;
+    final currentViewportWidth = renderBox?.size.width ?? 0.0;
+
+    // Check if we need to recalculate scroll due to layout changes
+    final scaleChanged = (currentBookScale - _lastBookScale).abs() > 0.01;
+    final viewportChanged =
+        (currentViewportWidth - _lastViewportWidth).abs() > 50.0;
+    final focusChanged =
+        widget.focusedBookId != null &&
+        widget.focusedBookId != _lastScrolledBookId;
+    final showFocusChanged = widget.showFocus && !oldWidget.showFocus;
+
+    // Scroll to focused book when:
+    // - Focus visibility changed from false to true (e.g. Ctrl+F pressed, Tab to books)
+    // - Focus changed
+    // - Scale changed
+    // - Viewport changed
+    // But only if showFocus is true and we have a focusedBookId
+    if (widget.showFocus &&
+        widget.focusedBookId != null &&
+        (showFocusChanged || focusChanged || scaleChanged || viewportChanged)) {
       _lastScrolledBookId = widget.focusedBookId;
-      // Schedule scroll with multiple attempts to ensure widget is rendered
-      _scrollToFocusedBookWithRetry();
+      _lastBookScale = currentBookScale;
+      _lastViewportWidth = currentViewportWidth;
+      // Schedule scroll after current frame to avoid setState during build
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _scrollToFocusedBookWithRetry();
+      });
     }
   }
 
@@ -71,7 +106,7 @@ class _BooksGridState extends State<BooksGrid> {
     );
     if (bookIndex == -1) return;
 
-    // Try using ensureVisible with key first
+    // Try using ensureVisible with key first (works only if book is already rendered)
     final key = _bookKeys[widget.focusedBookId];
     if (key?.currentContext != null) {
       try {
@@ -88,75 +123,92 @@ class _BooksGridState extends State<BooksGrid> {
       }
     }
 
-    // Fallback: calculate position by finding actual rendered book positions
-    // This is more reliable than calculating from grid parameters
-    if (_scrollController.hasClients && attempt < 5) {
-      // Try to find any rendered book to get actual row height
-      double? actualRowHeight;
-      int? actualColumns;
+    // Fallback: calculate position using theoretical and measured values
+    if (!_scrollController.hasClients) return;
 
-      // Sample a few rendered books to determine actual layout
-      for (int i = 0; i < widget.books.length && i < 20; i++) {
-        final key = _bookKeys[widget.books[i].id];
-        final bookContext = key?.currentContext;
-        if (bookContext != null) {
-          try {
-            final bookRenderBox = bookContext.findRenderObject() as RenderBox?;
-            if (bookRenderBox != null && actualRowHeight == null) {
-              actualRowHeight =
-                  bookRenderBox.size.height + 16.0; // height + mainAxisSpacing
-              break;
-            }
-          } catch (e) {
-            continue;
-          }
-        }
-      }
+    // Calculate theoretical values from grid parameters
+    final uiSettings = UISettingsProvider.of(context);
+    final bookScale = uiSettings.bookScale;
+    final maxCrossAxisExtent = 200 * bookScale;
+    final childAspectRatio = 0.65;
+    final crossAxisSpacing = 16.0;
+    final mainAxisSpacing = 16.0;
+    final padding = 16.0;
 
-      // Get columns from viewport width
-      final uiSettings = UISettingsProvider.of(context);
-      final bookScale = uiSettings.bookScale;
-      final maxCrossAxisExtent = 200 * bookScale;
-      final renderBox = context.findRenderObject() as RenderBox?;
-      final viewportWidth = renderBox?.size.width ?? 800.0;
-      final padding = 16.0;
-      final availableWidth = viewportWidth - (padding * 2);
-      actualColumns = (availableWidth / maxCrossAxisExtent).ceil().clamp(
-        1,
-        100,
-      );
+    // Calculate columns
+    final renderBox = context.findRenderObject() as RenderBox?;
+    final viewportWidth = renderBox?.size.width ?? 800.0;
+    final availableWidth = viewportWidth - (padding * 2);
+    final columns = (availableWidth / maxCrossAxisExtent).ceil().clamp(1, 100);
 
-      if (actualRowHeight != null && actualColumns != null) {
-        final row = bookIndex ~/ actualColumns;
+    // Calculate theoretical item dimensions
+    final itemWidth =
+        (availableWidth - (crossAxisSpacing * (columns - 1))) / columns;
+    final itemHeight = itemWidth / childAspectRatio;
+    final theoreticalRowHeight = itemHeight + mainAxisSpacing;
 
-        // Calculate position based on actual measured row height
-        final rowTopOffset = padding + (row * actualRowHeight);
-        final itemHeight =
-            actualRowHeight - 16.0; // Remove spacing to get pure item height
-        final bookCenterOffset = rowTopOffset + (itemHeight / 2);
-
-        final viewportHeight = _scrollController.position.viewportDimension;
-        final targetOffset = (bookCenterOffset - (viewportHeight / 2)).clamp(
-          0.0,
-          _scrollController.position.maxScrollExtent,
-        );
-
+    // Try to measure actual row height from rendered books
+    double? measuredRowHeight;
+    for (int i = 0; i < widget.books.length && i < 50; i++) {
+      final bookKey = _bookKeys[widget.books[i].id];
+      final bookContext = bookKey?.currentContext;
+      if (bookContext != null) {
         try {
-          _scrollController.animateTo(
-            targetOffset,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-          return; // Success
+          final bookRenderBox = bookContext.findRenderObject() as RenderBox?;
+          if (bookRenderBox != null) {
+            measuredRowHeight = bookRenderBox.size.height + mainAxisSpacing;
+            break;
+          }
         } catch (e) {
-          // Fall through to retry
+          continue;
         }
       }
+    }
 
-      // Retry if we couldn't measure actual layout yet
-      Future.delayed(Duration(milliseconds: 100 * (attempt + 1)), () {
-        _scrollToFocusedBookWithRetry(attempt: attempt + 1);
-      });
+    // Use measured height if available, otherwise use theoretical
+    final rowHeight = measuredRowHeight ?? theoreticalRowHeight;
+    final row = bookIndex ~/ columns;
+
+    // Calculate target scroll position
+    final rowTopOffset = padding + (row * rowHeight);
+    final itemHeightWithoutSpacing = rowHeight - mainAxisSpacing;
+    final bookCenterOffset = rowTopOffset + (itemHeightWithoutSpacing / 2);
+
+    final viewportHeight = _scrollController.position.viewportDimension;
+    final targetOffset = (bookCenterOffset - (viewportHeight / 2)).clamp(
+      0.0,
+      _scrollController.position.maxScrollExtent,
+    );
+
+    // If target is far away and we haven't measured actual height yet, do a two-step scroll
+    final currentOffset = _scrollController.offset;
+    final distanceToTarget = (targetOffset - currentOffset).abs();
+    final isFarAway = distanceToTarget > viewportHeight * 2;
+    final shouldRefine = measuredRowHeight == null && isFarAway && attempt == 0;
+
+    try {
+      if (shouldRefine) {
+        // Step 1: Jump close to target to trigger rendering
+        _scrollController.jumpTo(targetOffset);
+        // Step 2: Retry to get measured height and animate precisely
+        Future.delayed(const Duration(milliseconds: 50), () {
+          _scrollToFocusedBookWithRetry(attempt: 1);
+        });
+      } else {
+        // Normal scroll with animation
+        _scrollController.animateTo(
+          targetOffset,
+          duration: Duration(milliseconds: isFarAway ? 400 : 300),
+          curve: Curves.easeOut,
+        );
+      }
+    } catch (e) {
+      // Retry on error
+      if (attempt < 3) {
+        Future.delayed(Duration(milliseconds: 100 * (attempt + 1)), () {
+          _scrollToFocusedBookWithRetry(attempt: attempt + 1);
+        });
+      }
     }
   }
 
@@ -278,7 +330,7 @@ class _BooksGridState extends State<BooksGrid> {
                 book: book,
                 shelves: widget.shelves,
                 bookScale: bookScale,
-                isFocused: book.id == widget.focusedBookId,
+                isFocused: widget.showFocus && book.id == widget.focusedBookId,
               ),
             );
           },

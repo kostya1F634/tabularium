@@ -57,6 +57,13 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
   final FocusNode _focusNode = FocusNode();
   double _booksAreaWidth = 800.0; // Will be updated via LayoutBuilder
   String? Function()? _getCenterVisibleBookId;
+  void Function()? _requestSearchFocus; // Callback to focus books search field
+  bool Function()?
+  _isSearchFocused; // Callback to check if books search has focus
+  void Function()?
+  _requestShelfSearchFocus; // Callback to focus shelf search field
+  bool Function()?
+  _isShelfSearchFocused; // Callback to check if shelf search has focus
   List<Shelf> _filteredShelves = []; // Shelves after applying search filter
   bool _hasRestoredFocus = false; // Track if focus was restored from config
 
@@ -251,7 +258,6 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyF) {
       if (state.displayedBooks.isNotEmpty) {
         setState(() => _currentFocus = FocusArea.books);
-        bloc.add(const SaveFocusArea('books'));
 
         // Get center visible book from BooksGrid
         final centerBookId = _getCenterVisibleBookId?.call();
@@ -266,27 +272,75 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       return KeyEventResult.handled;
     }
 
+    // Handle / or . to focus on search or return from search
+    if (event.logicalKey == LogicalKeyboardKey.slash ||
+        event.logicalKey == LogicalKeyboardKey.period) {
+      if (_currentFocus == FocusArea.shelves) {
+        // In shelves area: focus shelf search
+        final shelfSearchHasFocus = _isShelfSearchFocused?.call() ?? false;
+
+        if (shelfSearchHasFocus) {
+          // Shelf search already focused: unfocus and return to shelves
+          FocusScope.of(context).unfocus();
+          _focusNode.requestFocus();
+        } else {
+          // Focus shelf search field
+          _requestShelfSearchFocus?.call();
+        }
+        return KeyEventResult.handled;
+      } else if (_currentFocus == FocusArea.books) {
+        // In books area: focus books search
+        final searchHasFocus = _isSearchFocused?.call() ?? false;
+
+        if (searchHasFocus) {
+          // Books search already focused: unfocus and return to books
+          FocusScope.of(context).unfocus();
+          _focusNode.requestFocus();
+        } else {
+          // Focus books search field
+          _requestSearchFocus?.call();
+        }
+        return KeyEventResult.handled;
+      }
+
+      return KeyEventResult.ignored;
+    }
+
     // Handle focus switching with Tab
     if (event.logicalKey == LogicalKeyboardKey.tab) {
-      if (_currentFocus == FocusArea.shelves) {
-        setState(() => _currentFocus = FocusArea.books);
-        bloc.add(const SaveFocusArea('books'));
+      // Don't handle Tab if any search field has focus
+      final searchHasFocus = _isSearchFocused?.call() ?? false;
+      final shelfSearchHasFocus = _isShelfSearchFocused?.call() ?? false;
+      if (searchHasFocus || shelfSearchHasFocus) {
+        return KeyEventResult.ignored;
+      }
 
+      if (_currentFocus == FocusArea.shelves) {
         if (state.displayedBooks.isEmpty) {
           // No books to focus on
           return KeyEventResult.handled;
         }
 
-        // Check if focused book exists in current displayed books
+        // Determine which book to focus
+        String bookIdToFocus;
         final focusedBookExists =
             state.focusedBookId != null &&
             state.displayedBooks.any((b) => b.id == state.focusedBookId);
 
-        if (!focusedBookExists) {
-          // If focused book doesn't exist or is null, focus first book
-          bloc.add(MoveFocusToBook(state.displayedBooks.first.id));
+        if (focusedBookExists) {
+          // Re-focus the same book to trigger scroll and visual update
+          bookIdToFocus = state.focusedBookId!;
+        } else {
+          // Focus first book if current focused book doesn't exist
+          bookIdToFocus = state.displayedBooks.first.id;
         }
-        // If focused book exists, it's already focused in state - no action needed
+
+        // Always trigger MoveFocusToBook to ensure visual focus appears
+        bloc.add(MoveFocusToBook(bookIdToFocus));
+
+        // Switch focus area
+        setState(() => _currentFocus = FocusArea.books);
+        bloc.add(const SaveFocusArea('books'));
       } else {
         setState(() => _currentFocus = FocusArea.shelves);
         bloc.add(const SaveFocusArea('shelves'));
@@ -645,6 +699,12 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                             _filteredShelves = filtered;
                           });
                         },
+                        onRegisterShelfSearchFocusCallback: (callback) {
+                          _requestShelfSearchFocus = callback;
+                        },
+                        onRegisterCheckShelfSearchFocusCallback: (callback) {
+                          _isShelfSearchFocused = callback;
+                        },
                       ),
                     ),
                     // Resize handle
@@ -690,6 +750,12 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                                 selectedShelf: state.selectedShelf,
                                 bookCount: state.displayedBooks.length,
                                 isFocused: _currentFocus == FocusArea.books,
+                                onRegisterFocusCallback: (callback) {
+                                  _requestSearchFocus = callback;
+                                },
+                                onRegisterCheckFocusCallback: (callback) {
+                                  _isSearchFocused = callback;
+                                },
                               ),
                               Container(
                                 height: 3,
@@ -702,10 +768,8 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                                 child: BooksGrid(
                                   books: state.displayedBooks,
                                   shelves: state.config.shelves,
-                                  focusedBookId:
-                                      _currentFocus == FocusArea.books
-                                      ? state.focusedBookId
-                                      : null,
+                                  focusedBookId: state.focusedBookId,
+                                  showFocus: _currentFocus == FocusArea.books,
                                   onRegisterCenterBookCallback: (callback) {
                                     _getCenterVisibleBookId = callback;
                                   },
