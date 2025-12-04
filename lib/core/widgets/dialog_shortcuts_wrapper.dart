@@ -19,27 +19,12 @@ class DialogShortcutsWrapper extends StatefulWidget {
 }
 
 class _DialogShortcutsWrapperState extends State<DialogShortcutsWrapper> {
-  final FocusNode _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    // Request focus after the dialog is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Focus(
-      focusNode: _focusNode,
+      // Don't request focus - let child widgets (like TextField with autofocus) get it
+      autofocus: false,
+      // Use onKeyEvent to catch keys from any focused child
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
           if (event.logicalKey == LogicalKeyboardKey.escape) {
