@@ -617,12 +617,13 @@ class _BookCard extends StatelessWidget {
           break;
         case 'add':
           // Determine which books to add: if selection exists, add selected books; otherwise, add clicked book
-          final booksToAdd = state.hasSelection
+          final hadSelection = state.hasSelection;
+          final booksToAdd = hadSelection
               ? state.selectedBookIds.toList()
               : [book.id];
 
           print(
-            'DEBUG books_grid: hasSelection=${state.hasSelection}, booksToAdd=${booksToAdd.length}, IDs=$booksToAdd',
+            'DEBUG books_grid: hasSelection=$hadSelection, booksToAdd=${booksToAdd.length}, IDs=$booksToAdd',
           );
 
           // Show shelf selection dialog
@@ -670,9 +671,20 @@ class _BookCard extends StatelessWidget {
             bloc.add(AddBooksToShelf(bookIds: booksToAdd, shelfId: shelfId));
 
             // Clear selection after adding
-            if (state.hasSelection && context.mounted) {
-              print('DEBUG books_grid: Clearing selection');
-              bloc.add(const ClearBookSelection());
+            print(
+              'DEBUG books_grid: hadSelection=$hadSelection, context.mounted=${context.mounted}',
+            );
+            if (hadSelection && context.mounted) {
+              // Wait a bit to ensure AddBooksToShelf completes
+              await Future.delayed(const Duration(milliseconds: 50));
+              if (context.mounted) {
+                print('DEBUG books_grid: Clearing selection');
+                bloc.add(const ClearBookSelection());
+              }
+            } else {
+              print(
+                'DEBUG books_grid: NOT clearing selection - hadSelection=$hadSelection, context.mounted=${context.mounted}',
+              );
             }
           }
           break;

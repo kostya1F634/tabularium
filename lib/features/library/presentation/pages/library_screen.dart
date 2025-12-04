@@ -191,8 +191,9 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyA) {
       // Show add to shelf dialog for selected books, focused book, or all books
       if (state.displayedBooks.isNotEmpty) {
+        final hadSelection = state.hasSelection;
         final Set<String> booksToAdd;
-        if (state.hasSelection) {
+        if (hadSelection) {
           booksToAdd = state.selectedBookIds;
           print(
             'DEBUG: Adding ${booksToAdd.length} selected books: $booksToAdd',
@@ -230,9 +231,19 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                       shelfId: newShelf.id,
                     ),
                   );
-                  if (state.hasSelection) {
-                    print('DEBUG: Clearing selection after add');
-                    bloc.add(const ClearBookSelection());
+                  print('DEBUG library_screen: hadSelection=$hadSelection');
+                  if (hadSelection) {
+                    // Wait for AddBooksToShelf to complete
+                    Future.delayed(const Duration(milliseconds: 50), () {
+                      print(
+                        'DEBUG library_screen: Clearing selection after add',
+                      );
+                      bloc.add(const ClearBookSelection());
+                    });
+                  } else {
+                    print(
+                      'DEBUG library_screen: NOT clearing - hadSelection was false',
+                    );
                   }
                 }
               });
@@ -243,9 +254,19 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
               bloc.add(
                 AddBooksToShelf(bookIds: booksToAdd.toList(), shelfId: result),
               );
-              if (state.hasSelection) {
-                print('DEBUG: Clearing selection after add');
-                bloc.add(const ClearBookSelection());
+              print(
+                'DEBUG library_screen (existing shelf): hadSelection=$hadSelection',
+              );
+              if (hadSelection) {
+                // Wait for AddBooksToShelf to complete
+                Future.delayed(const Duration(milliseconds: 50), () {
+                  print('DEBUG library_screen: Clearing selection after add');
+                  bloc.add(const ClearBookSelection());
+                });
+              } else {
+                print(
+                  'DEBUG library_screen: NOT clearing - hadSelection was false',
+                );
               }
             }
           }
@@ -267,6 +288,38 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
           // Fallback to middle of collection if grid not ready
           final centerIndex = (state.displayedBooks.length / 2).floor();
           bloc.add(MoveFocusToBook(state.displayedBooks[centerIndex].id));
+        }
+      }
+      return KeyEventResult.handled;
+    }
+
+    // Handle Ctrl+U to jump to first shelf/book
+    if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyU) {
+      if (_currentFocus == FocusArea.shelves) {
+        // Jump to first shelf
+        if (state.config.shelves.isNotEmpty) {
+          bloc.add(SelectShelf(state.config.shelves.first.id));
+        }
+      } else {
+        // Jump to first book
+        if (state.displayedBooks.isNotEmpty) {
+          bloc.add(MoveFocusToBook(state.displayedBooks.first.id));
+        }
+      }
+      return KeyEventResult.handled;
+    }
+
+    // Handle Ctrl+I to jump to last shelf/book
+    if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyI) {
+      if (_currentFocus == FocusArea.shelves) {
+        // Jump to last shelf
+        if (state.config.shelves.isNotEmpty) {
+          bloc.add(SelectShelf(state.config.shelves.last.id));
+        }
+      } else {
+        // Jump to last book
+        if (state.displayedBooks.isNotEmpty) {
+          bloc.add(MoveFocusToBook(state.displayedBooks.last.id));
         }
       }
       return KeyEventResult.handled;

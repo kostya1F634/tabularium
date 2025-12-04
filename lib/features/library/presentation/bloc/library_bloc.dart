@@ -348,10 +348,12 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       currentState.selectedShelf.id,
     );
 
+    // Don't clear selection here - let the caller decide
     emit(
       currentState.copyWith(
         config: updatedConfig,
         displayedBooks: displayedBooks,
+        // Keep selection to allow multiple operations
       ),
     );
   }
@@ -691,10 +693,18 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     ClearBookSelection event,
     Emitter<LibraryState> emit,
   ) async {
-    if (state is! LibraryLoaded) return;
+    print('DEBUG _onClearBookSelection: called');
+    if (state is! LibraryLoaded) {
+      print('DEBUG _onClearBookSelection: state is not LibraryLoaded');
+      return;
+    }
 
     final currentState = state as LibraryLoaded;
+    print(
+      'DEBUG _onClearBookSelection: clearing ${currentState.selectedBookIds.length} selected books',
+    );
     emit(currentState.copyWith(clearSelection: true));
+    print('DEBUG _onClearBookSelection: selection cleared');
   }
 
   Future<void> _onMoveBooksToShelf(
