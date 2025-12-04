@@ -511,7 +511,8 @@ class _ShelfItem extends StatelessWidget {
         final isHovering = candidateData.isNotEmpty;
 
         // Determine decoration based on focus and hover states
-        BoxDecoration? decoration;
+        // Always have a border to prevent layout shift
+        final BoxDecoration decoration;
         if (isFocused) {
           // Focus border (tertiary color, same as books)
           decoration = BoxDecoration(
@@ -528,8 +529,13 @@ class _ShelfItem extends StatelessWidget {
             ).colorScheme.primaryContainer.withOpacity(0.5),
             border: Border.all(
               color: Theme.of(context).colorScheme.primary,
-              width: 2,
+              width: 3,
             ),
+          );
+        } else {
+          // Transparent border to maintain consistent size
+          decoration = BoxDecoration(
+            border: Border.all(color: Colors.transparent, width: 3),
           );
         }
 
