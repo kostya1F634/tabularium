@@ -71,7 +71,7 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
   void initState() {
     super.initState();
     _loadSidebarWidth();
-    _focusNode.requestFocus();
+    // Focus will be requested when library loads (in BlocListener)
   }
 
   @override
@@ -727,6 +727,13 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
               } else if (lastFocusArea == 'shelves' || lastFocusArea == null) {
                 setState(() => _currentFocus = FocusArea.shelves);
               }
+
+              // Request focus after library is loaded and widgets are built
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && !_focusNode.hasFocus) {
+                  _focusNode.requestFocus();
+                }
+              });
             }
           },
           child: BlocBuilder<LibraryBloc, LibraryState>(

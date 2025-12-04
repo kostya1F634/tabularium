@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
+import 'package:synchronized/synchronized.dart';
 import '../../domain/entities/library_config.dart';
 
 /// Abstraction for managing library configuration file
@@ -22,6 +23,9 @@ abstract class ConfigDataSource {
 class ConfigDataSourceImpl implements ConfigDataSource {
   static const String configFileName = '.tabularium.conf';
 
+  // Lock to prevent concurrent writes to config file
+  final _writeLock = Lock();
+
   @override
   Future<LibraryConfig?> loadConfig(String directoryPath) async {
     final configPath = getConfigPath(directoryPath);
@@ -42,16 +46,19 @@ class ConfigDataSourceImpl implements ConfigDataSource {
 
   @override
   Future<void> saveConfig(LibraryConfig config) async {
-    final configPath = getConfigPath(config.directoryPath);
-    final configFile = File(configPath);
+    // Use lock to prevent concurrent writes that could corrupt the file
+    return await _writeLock.synchronized(() async {
+      final configPath = getConfigPath(config.directoryPath);
+      final configFile = File(configPath);
 
-    try {
-      final jsonMap = config.toJson();
-      final jsonString = const JsonEncoder.withIndent('  ').convert(jsonMap);
-      await configFile.writeAsString(jsonString);
-    } catch (e) {
-      throw Exception('Error saving config to $configPath: $e');
-    }
+      try {
+        final jsonMap = config.toJson();
+        final jsonString = const JsonEncoder.withIndent('  ').convert(jsonMap);
+        await configFile.writeAsString(jsonString);
+      } catch (e) {
+        throw Exception('Error saving config to $configPath: $e');
+      }
+    });
   }
 
   @override

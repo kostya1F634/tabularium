@@ -68,6 +68,7 @@ dependencies:
   # Window management for desktop platforms
   window_manager: ^0.4.3
   package_info_plus: ^9.0.0
+  synchronized: ^3.4.0
 
 dev_dependencies:
   flutter_test:
