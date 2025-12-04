@@ -72,12 +72,53 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     super.initState();
     _loadSidebarWidth();
     // Focus will be requested when library loads (in BlocListener)
+
+    // Listen to UI settings changes and restore focus
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final uiSettings = UISettingsProvider.of(context);
+      uiSettings.addListener(_onUISettingsChanged);
+    });
   }
 
   @override
   void dispose() {
+    // Remove listener if it was added
+    try {
+      final uiSettings = UISettingsProvider.of(context);
+      uiSettings.removeListener(_onUISettingsChanged);
+    } catch (_) {
+      // Context might not be available
+    }
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _onUISettingsChanged() {
+    print('[DEBUG] UI settings changed, will restore focus');
+    // When UI settings change (like bookScale), restore focus after rebuild
+    // Use double postFrameCallback to ensure widgets are fully rebuilt
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          print(
+            '[DEBUG] Before requestFocus: hasFocus=${_focusNode.hasFocus}, canRequestFocus=${_focusNode.canRequestFocus}',
+          );
+          // Unfocus any other widgets first
+          FocusScope.of(context).unfocus();
+          // Then request focus for our FocusNode using FocusScope
+          Future.delayed(const Duration(milliseconds: 50), () {
+            if (mounted) {
+              FocusScope.of(context).requestFocus(_focusNode);
+              print(
+                '[DEBUG] After requestFocus: hasFocus=${_focusNode.hasFocus}',
+              );
+            }
+          });
+        } else {
+          print('[DEBUG] Widget disposed, cannot restore focus');
+        }
+      });
+    });
   }
 
   Future<void> _loadSidebarWidth() async {
@@ -521,10 +562,11 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     final padding = 32.0; // 16 on each side
     final availableWidth = _booksAreaWidth - padding;
 
-    // Flutter's logic from SliverGridDelegateWithMaxCrossAxisExtent:
-    // Simply divide availableWidth by maxCrossAxisExtent and round up
-    // The actual item width will be smaller to fit the spacing
-    final columns = (availableWidth / maxCrossAxisExtent).ceil();
+    // Flutter's actual logic from SliverGridDelegateWithMaxCrossAxisExtent:
+    // crossAxisCount = (crossAxisExtent / (maxCrossAxisExtent + crossAxisSpacing)).ceil()
+    // Source: https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/rendering/sliver_grid.dart
+    final columns = (availableWidth / (maxCrossAxisExtent + crossAxisSpacing))
+        .ceil();
 
     return columns.clamp(1, 100);
   }
@@ -713,6 +755,7 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
 
     return Focus(
       focusNode: _focusNode,
+      autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
         appBar: const LibraryAppBar(),
