@@ -126,6 +126,12 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
 
     final isCtrlPressed = HardwareKeyboard.instance.isControlPressed;
 
+    // Handle Ctrl+W to toggle between library and welcome screen
+    if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyW) {
+      _toggleWelcomeScreen(context, state.config.directoryPath);
+      return KeyEventResult.handled;
+    }
+
     // Handle Ctrl+N for creating new shelf (works regardless of focus)
     if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyN) {
       _showCreateShelfDialog(context, bloc);
@@ -564,6 +570,20 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
     }
 
     return KeyEventResult.ignored;
+  }
+
+  void _toggleWelcomeScreen(
+    BuildContext context,
+    String currentDirectoryPath,
+  ) async {
+    // Save current directory to temp storage so we can return to it with Ctrl+W
+    final prefs = await AppSettings.getInstance();
+    await prefs.setString('temp_previous_directory', currentDirectoryPath);
+    // Clear last opened directory so app starts on welcome screen on next launch
+    await prefs.remove('last_opened_directory');
+    if (context.mounted) {
+      Navigator.of(context).pushReplacementNamed('/');
+    }
   }
 
   void _showCreateShelfDialog(BuildContext context, LibraryBloc bloc) {
