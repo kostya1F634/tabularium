@@ -156,6 +156,33 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
       return KeyEventResult.handled;
     }
 
+    // Handle Ctrl+1 to Ctrl+0 for quick shelf selection (first 10 shelves)
+    final digitKeys = [
+      LogicalKeyboardKey.digit1,
+      LogicalKeyboardKey.digit2,
+      LogicalKeyboardKey.digit3,
+      LogicalKeyboardKey.digit4,
+      LogicalKeyboardKey.digit5,
+      LogicalKeyboardKey.digit6,
+      LogicalKeyboardKey.digit7,
+      LogicalKeyboardKey.digit8,
+      LogicalKeyboardKey.digit9,
+      LogicalKeyboardKey.digit0,
+    ];
+
+    if (isCtrlPressed) {
+      for (int i = 0; i < digitKeys.length; i++) {
+        if (event.logicalKey == digitKeys[i]) {
+          final shelfIndex = i == 9 ? 9 : i; // Ctrl+0 maps to index 9
+          if (shelfIndex < _filteredShelves.length) {
+            final shelf = _filteredShelves[shelfIndex];
+            bloc.add(SelectShelf(shelf.id));
+          }
+          return KeyEventResult.handled;
+        }
+      }
+    }
+
     // Handle Ctrl+E for edit/properties
     if (isCtrlPressed && event.logicalKey == LogicalKeyboardKey.keyE) {
       if (_currentFocus == FocusArea.shelves) {
