@@ -166,6 +166,11 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     );
     await _saveLibrary(updatedConfig);
 
+    // Set focus to first book if available, otherwise clear focus
+    final newFocusedBookId = displayedBooks.isNotEmpty
+        ? displayedBooks.first.id
+        : null;
+
     emit(
       currentState.copyWith(
         config: updatedConfig,
@@ -173,7 +178,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         displayedBooks: displayedBooks,
         clearSearch: true,
         selectedBookIds: const {}, // Clear selection when switching shelves
-        clearFocus: true, // Clear focus when switching shelves
+        focusedBookId: newFocusedBookId, // Focus first book or null if no books
       ),
     );
   }
