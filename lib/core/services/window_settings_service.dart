@@ -33,6 +33,7 @@ class WindowSettingsService {
 
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
+      await windowManager.center(); // Explicitly center window
       await windowManager.focus();
     });
   }
