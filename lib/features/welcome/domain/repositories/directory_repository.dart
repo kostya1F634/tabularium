@@ -34,4 +34,7 @@ abstract class DirectoryRepository {
 
   /// Set last opened directory
   Future<void> setLastOpenedDirectory(String path);
+
+  /// Clear last opened directory
+  Future<void> clearLastOpenedDirectory();
 }

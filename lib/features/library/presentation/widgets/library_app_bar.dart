@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/services/app_settings.dart';
 import '../../../../core/widgets/app_menu_bar.dart';
 import '../bloc/library_bloc.dart';
 import '../bloc/library_state.dart';
@@ -23,7 +24,14 @@ class LibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
           Widget? centerWidget;
           if (state is LibraryLoaded) {
             centerWidget = InkWell(
-              onTap: () => Navigator.of(context).pushReplacementNamed('/'),
+              onTap: () async {
+                // Clear last opened directory so app starts on welcome screen next time
+                final prefs = await AppSettings.getInstance();
+                await prefs.remove('last_opened_directory');
+                if (context.mounted) {
+                  Navigator.of(context).pushReplacementNamed('/');
+                }
+              },
               borderRadius: BorderRadius.circular(4),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

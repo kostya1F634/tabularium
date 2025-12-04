@@ -180,4 +180,9 @@ class DirectoryRepositoryImpl implements DirectoryRepository {
   Future<void> setLastOpenedDirectory(String path) async {
     await _prefs.setString(_lastOpenedDirKey, path);
   }
+
+  @override
+  Future<void> clearLastOpenedDirectory() async {
+    await _prefs.remove(_lastOpenedDirKey);
+  }
 }

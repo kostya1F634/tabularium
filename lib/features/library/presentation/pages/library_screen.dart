@@ -738,8 +738,14 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () =>
-                            Navigator.of(context).pushReplacementNamed('/'),
+                        onPressed: () async {
+                          // Clear last opened directory so app starts on welcome screen next time
+                          final prefs = await AppSettings.getInstance();
+                          await prefs.remove('last_opened_directory');
+                          if (context.mounted) {
+                            Navigator.of(context).pushReplacementNamed('/');
+                          }
+                        },
                         child: Text(l10n.backToWelcome),
                       ),
                     ],

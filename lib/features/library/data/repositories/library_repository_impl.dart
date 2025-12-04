@@ -166,14 +166,68 @@ class LibraryRepositoryImpl implements LibraryRepository {
       }
 
       // Scan for new books that might have been added
-      final newBooks = await scanForNewBooks(existingConfig);
-      if (newBooks.isNotEmpty) {
-        print('[LibraryRepository] Found ${newBooks.length} new books');
+      final pdfPaths = await _pdfScanner.scanDirectory(directoryPath);
+      final existingPaths = existingConfig.books.map((b) => b.filePath).toSet();
+      final newPdfPaths = pdfPaths
+          .where((p) => !existingPaths.contains(p))
+          .toList();
+
+      if (newPdfPaths.isNotEmpty) {
+        print('[LibraryRepository] Found ${newPdfPaths.length} new books');
+        print('[LibraryRepository] Processing new books with thumbnails...');
+
+        final thumbnailsDirectory = path.join(directoryPath, thumbnailsDir);
+        final newBooks = <Book>[];
+
+        for (var i = 0; i < newPdfPaths.length; i++) {
+          final pdfPath = newPdfPaths[i];
+
+          // Report progress for new books
+          onProgress?.call(i + 1, newPdfPaths.length);
+
+          print(
+            '[LibraryRepository] Processing new book ${i + 1}/${newPdfPaths.length}: ${path.basename(pdfPath)}',
+          );
+
+          final fileName = path.basename(pdfPath);
+          final fileStats = await File(pdfPath).stat();
+          final id = _generateBookId(pdfPath);
+
+          print('[LibraryRepository] Generating thumbnail...');
+          final thumbnailPath = await _thumbnailGenerator.generateThumbnail(
+            pdfPath: pdfPath,
+            thumbnailsDirectory: thumbnailsDirectory,
+          );
+
+          if (thumbnailPath != null) {
+            print('[LibraryRepository] ✓ Thumbnail generated');
+          } else {
+            print('[LibraryRepository] ✗ Failed to generate thumbnail');
+          }
+
+          final book = Book(
+            id: id,
+            fileName: fileName,
+            filePath: pdfPath,
+            addedDate: DateTime.now(),
+            lastOpenedDate: DateTime.now(),
+            fileSize: fileStats.size,
+            thumbnailPath: thumbnailPath,
+          );
+
+          newBooks.add(book);
+        }
+
         final updatedConfig = existingConfig.copyWith(
           books: [...existingConfig.books, ...newBooks],
           lastScanDate: DateTime.now(),
         );
+
+        print(
+          '[LibraryRepository] Saving updated config with ${newBooks.length} new books...',
+        );
         await saveLibrary(updatedConfig);
+        print('[LibraryRepository] ✓ New books added successfully');
         return updatedConfig;
       }
       print('[LibraryRepository] No new books found');
