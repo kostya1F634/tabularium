@@ -506,12 +506,10 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
         if (currentIndex >= 3) {
           final newIndex = currentIndex - 1;
           if (newIndex >= 2) {
-            final shelfId = shelves[currentIndex].id;
             bloc.add(
               ReorderShelves(oldIndex: currentIndex, newIndex: newIndex),
             );
-            // Re-select the shelf to trigger scroll to new position
-            bloc.add(SelectShelf(shelfId));
+            // Scrolling will happen automatically in ShelfsSidebar.didUpdateWidget
           }
         }
       } else if (currentIndex > 0) {
@@ -527,12 +525,10 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
         if (currentIndex >= 2) {
           final newIndex = currentIndex + 1;
           if (newIndex < shelves.length) {
-            final shelfId = shelves[currentIndex].id;
             bloc.add(
               ReorderShelves(oldIndex: currentIndex, newIndex: newIndex),
             );
-            // Re-select the shelf to trigger scroll to new position
-            bloc.add(SelectShelf(shelfId));
+            // Scrolling will happen automatically in ShelfsSidebar.didUpdateWidget
           }
         }
       } else if (currentIndex < shelves.length - 1) {
@@ -878,6 +874,19 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                         },
                         onRegisterCheckShelfSearchFocusCallback: (callback) {
                           _isShelfSearchFocused = callback;
+                        },
+                        onRequestFocus: () {
+                          if (mounted) {
+                            _focusNode.requestFocus();
+                          }
+                        },
+                        onSwitchToShelvesArea: () {
+                          if (mounted && _currentFocus != FocusArea.shelves) {
+                            setState(() => _currentFocus = FocusArea.shelves);
+                            context.read<LibraryBloc>().add(
+                              const SaveFocusArea('shelves'),
+                            );
+                          }
                         },
                       ),
                     ),

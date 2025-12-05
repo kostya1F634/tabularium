@@ -18,6 +18,8 @@ class ShelfsSidebar extends StatefulWidget {
   final void Function(List<Shelf>)? onFilteredShelvesChanged;
   final void Function(void Function())? onRegisterShelfSearchFocusCallback;
   final void Function(bool Function())? onRegisterCheckShelfSearchFocusCallback;
+  final VoidCallback? onRequestFocus;
+  final VoidCallback? onSwitchToShelvesArea;
 
   const ShelfsSidebar({
     super.key,
@@ -29,6 +31,8 @@ class ShelfsSidebar extends StatefulWidget {
     this.onFilteredShelvesChanged,
     this.onRegisterShelfSearchFocusCallback,
     this.onRegisterCheckShelfSearchFocusCallback,
+    this.onRequestFocus,
+    this.onSwitchToShelvesArea,
   });
 
   @override
@@ -78,11 +82,26 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
     super.didUpdateWidget(oldWidget);
 
     // Scroll to selected shelf when it changes (keyboard navigation or click)
-    if (oldWidget.selectedShelfId != widget.selectedShelfId) {
+    // OR when shelf order changes (reordering with Ctrl+j/k)
+    final selectedShelfChanged =
+        oldWidget.selectedShelfId != widget.selectedShelfId;
+    final shelvesOrderChanged =
+        oldWidget.shelves.length == widget.shelves.length &&
+        !_shelvesOrderEqual(oldWidget.shelves, widget.shelves);
+
+    if (selectedShelfChanged || shelvesOrderChanged) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollToSelectedShelf();
       });
     }
+  }
+
+  bool _shelvesOrderEqual(List<Shelf> oldShelves, List<Shelf> newShelves) {
+    if (oldShelves.length != newShelves.length) return false;
+    for (int i = 0; i < oldShelves.length; i++) {
+      if (oldShelves[i].id != newShelves[i].id) return false;
+    }
+    return true;
   }
 
   void _scrollToSelectedShelf() {
@@ -341,6 +360,12 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
       isFocused: widget.isFocused && isSelected,
       onTap: () {
         context.read<LibraryBloc>().add(SelectShelf(shelf.id));
+        // Request focus for main screen when clicking on a shelf
+        widget.onRequestFocus?.call();
+        // Switch focus area to shelves after a small delay to let SelectShelf process
+        Future.delayed(const Duration(milliseconds: 50), () {
+          widget.onSwitchToShelvesArea?.call();
+        });
 
         // Scroll to shelf if it's a user shelf
         if (!shelf.isDefault) {
