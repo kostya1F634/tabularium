@@ -64,6 +64,10 @@ run-linux:
 	@echo "Running on Linux..."
 	@flutter run -d linux
 
+run-linux-release:
+	@echo "Running release on Linux..."
+	@./build/linux/x64/release/bundle/tabularium
+
 # Run on Windows
 run-windows:
 	@echo "Running on Windows..."
@@ -73,6 +77,7 @@ run-windows:
 run-macos:
 	@echo "Running on macOS..."
 	@flutter run -d macos
+
 
 # ============================================================================
 # Building (Release)
