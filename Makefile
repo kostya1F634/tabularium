@@ -240,7 +240,7 @@ enable-all-platforms:
 # ============================================================================
 
 # Install application to /opt/tabularium
-install: build-linux
+install-linux: build-linux
 	@echo "Installing Tabularium to /opt/tabularium..."
 	@if [ ! -d "./build/linux/x64/release/bundle" ]; then \
 		echo "Error: Release build not found. Run 'make build-linux' first."; \
@@ -266,7 +266,7 @@ install: build-linux
 	@echo "You can now launch Tabularium from your application menu."
 
 # Uninstall application
-uninstall:
+uninstall-linux:
 	@echo "Uninstalling Tabularium..."
 	@if [ -d "/opt/tabularium" ]; then \
 		echo "Removing application files..."; \
