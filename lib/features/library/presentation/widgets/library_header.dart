@@ -53,6 +53,23 @@ class _LibraryHeaderState extends State<LibraryHeader> {
     super.dispose();
   }
 
+  String _getSortOptionText(BookSortOption option) {
+    switch (option) {
+      case BookSortOption.dateAddedNewest:
+        return 'Date Added ↓';
+      case BookSortOption.dateAddedOldest:
+        return 'Date Added ↑';
+      case BookSortOption.dateOpenedNewest:
+        return 'Date Opened ↓';
+      case BookSortOption.dateOpenedOldest:
+        return 'Date Opened ↑';
+      case BookSortOption.titleAZ:
+        return 'Title A-Z';
+      case BookSortOption.titleZA:
+        return 'Title Z-A';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -237,148 +254,147 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                 // Search field (always visible when not in selection mode, aligned to the right)
                 if (!hasSelection) ...[
                   const Spacer(),
-                  // Sort dropdown
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Theme.of(context).dividerColor,
-                        width: 1,
+                  // Sort menu
+                  PopupMenuButton<BookSortOption>(
+                    offset: const Offset(0, 48),
+                    onSelected: (BookSortOption newValue) {
+                      context.read<LibraryBloc>().add(SortBooks(newValue));
+                      FocusScope.of(context).unfocus();
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: BookSortOption.dateAddedNewest,
+                        child: Container(
+                          decoration:
+                              state.sortOption == BookSortOption.dateAddedNewest
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          child: const Text('Date Added ↓'),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: DropdownButton<BookSortOption>(
-                      value: state.sortOption,
-                      icon: const Icon(Icons.arrow_drop_down, size: 20),
-                      underline: Container(),
-                      focusColor: Colors.transparent,
-                      onChanged: (BookSortOption? newValue) {
-                        if (newValue != null) {
-                          context.read<LibraryBloc>().add(SortBooks(newValue));
-                          // Remove focus from dropdown after selection
-                          FocusScope.of(context).unfocus();
-                        }
-                      },
-                      items: [
-                        DropdownMenuItem(
-                          value: BookSortOption.dateAddedNewest,
-                          child: Container(
-                            decoration:
-                                state.sortOption ==
-                                    BookSortOption.dateAddedNewest
-                                ? BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(4),
-                                  )
-                                : null,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: const Text('Date Added ↓'),
+                      PopupMenuItem(
+                        value: BookSortOption.dateAddedOldest,
+                        child: Container(
+                          decoration:
+                              state.sortOption == BookSortOption.dateAddedOldest
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
+                          child: const Text('Date Added ↑'),
                         ),
-                        DropdownMenuItem(
-                          value: BookSortOption.dateAddedOldest,
-                          child: Container(
-                            decoration:
-                                state.sortOption ==
-                                    BookSortOption.dateAddedOldest
-                                ? BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(4),
-                                  )
-                                : null,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: const Text('Date Added ↑'),
+                      ),
+                      PopupMenuItem(
+                        value: BookSortOption.dateOpenedNewest,
+                        child: Container(
+                          decoration:
+                              state.sortOption ==
+                                  BookSortOption.dateOpenedNewest
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
+                          child: const Text('Date Opened ↓'),
                         ),
-                        DropdownMenuItem(
-                          value: BookSortOption.dateOpenedNewest,
-                          child: Container(
-                            decoration:
-                                state.sortOption ==
-                                    BookSortOption.dateOpenedNewest
-                                ? BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(4),
-                                  )
-                                : null,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: const Text('Date Opened ↓'),
+                      ),
+                      PopupMenuItem(
+                        value: BookSortOption.dateOpenedOldest,
+                        child: Container(
+                          decoration:
+                              state.sortOption ==
+                                  BookSortOption.dateOpenedOldest
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
+                          child: const Text('Date Opened ↑'),
                         ),
-                        DropdownMenuItem(
-                          value: BookSortOption.dateOpenedOldest,
-                          child: Container(
-                            decoration:
-                                state.sortOption ==
-                                    BookSortOption.dateOpenedOldest
-                                ? BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(4),
-                                  )
-                                : null,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: const Text('Date Opened ↑'),
+                      ),
+                      PopupMenuItem(
+                        value: BookSortOption.titleAZ,
+                        child: Container(
+                          decoration: state.sortOption == BookSortOption.titleAZ
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
+                          child: const Text('Title A-Z'),
                         ),
-                        DropdownMenuItem(
-                          value: BookSortOption.titleAZ,
-                          child: Container(
-                            decoration:
-                                state.sortOption == BookSortOption.titleAZ
-                                ? BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(4),
-                                  )
-                                : null,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: const Text('Title A-Z'),
+                      ),
+                      PopupMenuItem(
+                        value: BookSortOption.titleZA,
+                        child: Container(
+                          decoration: state.sortOption == BookSortOption.titleZA
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
+                          child: const Text('Title Z-A'),
                         ),
-                        DropdownMenuItem(
-                          value: BookSortOption.titleZA,
-                          child: Container(
-                            decoration:
-                                state.sortOption == BookSortOption.titleZA
-                                ? BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(4),
-                                  )
-                                : null,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            child: const Text('Title Z-A'),
-                          ),
+                      ),
+                    ],
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                          width: 1,
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(_getSortOptionText(state.sortOption)),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_drop_down, size: 20),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
