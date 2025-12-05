@@ -1,4 +1,4 @@
-.PHONY: help run run-linux run-windows run-macos test test-unit test-verbose test-watch coverage coverage-html clean build build-linux build-windows build-macos gen-mocks format format-check lint check pre-commit deps deps-upgrade deps-outdated devices doctor enable-linux enable-windows enable-macos enable-all-platforms
+.PHONY: help run run-linux run-windows run-macos test test-unit test-verbose test-watch coverage coverage-html clean build build-linux build-windows build-macos gen-mocks format format-check lint check pre-commit deps deps-upgrade deps-outdated devices doctor enable-linux enable-windows enable-macos enable-all-platforms install uninstall
 
 # Show help
 help:
@@ -45,6 +45,10 @@ help:
 	@echo "  make enable-windows - Enable Windows desktop support"
 	@echo "  make enable-macos   - Enable macOS desktop support"
 	@echo "  make enable-all-platforms - Enable all desktop platforms"
+	@echo ""
+	@echo "Deployment (Linux):"
+	@echo "  make install        - Install application to /opt/tabularium"
+	@echo "  make uninstall      - Remove installed application"
 
 # ============================================================================
 # Running (Development)
@@ -230,3 +234,54 @@ enable-all-platforms:
 	@flutter config --enable-windows-desktop
 	@flutter config --enable-macos-desktop
 	@echo "✓ All desktop platforms enabled"
+
+# ============================================================================
+# Deployment (Linux)
+# ============================================================================
+
+# Install application to /opt/tabularium
+install: build-linux
+	@echo "Installing Tabularium to /opt/tabularium..."
+	@if [ ! -d "./build/linux/x64/release/bundle" ]; then \
+		echo "Error: Release build not found. Run 'make build-linux' first."; \
+		exit 1; \
+	fi
+	@echo "Creating installation directory..."
+	@sudo mkdir -p /opt/tabularium
+	@echo "Copying application files..."
+	@sudo cp -r ./build/linux/x64/release/bundle/* /opt/tabularium/
+	@echo "Creating desktop entry..."
+	@echo "[Desktop Entry]" | sudo tee /usr/share/applications/tabularium.desktop > /dev/null
+	@echo "Name=Tabularium" | sudo tee -a /usr/share/applications/tabularium.desktop > /dev/null
+	@echo "Comment=Your Personal PDF Library Manager" | sudo tee -a /usr/share/applications/tabularium.desktop > /dev/null
+	@echo "Exec=/opt/tabularium/tabularium" | sudo tee -a /usr/share/applications/tabularium.desktop > /dev/null
+	@echo "Icon=/opt/tabularium/data/flutter_assets/assets/icon.png" | sudo tee -a /usr/share/applications/tabularium.desktop > /dev/null
+	@echo "Terminal=false" | sudo tee -a /usr/share/applications/tabularium.desktop > /dev/null
+	@echo "Type=Application" | sudo tee -a /usr/share/applications/tabularium.desktop > /dev/null
+	@echo "Categories=Office;Viewer;" | sudo tee -a /usr/share/applications/tabularium.desktop > /dev/null
+	@sudo chmod 644 /usr/share/applications/tabularium.desktop
+	@echo "Updating desktop database..."
+	@sudo update-desktop-database /usr/share/applications/ 2>/dev/null || true
+	@echo "✓ Installation completed!"
+	@echo "You can now launch Tabularium from your application menu."
+
+# Uninstall application
+uninstall:
+	@echo "Uninstalling Tabularium..."
+	@if [ -d "/opt/tabularium" ]; then \
+		echo "Removing application files..."; \
+		sudo rm -rf /opt/tabularium; \
+		echo "✓ Application files removed"; \
+	else \
+		echo "Application directory not found, skipping..."; \
+	fi
+	@if [ -f "/usr/share/applications/tabularium.desktop" ]; then \
+		echo "Removing desktop entry..."; \
+		sudo rm -f /usr/share/applications/tabularium.desktop; \
+		echo "✓ Desktop entry removed"; \
+	else \
+		echo "Desktop entry not found, skipping..."; \
+	fi
+	@echo "Updating desktop database..."
+	@sudo update-desktop-database /usr/share/applications/ 2>/dev/null || true
+	@echo "✓ Tabularium has been uninstalled"
