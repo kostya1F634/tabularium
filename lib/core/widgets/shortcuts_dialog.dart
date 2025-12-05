@@ -22,18 +22,44 @@ class ShortcutsDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _buildSection(context, 'General', [
+                  _ShortcutItem(
+                    'Ctrl+W',
+                    'Toggle between library and welcome screen',
+                  ),
                   _ShortcutItem('Ctrl+N', 'Create new shelf'),
                   _ShortcutItem('Ctrl+O', 'Open books (all or selected)'),
-                  _ShortcutItem('Ctrl+E', 'Edit shelf / Book properties'),
                   _ShortcutItem('Ctrl+S', 'Select all books'),
                   _ShortcutItem('Ctrl+D', 'Clear selection'),
+                  _ShortcutItem(
+                    'Ctrl+1...0',
+                    'Quick shelf selection (first 10 shelves)',
+                  ),
+                  _ShortcutItem('Ctrl+E', 'Edit shelf / Book properties'),
+                  _ShortcutItem('Ctrl+T', 'Toggle view mode (Grid/Cabinet)'),
+                  _ShortcutItem(
+                    'Ctrl+A',
+                    'Add selected/focused/all books to shelf',
+                  ),
+                  _ShortcutItem('Ctrl+F', 'Focus on center visible book'),
+                  _ShortcutItem('Ctrl+U', 'Jump to first shelf/book'),
+                  _ShortcutItem('Ctrl+I', 'Jump to last shelf/book'),
+                  _ShortcutItem('/ or .', 'Focus/unfocus search field'),
+                  _ShortcutItem(
+                    'Tab',
+                    'Switch focus between shelves and books',
+                  ),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection(context, 'Navigation', [
-                  _ShortcutItem('H / ←', 'Focus on shelves'),
-                  _ShortcutItem('L / →', 'Focus on books'),
-                  _ShortcutItem('J / ↓', 'Move down (in shelves)'),
-                  _ShortcutItem('K / ↑', 'Move up (in shelves)'),
+                _buildSection(context, 'Navigation - Shelves', [
+                  _ShortcutItem('J / ↓', 'Move down'),
+                  _ShortcutItem('K / ↑', 'Move up'),
+                ]),
+                const SizedBox(height: 16),
+                _buildSection(context, 'Navigation - Books', [
+                  _ShortcutItem('H / ←', 'Move left'),
+                  _ShortcutItem('J / ↓', 'Move down'),
+                  _ShortcutItem('K / ↑', 'Move up'),
+                  _ShortcutItem('L / →', 'Move right'),
                 ]),
                 const SizedBox(height: 16),
                 _buildSection(context, 'Shelves', [
@@ -43,7 +69,9 @@ class ShortcutsDialog extends StatelessWidget {
                 ]),
                 const SizedBox(height: 16),
                 _buildSection(context, 'Books', [
-                  _ShortcutItem('Delete', 'Remove book from shelf'),
+                  _ShortcutItem('Enter', 'Open focused book'),
+                  _ShortcutItem('Space', 'Toggle selection of focused book'),
+                  _ShortcutItem('Delete', 'Remove selected books from shelf'),
                 ]),
               ],
             ),
