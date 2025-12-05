@@ -289,4 +289,22 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get selectShelf => 'Выбрать полку';
+
+  @override
+  String get sortDateAddedNewest => 'Дата добавления ↓';
+
+  @override
+  String get sortDateAddedOldest => 'Дата добавления ↑';
+
+  @override
+  String get sortDateOpenedNewest => 'Дата открытия ↓';
+
+  @override
+  String get sortDateOpenedOldest => 'Дата открытия ↑';
+
+  @override
+  String get sortTitleAZ => 'Название А-Я';
+
+  @override
+  String get sortTitleZA => 'Название Я-А';
 }

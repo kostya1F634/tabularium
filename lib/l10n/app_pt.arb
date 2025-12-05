@@ -83,5 +83,11 @@
   "bookScaleGrid": "Escala (Grade)",
   "bookScaleCabinet": "Escala (Estante)",
   "add": "Adicionar",
-  "selectShelf": "Selecionar Prateleira"
+  "selectShelf": "Selecionar Prateleira",
+  "sortDateAddedNewest": "Adicionado ↓",
+  "sortDateAddedOldest": "Adicionado ↑",
+  "sortDateOpenedNewest": "Aberto ↓",
+  "sortDateOpenedOldest": "Aberto ↑",
+  "sortTitleAZ": "Título A-Z",
+  "sortTitleZA": "Título Z-A"
 }

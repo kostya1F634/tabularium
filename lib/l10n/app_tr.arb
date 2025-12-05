@@ -83,5 +83,11 @@
   "bookScaleGrid": "Ölçek (Izgara)",
   "bookScaleCabinet": "Ölçek (Dolap)",
   "add": "Ekle",
-  "selectShelf": "Raf Seç"
+  "selectShelf": "Raf Seç",
+  "sortDateAddedNewest": "Eklenme ↓",
+  "sortDateAddedOldest": "Eklenme ↑",
+  "sortDateOpenedNewest": "Açılma ↓",
+  "sortDateOpenedOldest": "Açılma ↑",
+  "sortTitleAZ": "Başlık A-Z",
+  "sortTitleZA": "Başlık Z-A"
 }

@@ -83,5 +83,11 @@
   "bookScaleGrid": "Skalierung (Raster)",
   "bookScaleCabinet": "Skalierung (Regal)",
   "add": "Hinzufügen",
-  "selectShelf": "Regal Auswählen"
+  "selectShelf": "Regal Auswählen",
+  "sortDateAddedNewest": "Hinzugefügt ↓",
+  "sortDateAddedOldest": "Hinzugefügt ↑",
+  "sortDateOpenedNewest": "Geöffnet ↓",
+  "sortDateOpenedOldest": "Geöffnet ↑",
+  "sortTitleAZ": "Titel A-Z",
+  "sortTitleZA": "Titel Z-A"
 }

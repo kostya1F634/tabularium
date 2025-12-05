@@ -83,5 +83,11 @@
   "bookScaleGrid": "책 크기 (그리드)",
   "bookScaleCabinet": "책 크기 (서가)",
   "add": "추가",
-  "selectShelf": "서가 선택"
+  "selectShelf": "서가 선택",
+  "sortDateAddedNewest": "추가일 ↓",
+  "sortDateAddedOldest": "추가일 ↑",
+  "sortDateOpenedNewest": "열린 날짜 ↓",
+  "sortDateOpenedOldest": "열린 날짜 ↑",
+  "sortTitleAZ": "제목 A-Z",
+  "sortTitleZA": "제목 Z-A"
 }

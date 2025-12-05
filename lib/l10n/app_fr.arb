@@ -83,5 +83,11 @@
   "bookScaleGrid": "Échelle (Grille)",
   "bookScaleCabinet": "Échelle (Armoire)",
   "add": "Ajouter",
-  "selectShelf": "Sélectionner Étagère"
+  "selectShelf": "Sélectionner Étagère",
+  "sortDateAddedNewest": "Ajout ↓",
+  "sortDateAddedOldest": "Ajout ↑",
+  "sortDateOpenedNewest": "Ouvert ↓",
+  "sortDateOpenedOldest": "Ouvert ↑",
+  "sortTitleAZ": "Titre A-Z",
+  "sortTitleZA": "Titre Z-A"
 }

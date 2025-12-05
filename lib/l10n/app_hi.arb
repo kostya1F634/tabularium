@@ -83,5 +83,11 @@
   "bookScaleGrid": "स्केल (ग्रिड)",
   "bookScaleCabinet": "स्केल (कैबिनेट)",
   "add": "जोड़ें",
-  "selectShelf": "शेल्फ़ चुनें"
+  "selectShelf": "शेल्फ़ चुनें",
+  "sortDateAddedNewest": "जोड़ा गया ↓",
+  "sortDateAddedOldest": "जोड़ा गया ↑",
+  "sortDateOpenedNewest": "खोला गया ↓",
+  "sortDateOpenedOldest": "खोला गया ↑",
+  "sortTitleAZ": "शीर्षक A-Z",
+  "sortTitleZA": "शीर्षक Z-A"
 }

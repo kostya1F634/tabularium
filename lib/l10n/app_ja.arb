@@ -83,5 +83,11 @@
   "bookScaleGrid": "本のスケール（グリッド）",
   "bookScaleCabinet": "本のスケール（本棚）",
   "add": "追加",
-  "selectShelf": "本棚を選択"
+  "selectShelf": "本棚を選択",
+  "sortDateAddedNewest": "追加日 ↓",
+  "sortDateAddedOldest": "追加日 ↑",
+  "sortDateOpenedNewest": "開いた日 ↓",
+  "sortDateOpenedOldest": "開いた日 ↑",
+  "sortTitleAZ": "タイトル A-Z",
+  "sortTitleZA": "タイトル Z-A"
 }

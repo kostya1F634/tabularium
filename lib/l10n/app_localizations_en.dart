@@ -286,4 +286,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectShelf => 'Select Shelf';
+
+  @override
+  String get sortDateAddedNewest => 'Date Added ↓';
+
+  @override
+  String get sortDateAddedOldest => 'Date Added ↑';
+
+  @override
+  String get sortDateOpenedNewest => 'Date Opened ↓';
+
+  @override
+  String get sortDateOpenedOldest => 'Date Opened ↑';
+
+  @override
+  String get sortTitleAZ => 'Title A-Z';
+
+  @override
+  String get sortTitleZA => 'Title Z-A';
 }

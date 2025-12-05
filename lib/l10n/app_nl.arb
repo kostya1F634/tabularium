@@ -83,5 +83,11 @@
   "bookScaleGrid": "Schaal (Raster)",
   "bookScaleCabinet": "Schaal (Kast)",
   "add": "Toevoegen",
-  "selectShelf": "Plank Selecteren"
+  "selectShelf": "Plank Selecteren",
+  "sortDateAddedNewest": "Toegevoegd ↓",
+  "sortDateAddedOldest": "Toegevoegd ↑",
+  "sortDateOpenedNewest": "Geopend ↓",
+  "sortDateOpenedOldest": "Geopend ↑",
+  "sortTitleAZ": "Titel A-Z",
+  "sortTitleZA": "Titel Z-A"
 }

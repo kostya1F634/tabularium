@@ -83,5 +83,11 @@
   "bookScaleGrid": "Skala (Siatka)",
   "bookScaleCabinet": "Skala (Szafa)",
   "add": "Dodaj",
-  "selectShelf": "Wybierz Półkę"
+  "selectShelf": "Wybierz Półkę",
+  "sortDateAddedNewest": "Dodano ↓",
+  "sortDateAddedOldest": "Dodano ↑",
+  "sortDateOpenedNewest": "Otwarto ↓",
+  "sortDateOpenedOldest": "Otwarto ↑",
+  "sortTitleAZ": "Tytuł A-Z",
+  "sortTitleZA": "Tytuł Z-A"
 }

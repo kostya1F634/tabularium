@@ -449,5 +449,35 @@
   "selectShelf": "Select Shelf",
   "@selectShelf": {
     "description": "Select shelf dialog title"
+  },
+
+  "sortDateAddedNewest": "Date Added ↓",
+  "@sortDateAddedNewest": {
+    "description": "Sort by date added, newest first"
+  },
+
+  "sortDateAddedOldest": "Date Added ↑",
+  "@sortDateAddedOldest": {
+    "description": "Sort by date added, oldest first"
+  },
+
+  "sortDateOpenedNewest": "Date Opened ↓",
+  "@sortDateOpenedNewest": {
+    "description": "Sort by date opened, newest first"
+  },
+
+  "sortDateOpenedOldest": "Date Opened ↑",
+  "@sortDateOpenedOldest": {
+    "description": "Sort by date opened, oldest first"
+  },
+
+  "sortTitleAZ": "Title A-Z",
+  "@sortTitleAZ": {
+    "description": "Sort by title A to Z"
+  },
+
+  "sortTitleZA": "Title Z-A",
+  "@sortTitleZA": {
+    "description": "Sort by title Z to A"
   }
 }

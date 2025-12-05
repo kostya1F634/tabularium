@@ -37,7 +37,21 @@ class LanguageService extends ChangeNotifier {
   /// Get list of supported locales
   static List<Locale> get supportedLocales => const [
     Locale('en'), // English
-    Locale('ru'), // Russian
+    Locale('ru'), // Русский
+    Locale('zh'), // 中文
+    Locale('de'), // Deutsch
+    Locale('fr'), // Français
+    Locale('es'), // Español
+    Locale('it'), // Italiano
+    Locale('pt'), // Português
+    Locale('ja'), // 日本語
+    Locale('ko'), // 한국어
+    Locale('hi'), // हिन्दी
+    Locale('ar'), // العربية
+    Locale('tr'), // Türkçe
+    Locale('nl'), // Nederlands
+    Locale('da'), // Dansk
+    Locale('pl'), // Polski
   ];
 
   /// Check if locale is supported

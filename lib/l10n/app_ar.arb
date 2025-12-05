@@ -83,5 +83,11 @@
   "bookScaleGrid": "المقياس (الشبكة)",
   "bookScaleCabinet": "المقياس (الخزانة)",
   "add": "إضافة",
-  "selectShelf": "اختر رفاً"
+  "selectShelf": "اختر رفاً",
+  "sortDateAddedNewest": "تاريخ الإضافة ↓",
+  "sortDateAddedOldest": "تاريخ الإضافة ↑",
+  "sortDateOpenedNewest": "تاريخ الفتح ↓",
+  "sortDateOpenedOldest": "تاريخ الفتح ↑",
+  "sortTitleAZ": "العنوان A-Z",
+  "sortTitleZA": "العنوان Z-A"
 }

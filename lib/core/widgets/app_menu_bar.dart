@@ -8,6 +8,7 @@ import '../../features/library/presentation/pages/library_view_wrapper.dart';
 import '../../features/library/presentation/bloc/library_bloc.dart';
 import '../../features/library/presentation/bloc/library_event.dart';
 import '../services/language_provider.dart';
+import '../services/language_service.dart';
 import '../services/theme_provider.dart';
 import '../services/ui_settings_provider.dart';
 import '../services/window_settings_provider.dart';
@@ -134,46 +135,8 @@ class AppMenuBar extends StatelessWidget {
                   languageService.changeLanguage(Locale(languageCode));
                   Navigator.pop(context); // Close parent menu
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'en',
-                    child: Container(
-                      decoration:
-                          languageService.currentLocale.languageCode == 'en'
-                          ? BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(4),
-                            )
-                          : null,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      child: const Text('English'),
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'ru',
-                    child: Container(
-                      decoration:
-                          languageService.currentLocale.languageCode == 'ru'
-                          ? BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(4),
-                            )
-                          : null,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      child: const Text('Русский'),
-                    ),
-                  ),
-                ],
+                itemBuilder: (context) =>
+                    _buildLanguageMenuItems(context, languageService),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -390,23 +353,23 @@ class AppMenuBar extends StatelessWidget {
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'about',
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 16),
-                    SizedBox(width: 8),
-                    Text('About'),
+                    const Icon(Icons.info_outline, size: 16),
+                    const SizedBox(width: 8),
+                    Text(l10n.about),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'reset',
                 child: Row(
                   children: [
-                    Icon(Icons.restart_alt, size: 16),
-                    SizedBox(width: 8),
-                    Text('Reset Settings'),
+                    const Icon(Icons.restart_alt, size: 16),
+                    const SizedBox(width: 8),
+                    Text(l10n.resetSettings),
                   ],
                 ),
               ),
@@ -418,5 +381,54 @@ class AppMenuBar extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  /// Build language menu items for all supported languages
+  List<PopupMenuEntry<String>> _buildLanguageMenuItems(
+    BuildContext context,
+    LanguageService languageService,
+  ) {
+    // Map of language codes to their native names
+    const languageNames = {
+      'en': 'English',
+      'ru': 'Русский',
+      'zh': '中文',
+      'de': 'Deutsch',
+      'fr': 'Français',
+      'es': 'Español',
+      'it': 'Italiano',
+      'pt': 'Português',
+      'ja': '日本語',
+      'ko': '한국어',
+      'hi': 'हिन्दी',
+      'ar': 'العربية',
+      'tr': 'Türkçe',
+      'nl': 'Nederlands',
+      'da': 'Dansk',
+      'pl': 'Polski',
+    };
+
+    return languageNames.entries.map((entry) {
+      final languageCode = entry.key;
+      final languageName = entry.value;
+      final isSelected =
+          languageService.currentLocale.languageCode == languageCode;
+
+      return PopupMenuItem(
+        value: languageCode,
+        child: Container(
+          decoration: isSelected
+              ? BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(4),
+                )
+              : null,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Text(languageName),
+        ),
+      );
+    }).toList();
   }
 }

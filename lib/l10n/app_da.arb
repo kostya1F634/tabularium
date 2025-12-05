@@ -83,5 +83,11 @@
   "bookScaleGrid": "Skala (Gitter)",
   "bookScaleCabinet": "Skala (Skab)",
   "add": "Tilføj",
-  "selectShelf": "Vælg Hylde"
+  "selectShelf": "Vælg Hylde",
+  "sortDateAddedNewest": "Tilføjet ↓",
+  "sortDateAddedOldest": "Tilføjet ↑",
+  "sortDateOpenedNewest": "Åbnet ↓",
+  "sortDateOpenedOldest": "Åbnet ↑",
+  "sortTitleAZ": "Titel A-Z",
+  "sortTitleZA": "Titel Z-A"
 }

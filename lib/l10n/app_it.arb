@@ -83,5 +83,11 @@
   "bookScaleGrid": "Scala (Griglia)",
   "bookScaleCabinet": "Scala (Libreria)",
   "add": "Aggiungi",
-  "selectShelf": "Seleziona Scaffale"
+  "selectShelf": "Seleziona Scaffale",
+  "sortDateAddedNewest": "Aggiunto ↓",
+  "sortDateAddedOldest": "Aggiunto ↑",
+  "sortDateOpenedNewest": "Aperto ↓",
+  "sortDateOpenedOldest": "Aperto ↑",
+  "sortTitleAZ": "Titolo A-Z",
+  "sortTitleZA": "Titolo Z-A"
 }

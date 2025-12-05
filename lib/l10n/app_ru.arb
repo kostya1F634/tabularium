@@ -84,5 +84,11 @@
   "bookScaleGrid": "Масштаб книг (Сетка)",
   "bookScaleCabinet": "Масштаб книг (Шкаф)",
   "add": "Добавить",
-  "selectShelf": "Выбрать полку"
+  "selectShelf": "Выбрать полку",
+  "sortDateAddedNewest": "Дата добавления ↓",
+  "sortDateAddedOldest": "Дата добавления ↑",
+  "sortDateOpenedNewest": "Дата открытия ↓",
+  "sortDateOpenedOldest": "Дата открытия ↑",
+  "sortTitleAZ": "Название А-Я",
+  "sortTitleZA": "Название Я-А"
 }

@@ -83,5 +83,11 @@
   "bookScaleGrid": "图书缩放（网格）",
   "bookScaleCabinet": "图书缩放（书柜）",
   "add": "添加",
-  "selectShelf": "选择书架"
+  "selectShelf": "选择书架",
+  "sortDateAddedNewest": "添加日期 ↓",
+  "sortDateAddedOldest": "添加日期 ↑",
+  "sortDateOpenedNewest": "打开日期 ↓",
+  "sortDateOpenedOldest": "打开日期 ↑",
+  "sortTitleAZ": "标题 A-Z",
+  "sortTitleZA": "标题 Z-A"
 }
