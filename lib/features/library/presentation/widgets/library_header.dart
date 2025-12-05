@@ -251,6 +251,7 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                       value: state.sortOption,
                       icon: const Icon(Icons.arrow_drop_down, size: 20),
                       underline: Container(),
+                      focusColor: Colors.transparent,
                       onChanged: (BookSortOption? newValue) {
                         if (newValue != null) {
                           context.read<LibraryBloc>().add(SortBooks(newValue));
