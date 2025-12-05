@@ -14,6 +14,7 @@ import '../services/window_settings_provider.dart';
 import '../theme/app_theme.dart';
 import 'dialog_shortcuts_wrapper.dart';
 import 'shortcuts_dialog.dart';
+import 'theme_picker_dialog.dart';
 
 /// Reusable menu bar widget with theme and language settings
 class AppMenuBar extends StatelessWidget {
@@ -107,41 +108,15 @@ class AppMenuBar extends StatelessWidget {
             },
           ),
         // Theme button
-        PopupMenuButton<AppThemeMode>(
+        IconButton(
           icon: const Icon(Icons.palette, size: 16),
           tooltip: l10n.theme,
-          offset: const Offset(0, 30),
-          onSelected: (theme) => themeService.setTheme(theme),
-          itemBuilder: (context) {
-            final items = <PopupMenuEntry<AppThemeMode>>[];
-            final themes = themeService.getGroupedThemes();
-
-            for (int i = 0; i < themes.length; i++) {
-              final theme = themes[i];
-
-              // Add divider between theme families
-              if (i > 0 && _shouldAddDivider(themes[i - 1], theme)) {
-                items.add(const PopupMenuDivider());
-              }
-
-              items.add(
-                PopupMenuItem(
-                  value: theme,
-                  child: Row(
-                    children: [
-                      if (themeService.currentTheme == theme)
-                        const Icon(Icons.check, size: 16)
-                      else
-                        const SizedBox(width: 16),
-                      const SizedBox(width: 8),
-                      Text(themeService.getThemeName(theme)),
-                    ],
-                  ),
-                ),
-              );
-            }
-
-            return items;
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) =>
+                  ThemePickerDialog(themeService: themeService),
+            );
           },
         ),
         // Settings button
@@ -162,28 +137,40 @@ class AppMenuBar extends StatelessWidget {
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     value: 'en',
-                    child: Row(
-                      children: [
-                        if (languageService.currentLocale.languageCode == 'en')
-                          const Icon(Icons.check, size: 16)
-                        else
-                          const SizedBox(width: 16),
-                        const SizedBox(width: 8),
-                        const Text('English'),
-                      ],
+                    child: Container(
+                      decoration:
+                          languageService.currentLocale.languageCode == 'en'
+                          ? BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            )
+                          : null,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: const Text('English'),
                     ),
                   ),
                   PopupMenuItem(
                     value: 'ru',
-                    child: Row(
-                      children: [
-                        if (languageService.currentLocale.languageCode == 'ru')
-                          const Icon(Icons.check, size: 16)
-                        else
-                          const SizedBox(width: 16),
-                        const SizedBox(width: 8),
-                        const Text('Русский'),
-                      ],
+                    child: Container(
+                      decoration:
+                          languageService.currentLocale.languageCode == 'ru'
+                          ? BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            )
+                          : null,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: const Text('Русский'),
                     ),
                   ),
                 ],
@@ -216,15 +203,20 @@ class AppMenuBar extends StatelessWidget {
                 itemBuilder: (context) => [0.8, 0.9, 1.0, 1.2, 1.5].map((size) {
                   return PopupMenuItem(
                     value: size,
-                    child: Row(
-                      children: [
-                        if (uiSettings.fontSize == size)
-                          const Icon(Icons.check, size: 16)
-                        else
-                          const SizedBox(width: 16),
-                        const SizedBox(width: 8),
-                        Text(uiSettings.getFontSizeLabel(size)),
-                      ],
+                    child: Container(
+                      decoration: uiSettings.fontSize == size
+                          ? BoxDecoration(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            )
+                          : null,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: Text(uiSettings.getFontSizeLabel(size)),
                     ),
                   );
                 }).toList(),
@@ -258,15 +250,20 @@ class AppMenuBar extends StatelessWidget {
                     [0.7, 0.85, 1.0, 1.25, 1.5, 2.0].map((scale) {
                       return PopupMenuItem(
                         value: scale,
-                        child: Row(
-                          children: [
-                            if (uiSettings.bookScale == scale)
-                              const Icon(Icons.check, size: 16)
-                            else
-                              const SizedBox(width: 16),
-                            const SizedBox(width: 8),
-                            Text(uiSettings.getBookScaleLabel(scale)),
-                          ],
+                        child: Container(
+                          decoration: uiSettings.bookScale == scale
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          child: Text(uiSettings.getBookScaleLabel(scale)),
                         ),
                       );
                     }).toList(),
@@ -300,15 +297,20 @@ class AppMenuBar extends StatelessWidget {
                     [0.7, 0.85, 1.0, 1.25, 1.5, 2.0].map((scale) {
                       return PopupMenuItem(
                         value: scale,
-                        child: Row(
-                          children: [
-                            if (uiSettings.bookScaleCabinet == scale)
-                              const Icon(Icons.check, size: 16)
-                            else
-                              const SizedBox(width: 16),
-                            const SizedBox(width: 8),
-                            Text(uiSettings.getBookScaleLabel(scale)),
-                          ],
+                        child: Container(
+                          decoration: uiSettings.bookScaleCabinet == scale
+                              ? BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          child: Text(uiSettings.getBookScaleLabel(scale)),
                         ),
                       );
                     }).toList(),
@@ -416,34 +418,5 @@ class AppMenuBar extends StatelessWidget {
         ],
       ],
     );
-  }
-
-  /// Determines if a divider should be added between two themes
-  /// Returns true if themes belong to different families
-  static bool _shouldAddDivider(AppThemeMode prev, AppThemeMode current) {
-    // Define theme family boundaries
-    // A divider is added when switching from one family to another
-    final familyStarts = [
-      AppThemeMode.light, // Default
-      AppThemeMode.atomOneDark, // Atom One
-      AppThemeMode.ayuDark, // Ayu
-      AppThemeMode.catppuccinLatte, // Catppuccin
-      AppThemeMode.dracula, // Dracula
-      AppThemeMode.everforestDark, // Everforest
-      AppThemeMode.githubDark, // GitHub
-      AppThemeMode.gruber, // Gruber
-      AppThemeMode.gruvboxDark, // Gruvbox
-      AppThemeMode.materialDark, // Material
-      AppThemeMode.monokai, // Monokai
-      AppThemeMode.nordDark, // Nord
-      AppThemeMode.paper, // Paper
-      AppThemeMode.realistic, // Realistic
-      AppThemeMode.rosePineDawn, // Rosé Pine
-      AppThemeMode.solarizedDark, // Solarized
-      AppThemeMode.tokyoNight, // Tokyo Night
-      AppThemeMode.highContrast, // Special
-    ];
-
-    return familyStarts.contains(current);
   }
 }

@@ -262,27 +262,121 @@ class _LibraryHeaderState extends State<LibraryHeader> {
                       items: [
                         DropdownMenuItem(
                           value: BookSortOption.dateAddedNewest,
-                          child: Text('Date Added ↓'),
+                          child: Container(
+                            decoration:
+                                state.sortOption ==
+                                    BookSortOption.dateAddedNewest
+                                ? BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  )
+                                : null,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: const Text('Date Added ↓'),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: BookSortOption.dateAddedOldest,
-                          child: Text('Date Added ↑'),
+                          child: Container(
+                            decoration:
+                                state.sortOption ==
+                                    BookSortOption.dateAddedOldest
+                                ? BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  )
+                                : null,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: const Text('Date Added ↑'),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: BookSortOption.dateOpenedNewest,
-                          child: Text('Date Opened ↓'),
+                          child: Container(
+                            decoration:
+                                state.sortOption ==
+                                    BookSortOption.dateOpenedNewest
+                                ? BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  )
+                                : null,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: const Text('Date Opened ↓'),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: BookSortOption.dateOpenedOldest,
-                          child: Text('Date Opened ↑'),
+                          child: Container(
+                            decoration:
+                                state.sortOption ==
+                                    BookSortOption.dateOpenedOldest
+                                ? BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  )
+                                : null,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: const Text('Date Opened ↑'),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: BookSortOption.titleAZ,
-                          child: Text('Title A-Z'),
+                          child: Container(
+                            decoration:
+                                state.sortOption == BookSortOption.titleAZ
+                                ? BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  )
+                                : null,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: const Text('Title A-Z'),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: BookSortOption.titleZA,
-                          child: Text('Title Z-A'),
+                          child: Container(
+                            decoration:
+                                state.sortOption == BookSortOption.titleZA
+                                ? BoxDecoration(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  )
+                                : null,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: const Text('Title Z-A'),
+                          ),
                         ),
                       ],
                     ),
