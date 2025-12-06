@@ -304,4 +304,118 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Titolo Z-A';
+
+  @override
+  String get searchThemes => 'Cerca temi...';
+
+  @override
+  String get sizeSmall => 'Piccolo';
+
+  @override
+  String get sizeMedium => 'Medio';
+
+  @override
+  String get sizeNormal => 'Normale';
+
+  @override
+  String get sizeLarge => 'Grande';
+
+  @override
+  String get sizeExtraLarge => 'Molto grande';
+
+  @override
+  String get sizeTiny => 'Minuscolo';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Generale';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navigazione - Scaffali';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navigazione - Libri';
+
+  @override
+  String get shortcutsShelves => 'Scaffali';
+
+  @override
+  String get shortcutsBooks => 'Libri';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Passa tra biblioteca e schermata di benvenuto';
+
+  @override
+  String get shortcutCreateShelf => 'Crea nuovo scaffale';
+
+  @override
+  String get shortcutOpenBooks => 'Apri libri (tutti o selezionati)';
+
+  @override
+  String get shortcutSelectAll => 'Seleziona tutto';
+
+  @override
+  String get shortcutClearSelection => 'Cancella selezione';
+
+  @override
+  String get shortcutQuickShelf => 'Selezione rapida scaffale (primi 10)';
+
+  @override
+  String get shortcutEdit => 'Modifica scaffale / Proprietà libro';
+
+  @override
+  String get shortcutToggleView => 'Cambia modalità vista (Griglia/Libreria)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Aggiungi libri a scaffale (selezionati/focus/tutti)';
+
+  @override
+  String get shortcutFocusCenter => 'Focalizza libro centrale visibile';
+
+  @override
+  String get shortcutJumpFirst => 'Vai al primo scaffale/libro';
+
+  @override
+  String get shortcutJumpLast => 'Vai all\'ultimo scaffale/libro';
+
+  @override
+  String get shortcutFocusSearch => 'Focalizza/defocalizza campo di ricerca';
+
+  @override
+  String get shortcutSwitchFocus => 'Cambia focus tra scaffali e libri';
+
+  @override
+  String get shortcutMoveDown => 'Sposta giù';
+
+  @override
+  String get shortcutMoveUp => 'Sposta su';
+
+  @override
+  String get shortcutMoveLeft => 'Sposta a sinistra';
+
+  @override
+  String get shortcutMoveRight => 'Sposta a destra';
+
+  @override
+  String get shortcutMoveShelfDown => 'Sposta scaffale giù';
+
+  @override
+  String get shortcutMoveShelfUp => 'Sposta scaffale su';
+
+  @override
+  String get shortcutDeleteShelf => 'Elimina scaffale';
+
+  @override
+  String get shortcutOpenFocused => 'Apri libro focalizzato';
+
+  @override
+  String get shortcutToggleSelection => 'Cambia selezione libro focalizzato';
+
+  @override
+  String get shortcutRemoveFromShelf =>
+      'Rimuovi libri selezionati dallo scaffale';
 }

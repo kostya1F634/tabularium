@@ -21,57 +21,45 @@ class ShortcutsDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildSection(context, 'General', [
-                  _ShortcutItem(
-                    'Ctrl+W',
-                    'Toggle between library and welcome screen',
-                  ),
-                  _ShortcutItem('Ctrl+N', 'Create new shelf'),
-                  _ShortcutItem('Ctrl+O', 'Open books (all or selected)'),
-                  _ShortcutItem('Ctrl+S', 'Select all books'),
-                  _ShortcutItem('Ctrl+D', 'Clear selection'),
-                  _ShortcutItem(
-                    'Ctrl+1...0',
-                    'Quick shelf selection (first 10 shelves)',
-                  ),
-                  _ShortcutItem('Ctrl+E', 'Edit shelf / Book properties'),
-                  _ShortcutItem('Ctrl+T', 'Toggle view mode (Grid/Cabinet)'),
-                  _ShortcutItem(
-                    'Ctrl+A',
-                    'Add selected/focused/all books to shelf',
-                  ),
-                  _ShortcutItem('Ctrl+F', 'Focus on center visible book'),
-                  _ShortcutItem('Ctrl+U', 'Jump to first shelf/book'),
-                  _ShortcutItem('Ctrl+I', 'Jump to last shelf/book'),
-                  _ShortcutItem('/ or .', 'Focus/unfocus search field'),
-                  _ShortcutItem(
-                    'Tab',
-                    'Switch focus between shelves and books',
-                  ),
+                _buildSection(context, l10n.shortcutsGeneral, [
+                  _ShortcutItem('Ctrl+W', l10n.shortcutToggleScreen),
+                  _ShortcutItem('Ctrl+N', l10n.shortcutCreateShelf),
+                  _ShortcutItem('Ctrl+O', l10n.shortcutOpenBooks),
+                  _ShortcutItem('Ctrl+S', l10n.shortcutSelectAll),
+                  _ShortcutItem('Ctrl+D', l10n.shortcutClearSelection),
+                  _ShortcutItem('Ctrl+1...0', l10n.shortcutQuickShelf),
+                  _ShortcutItem('Ctrl+E', l10n.shortcutEdit),
+                  _ShortcutItem('Ctrl+T', l10n.shortcutToggleView),
+                  _ShortcutItem('Ctrl+A', l10n.shortcutAddToShelf),
+                  _ShortcutItem('Ctrl+F', l10n.shortcutFocusCenter),
+                  _ShortcutItem('Ctrl+U', l10n.shortcutJumpFirst),
+                  _ShortcutItem('Ctrl+I', l10n.shortcutJumpLast),
+                  _ShortcutItem('/ or .', l10n.shortcutFocusSearch),
+                  _ShortcutItem('Tab', l10n.shortcutSwitchFocus),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection(context, 'Navigation - Shelves', [
-                  _ShortcutItem('J / ↓', 'Move down'),
-                  _ShortcutItem('K / ↑', 'Move up'),
+                _buildSection(context, l10n.shortcutsNavigationShelves, [
+                  _ShortcutItem('J / ↓', l10n.shortcutMoveDown),
+                  _ShortcutItem('K / ↑', l10n.shortcutMoveUp),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection(context, 'Navigation - Books', [
-                  _ShortcutItem('H / ←', 'Move left'),
-                  _ShortcutItem('J / ↓', 'Move down'),
-                  _ShortcutItem('K / ↑', 'Move up'),
-                  _ShortcutItem('L / →', 'Move right'),
+                _buildSection(context, l10n.shortcutsNavigationBooks, [
+                  _ShortcutItem('H / ←', l10n.shortcutMoveLeft),
+                  _ShortcutItem('J / ↓', l10n.shortcutMoveDown),
+                  _ShortcutItem('K / ↑', l10n.shortcutMoveUp),
+                  _ShortcutItem('L / →', l10n.shortcutMoveRight),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection(context, 'Shelves', [
-                  _ShortcutItem('Ctrl+J / Ctrl+↓', 'Move shelf down'),
-                  _ShortcutItem('Ctrl+K / Ctrl+↑', 'Move shelf up'),
-                  _ShortcutItem('Delete', 'Delete shelf'),
+                _buildSection(context, l10n.shortcutsShelves, [
+                  _ShortcutItem('Ctrl+J / Ctrl+↓', l10n.shortcutMoveShelfDown),
+                  _ShortcutItem('Ctrl+K / Ctrl+↑', l10n.shortcutMoveShelfUp),
+                  _ShortcutItem('Delete', l10n.shortcutDeleteShelf),
                 ]),
                 const SizedBox(height: 16),
-                _buildSection(context, 'Books', [
-                  _ShortcutItem('Enter', 'Open focused book'),
-                  _ShortcutItem('Space', 'Toggle selection of focused book'),
-                  _ShortcutItem('Delete', 'Remove selected books from shelf'),
+                _buildSection(context, l10n.shortcutsBooks, [
+                  _ShortcutItem('Enter', l10n.shortcutOpenFocused),
+                  _ShortcutItem('Space', l10n.shortcutToggleSelection),
+                  _ShortcutItem('Delete', l10n.shortcutRemoveFromShelf),
                 ]),
               ],
             ),
@@ -80,7 +68,7 @@ class ShortcutsDialog extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+            child: Text(l10n.ok),
           ),
         ],
       ),

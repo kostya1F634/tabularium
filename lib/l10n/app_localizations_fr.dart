@@ -304,4 +304,118 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Titre Z-A';
+
+  @override
+  String get searchThemes => 'Rechercher thèmes...';
+
+  @override
+  String get sizeSmall => 'Petit';
+
+  @override
+  String get sizeMedium => 'Moyen';
+
+  @override
+  String get sizeNormal => 'Normal';
+
+  @override
+  String get sizeLarge => 'Grand';
+
+  @override
+  String get sizeExtraLarge => 'Très grand';
+
+  @override
+  String get sizeTiny => 'Minuscule';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Général';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navigation - Étagères';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navigation - Livres';
+
+  @override
+  String get shortcutsShelves => 'Étagères';
+
+  @override
+  String get shortcutsBooks => 'Livres';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Basculer entre bibliothèque et écran d\'accueil';
+
+  @override
+  String get shortcutCreateShelf => 'Créer nouvelle étagère';
+
+  @override
+  String get shortcutOpenBooks => 'Ouvrir livres (tous ou sélectionnés)';
+
+  @override
+  String get shortcutSelectAll => 'Tout sélectionner';
+
+  @override
+  String get shortcutClearSelection => 'Effacer sélection';
+
+  @override
+  String get shortcutQuickShelf => 'Sélection rapide étagère (10 premières)';
+
+  @override
+  String get shortcutEdit => 'Modifier étagère / Propriétés du livre';
+
+  @override
+  String get shortcutToggleView => 'Changer mode d\'affichage (Grille/Armoire)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Ajouter livres à étagère (sélectionnés/focus/tous)';
+
+  @override
+  String get shortcutFocusCenter => 'Focaliser sur livre central visible';
+
+  @override
+  String get shortcutJumpFirst => 'Aller à première étagère/livre';
+
+  @override
+  String get shortcutJumpLast => 'Aller à dernière étagère/livre';
+
+  @override
+  String get shortcutFocusSearch => 'Focaliser/défocaliser champ de recherche';
+
+  @override
+  String get shortcutSwitchFocus => 'Basculer focus entre étagères et livres';
+
+  @override
+  String get shortcutMoveDown => 'Descendre';
+
+  @override
+  String get shortcutMoveUp => 'Monter';
+
+  @override
+  String get shortcutMoveLeft => 'Aller à gauche';
+
+  @override
+  String get shortcutMoveRight => 'Aller à droite';
+
+  @override
+  String get shortcutMoveShelfDown => 'Déplacer étagère vers le bas';
+
+  @override
+  String get shortcutMoveShelfUp => 'Déplacer étagère vers le haut';
+
+  @override
+  String get shortcutDeleteShelf => 'Supprimer étagère';
+
+  @override
+  String get shortcutOpenFocused => 'Ouvrir livre focalisé';
+
+  @override
+  String get shortcutToggleSelection => 'Basculer sélection du livre focalisé';
+
+  @override
+  String get shortcutRemoveFromShelf =>
+      'Retirer livres sélectionnés de l\'étagère';
 }

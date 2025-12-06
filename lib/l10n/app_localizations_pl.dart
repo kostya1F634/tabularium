@@ -314,4 +314,118 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Tytuł Z-A';
+
+  @override
+  String get searchThemes => 'Szukaj motywów...';
+
+  @override
+  String get sizeSmall => 'Mały';
+
+  @override
+  String get sizeMedium => 'Średni';
+
+  @override
+  String get sizeNormal => 'Normalny';
+
+  @override
+  String get sizeLarge => 'Duży';
+
+  @override
+  String get sizeExtraLarge => 'Bardzo duży';
+
+  @override
+  String get sizeTiny => 'Malutki';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Ogólne';
+
+  @override
+  String get shortcutsNavigationShelves => 'Nawigacja - Półki';
+
+  @override
+  String get shortcutsNavigationBooks => 'Nawigacja - Książki';
+
+  @override
+  String get shortcutsShelves => 'Półki';
+
+  @override
+  String get shortcutsBooks => 'Książki';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Przełącz między biblioteką a ekranem powitalnym';
+
+  @override
+  String get shortcutCreateShelf => 'Utwórz nową półkę';
+
+  @override
+  String get shortcutOpenBooks => 'Otwórz książki (wszystkie lub zaznaczone)';
+
+  @override
+  String get shortcutSelectAll => 'Zaznacz wszystkie';
+
+  @override
+  String get shortcutClearSelection => 'Wyczyść zaznaczenie';
+
+  @override
+  String get shortcutQuickShelf => 'Szybki wybór półki (pierwsze 10)';
+
+  @override
+  String get shortcutEdit => 'Edytuj półkę / Właściwości książki';
+
+  @override
+  String get shortcutToggleView => 'Przełącz tryb widoku (Siatka/Szafa)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Dodaj książki do półki (zaznaczone/fokus/wszystkie)';
+
+  @override
+  String get shortcutFocusCenter => 'Fokus na centralną widoczną książkę';
+
+  @override
+  String get shortcutJumpFirst => 'Skocz do pierwszej półki/książki';
+
+  @override
+  String get shortcutJumpLast => 'Skocz do ostatniej półki/książki';
+
+  @override
+  String get shortcutFocusSearch => 'Fokus/defokus pole wyszukiwania';
+
+  @override
+  String get shortcutSwitchFocus => 'Przełącz fokus między półkami a książkami';
+
+  @override
+  String get shortcutMoveDown => 'Przesuń w dół';
+
+  @override
+  String get shortcutMoveUp => 'Przesuń w górę';
+
+  @override
+  String get shortcutMoveLeft => 'Przesuń w lewo';
+
+  @override
+  String get shortcutMoveRight => 'Przesuń w prawo';
+
+  @override
+  String get shortcutMoveShelfDown => 'Przesuń półkę w dół';
+
+  @override
+  String get shortcutMoveShelfUp => 'Przesuń półkę w górę';
+
+  @override
+  String get shortcutDeleteShelf => 'Usuń półkę';
+
+  @override
+  String get shortcutOpenFocused => 'Otwórz książkę w fokusie';
+
+  @override
+  String get shortcutToggleSelection =>
+      'Przełącz zaznaczenie książki w fokusie';
+
+  @override
+  String get shortcutRemoveFromShelf => 'Usuń zaznaczone książki z półki';
 }

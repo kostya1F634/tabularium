@@ -304,4 +304,118 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Titel Z-A';
+
+  @override
+  String get searchThemes => 'Thema\'s zoeken...';
+
+  @override
+  String get sizeSmall => 'Klein';
+
+  @override
+  String get sizeMedium => 'Gemiddeld';
+
+  @override
+  String get sizeNormal => 'Normaal';
+
+  @override
+  String get sizeLarge => 'Groot';
+
+  @override
+  String get sizeExtraLarge => 'Extra groot';
+
+  @override
+  String get sizeTiny => 'Zeer klein';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Algemeen';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navigatie - Planken';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navigatie - Boeken';
+
+  @override
+  String get shortcutsShelves => 'Planken';
+
+  @override
+  String get shortcutsBooks => 'Boeken';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Schakelen tussen bibliotheek en welkomstscherm';
+
+  @override
+  String get shortcutCreateShelf => 'Nieuwe plank maken';
+
+  @override
+  String get shortcutOpenBooks => 'Boeken openen (alle of geselecteerd)';
+
+  @override
+  String get shortcutSelectAll => 'Alles selecteren';
+
+  @override
+  String get shortcutClearSelection => 'Selectie wissen';
+
+  @override
+  String get shortcutQuickShelf => 'Snelle plankselectie (eerste 10)';
+
+  @override
+  String get shortcutEdit => 'Plank bewerken / Boekeigenschappen';
+
+  @override
+  String get shortcutToggleView => 'Weergavemodus wisselen (Raster/Kast)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Boeken toevoegen aan plank (geselecteerd/focus/alle)';
+
+  @override
+  String get shortcutFocusCenter => 'Focus op centraal zichtbaar boek';
+
+  @override
+  String get shortcutJumpFirst => 'Spring naar eerste plank/boek';
+
+  @override
+  String get shortcutJumpLast => 'Spring naar laatste plank/boek';
+
+  @override
+  String get shortcutFocusSearch => 'Zoekveld focus/defocus';
+
+  @override
+  String get shortcutSwitchFocus => 'Wissel focus tussen planken en boeken';
+
+  @override
+  String get shortcutMoveDown => 'Naar beneden';
+
+  @override
+  String get shortcutMoveUp => 'Naar boven';
+
+  @override
+  String get shortcutMoveLeft => 'Naar links';
+
+  @override
+  String get shortcutMoveRight => 'Naar rechts';
+
+  @override
+  String get shortcutMoveShelfDown => 'Plank naar beneden';
+
+  @override
+  String get shortcutMoveShelfUp => 'Plank naar boven';
+
+  @override
+  String get shortcutDeleteShelf => 'Plank verwijderen';
+
+  @override
+  String get shortcutOpenFocused => 'Gefocust boek openen';
+
+  @override
+  String get shortcutToggleSelection => 'Selectie van gefocust boek wisselen';
+
+  @override
+  String get shortcutRemoveFromShelf =>
+      'Geselecteerde boeken van plank verwijderen';
 }

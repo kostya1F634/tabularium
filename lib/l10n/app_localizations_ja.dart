@@ -290,4 +290,115 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'タイトル Z-A';
+
+  @override
+  String get searchThemes => 'テーマを検索...';
+
+  @override
+  String get sizeSmall => '小';
+
+  @override
+  String get sizeMedium => '中';
+
+  @override
+  String get sizeNormal => '通常';
+
+  @override
+  String get sizeLarge => '大';
+
+  @override
+  String get sizeExtraLarge => '特大';
+
+  @override
+  String get sizeTiny => '極小';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => '一般';
+
+  @override
+  String get shortcutsNavigationShelves => 'ナビゲーション - 本棚';
+
+  @override
+  String get shortcutsNavigationBooks => 'ナビゲーション - 本';
+
+  @override
+  String get shortcutsShelves => '本棚';
+
+  @override
+  String get shortcutsBooks => '本';
+
+  @override
+  String get shortcutToggleScreen => '図書館とウェルカム画面を切替';
+
+  @override
+  String get shortcutCreateShelf => '新しい本棚を作成';
+
+  @override
+  String get shortcutOpenBooks => '本を開く（すべてまたは選択）';
+
+  @override
+  String get shortcutSelectAll => 'すべて選択';
+
+  @override
+  String get shortcutClearSelection => '選択解除';
+
+  @override
+  String get shortcutQuickShelf => '本棚クイック選択（最初の10個）';
+
+  @override
+  String get shortcutEdit => '本棚を編集 / 本のプロパティ';
+
+  @override
+  String get shortcutToggleView => '表示モード切替（グリッド/本棚）';
+
+  @override
+  String get shortcutAddToShelf => '本棚に追加（選択/フォーカス/すべて）';
+
+  @override
+  String get shortcutFocusCenter => '中央の表示本にフォーカス';
+
+  @override
+  String get shortcutJumpFirst => '最初の本棚/本へジャンプ';
+
+  @override
+  String get shortcutJumpLast => '最後の本棚/本へジャンプ';
+
+  @override
+  String get shortcutFocusSearch => '検索フィールドをフォーカス/解除';
+
+  @override
+  String get shortcutSwitchFocus => '本棚と本の間でフォーカス切替';
+
+  @override
+  String get shortcutMoveDown => '下へ移動';
+
+  @override
+  String get shortcutMoveUp => '上へ移動';
+
+  @override
+  String get shortcutMoveLeft => '左へ移動';
+
+  @override
+  String get shortcutMoveRight => '右へ移動';
+
+  @override
+  String get shortcutMoveShelfDown => '本棚を下へ移動';
+
+  @override
+  String get shortcutMoveShelfUp => '本棚を上へ移動';
+
+  @override
+  String get shortcutDeleteShelf => '本棚を削除';
+
+  @override
+  String get shortcutOpenFocused => 'フォーカスされた本を開く';
+
+  @override
+  String get shortcutToggleSelection => 'フォーカスされた本の選択を切替';
+
+  @override
+  String get shortcutRemoveFromShelf => '選択した本を本棚から削除';
 }

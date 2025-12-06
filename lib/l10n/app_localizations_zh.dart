@@ -290,4 +290,115 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get sortTitleZA => '标题 Z-A';
+
+  @override
+  String get searchThemes => '搜索主题...';
+
+  @override
+  String get sizeSmall => '小';
+
+  @override
+  String get sizeMedium => '中';
+
+  @override
+  String get sizeNormal => '正常';
+
+  @override
+  String get sizeLarge => '大';
+
+  @override
+  String get sizeExtraLarge => '超大';
+
+  @override
+  String get sizeTiny => '极小';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => '通用';
+
+  @override
+  String get shortcutsNavigationShelves => '导航 - 书架';
+
+  @override
+  String get shortcutsNavigationBooks => '导航 - 图书';
+
+  @override
+  String get shortcutsShelves => '书架';
+
+  @override
+  String get shortcutsBooks => '图书';
+
+  @override
+  String get shortcutToggleScreen => '在图书馆和欢迎屏幕之间切换';
+
+  @override
+  String get shortcutCreateShelf => '创建新书架';
+
+  @override
+  String get shortcutOpenBooks => '打开图书（全部或选定）';
+
+  @override
+  String get shortcutSelectAll => '全选图书';
+
+  @override
+  String get shortcutClearSelection => '清除选择';
+
+  @override
+  String get shortcutQuickShelf => '快速选择书架（前10个）';
+
+  @override
+  String get shortcutEdit => '编辑书架/图书属性';
+
+  @override
+  String get shortcutToggleView => '切换视图模式（网格/书柜）';
+
+  @override
+  String get shortcutAddToShelf => '将选定/聚焦/全部图书添加到书架';
+
+  @override
+  String get shortcutFocusCenter => '聚焦中间可见图书';
+
+  @override
+  String get shortcutJumpFirst => '跳到第一个书架/图书';
+
+  @override
+  String get shortcutJumpLast => '跳到最后一个书架/图书';
+
+  @override
+  String get shortcutFocusSearch => '聚焦/取消聚焦搜索框';
+
+  @override
+  String get shortcutSwitchFocus => '在书架和图书之间切换焦点';
+
+  @override
+  String get shortcutMoveDown => '向下移动';
+
+  @override
+  String get shortcutMoveUp => '向上移动';
+
+  @override
+  String get shortcutMoveLeft => '向左移动';
+
+  @override
+  String get shortcutMoveRight => '向右移动';
+
+  @override
+  String get shortcutMoveShelfDown => '向下移动书架';
+
+  @override
+  String get shortcutMoveShelfUp => '向上移动书架';
+
+  @override
+  String get shortcutDeleteShelf => '删除书架';
+
+  @override
+  String get shortcutOpenFocused => '打开聚焦图书';
+
+  @override
+  String get shortcutToggleSelection => '切换聚焦图书的选择状态';
+
+  @override
+  String get shortcutRemoveFromShelf => '从书架移除选定图书';
 }

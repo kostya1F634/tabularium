@@ -304,4 +304,119 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Título Z-A';
+
+  @override
+  String get searchThemes => 'Buscar temas...';
+
+  @override
+  String get sizeSmall => 'Pequeño';
+
+  @override
+  String get sizeMedium => 'Medio';
+
+  @override
+  String get sizeNormal => 'Normal';
+
+  @override
+  String get sizeLarge => 'Grande';
+
+  @override
+  String get sizeExtraLarge => 'Muy grande';
+
+  @override
+  String get sizeTiny => 'Diminuto';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'General';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navegación - Estantes';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navegación - Libros';
+
+  @override
+  String get shortcutsShelves => 'Estantes';
+
+  @override
+  String get shortcutsBooks => 'Libros';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Alternar entre biblioteca y pantalla de bienvenida';
+
+  @override
+  String get shortcutCreateShelf => 'Crear nuevo estante';
+
+  @override
+  String get shortcutOpenBooks => 'Abrir libros (todos o seleccionados)';
+
+  @override
+  String get shortcutSelectAll => 'Seleccionar todo';
+
+  @override
+  String get shortcutClearSelection => 'Limpiar selección';
+
+  @override
+  String get shortcutQuickShelf => 'Selección rápida estante (primeros 10)';
+
+  @override
+  String get shortcutEdit => 'Editar estante / Propiedades del libro';
+
+  @override
+  String get shortcutToggleView =>
+      'Cambiar modo de vista (Cuadrícula/Estantería)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Añadir libros a estante (seleccionados/enfocados/todos)';
+
+  @override
+  String get shortcutFocusCenter => 'Enfocar libro central visible';
+
+  @override
+  String get shortcutJumpFirst => 'Ir al primer estante/libro';
+
+  @override
+  String get shortcutJumpLast => 'Ir al último estante/libro';
+
+  @override
+  String get shortcutFocusSearch => 'Enfocar/desenfocar campo de búsqueda';
+
+  @override
+  String get shortcutSwitchFocus => 'Cambiar enfoque entre estantes y libros';
+
+  @override
+  String get shortcutMoveDown => 'Mover hacia abajo';
+
+  @override
+  String get shortcutMoveUp => 'Mover hacia arriba';
+
+  @override
+  String get shortcutMoveLeft => 'Mover hacia la izquierda';
+
+  @override
+  String get shortcutMoveRight => 'Mover hacia la derecha';
+
+  @override
+  String get shortcutMoveShelfDown => 'Mover estante hacia abajo';
+
+  @override
+  String get shortcutMoveShelfUp => 'Mover estante hacia arriba';
+
+  @override
+  String get shortcutDeleteShelf => 'Eliminar estante';
+
+  @override
+  String get shortcutOpenFocused => 'Abrir libro enfocado';
+
+  @override
+  String get shortcutToggleSelection => 'Alternar selección del libro enfocado';
+
+  @override
+  String get shortcutRemoveFromShelf =>
+      'Quitar libros seleccionados del estante';
 }

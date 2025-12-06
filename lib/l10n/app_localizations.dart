@@ -659,6 +659,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Title Z-A'**
   String get sortTitleZA;
+
+  /// Placeholder for theme search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search themes...'**
+  String get searchThemes;
+
+  /// Small size label
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get sizeSmall;
+
+  /// Medium size label
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get sizeMedium;
+
+  /// Normal size label
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get sizeNormal;
+
+  /// Large size label
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get sizeLarge;
+
+  /// Extra large size label
+  ///
+  /// In en, this message translates to:
+  /// **'Extra Large'**
+  String get sizeExtraLarge;
+
+  /// Tiny size label
+  ///
+  /// In en, this message translates to:
+  /// **'Tiny'**
+  String get sizeTiny;
+
+  /// XXL size label
+  ///
+  /// In en, this message translates to:
+  /// **'XXL'**
+  String get sizeXXL;
+
+  /// No description provided for @shortcutsGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get shortcutsGeneral;
+
+  /// No description provided for @shortcutsNavigationShelves.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation - Shelves'**
+  String get shortcutsNavigationShelves;
+
+  /// No description provided for @shortcutsNavigationBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation - Books'**
+  String get shortcutsNavigationBooks;
+
+  /// No description provided for @shortcutsShelves.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelves'**
+  String get shortcutsShelves;
+
+  /// No description provided for @shortcutsBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Books'**
+  String get shortcutsBooks;
+
+  /// No description provided for @shortcutToggleScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle between library and welcome screen'**
+  String get shortcutToggleScreen;
+
+  /// No description provided for @shortcutCreateShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new shelf'**
+  String get shortcutCreateShelf;
+
+  /// No description provided for @shortcutOpenBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Open books (all or selected)'**
+  String get shortcutOpenBooks;
+
+  /// No description provided for @shortcutSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all books'**
+  String get shortcutSelectAll;
+
+  /// No description provided for @shortcutClearSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear selection'**
+  String get shortcutClearSelection;
+
+  /// No description provided for @shortcutQuickShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick shelf selection (first 10 shelves)'**
+  String get shortcutQuickShelf;
+
+  /// No description provided for @shortcutEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit shelf / Book properties'**
+  String get shortcutEdit;
+
+  /// No description provided for @shortcutToggleView.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle view mode (Grid/Cabinet)'**
+  String get shortcutToggleView;
+
+  /// No description provided for @shortcutAddToShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Add selected/focused/all books to shelf'**
+  String get shortcutAddToShelf;
+
+  /// No description provided for @shortcutFocusCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on center visible book'**
+  String get shortcutFocusCenter;
+
+  /// No description provided for @shortcutJumpFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to first shelf/book'**
+  String get shortcutJumpFirst;
+
+  /// No description provided for @shortcutJumpLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump to last shelf/book'**
+  String get shortcutJumpLast;
+
+  /// No description provided for @shortcutFocusSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus/unfocus search field'**
+  String get shortcutFocusSearch;
+
+  /// No description provided for @shortcutSwitchFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch focus between shelves and books'**
+  String get shortcutSwitchFocus;
+
+  /// No description provided for @shortcutMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get shortcutMoveDown;
+
+  /// No description provided for @shortcutMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get shortcutMoveUp;
+
+  /// No description provided for @shortcutMoveLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Move left'**
+  String get shortcutMoveLeft;
+
+  /// No description provided for @shortcutMoveRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Move right'**
+  String get shortcutMoveRight;
+
+  /// No description provided for @shortcutMoveShelfDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move shelf down'**
+  String get shortcutMoveShelfDown;
+
+  /// No description provided for @shortcutMoveShelfUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move shelf up'**
+  String get shortcutMoveShelfUp;
+
+  /// No description provided for @shortcutDeleteShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete shelf'**
+  String get shortcutDeleteShelf;
+
+  /// No description provided for @shortcutOpenFocused.
+  ///
+  /// In en, this message translates to:
+  /// **'Open focused book'**
+  String get shortcutOpenFocused;
+
+  /// No description provided for @shortcutToggleSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle selection of focused book'**
+  String get shortcutToggleSelection;
+
+  /// No description provided for @shortcutRemoveFromShelf.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove selected books from shelf'**
+  String get shortcutRemoveFromShelf;
 }
 
 class _AppLocalizationsDelegate

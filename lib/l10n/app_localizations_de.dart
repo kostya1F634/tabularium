@@ -304,4 +304,120 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Titel Z-A';
+
+  @override
+  String get searchThemes => 'Themen suchen...';
+
+  @override
+  String get sizeSmall => 'Klein';
+
+  @override
+  String get sizeMedium => 'Mittel';
+
+  @override
+  String get sizeNormal => 'Normal';
+
+  @override
+  String get sizeLarge => 'Groß';
+
+  @override
+  String get sizeExtraLarge => 'Sehr groß';
+
+  @override
+  String get sizeTiny => 'Sehr klein';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Allgemein';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navigation - Regale';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navigation - Bücher';
+
+  @override
+  String get shortcutsShelves => 'Regale';
+
+  @override
+  String get shortcutsBooks => 'Bücher';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Zwischen Bibliothek und Startbildschirm wechseln';
+
+  @override
+  String get shortcutCreateShelf => 'Neues Regal erstellen';
+
+  @override
+  String get shortcutOpenBooks => 'Bücher öffnen (alle oder ausgewählte)';
+
+  @override
+  String get shortcutSelectAll => 'Alle Bücher auswählen';
+
+  @override
+  String get shortcutClearSelection => 'Auswahl aufheben';
+
+  @override
+  String get shortcutQuickShelf => 'Schnellauswahl Regal (erste 10)';
+
+  @override
+  String get shortcutEdit => 'Regal bearbeiten / Bucheigenschaften';
+
+  @override
+  String get shortcutToggleView => 'Ansichtsmodus wechseln (Raster/Regal)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Bücher zu Regal hinzufügen (ausgewählt/fokussiert/alle)';
+
+  @override
+  String get shortcutFocusCenter => 'Mittleres sichtbares Buch fokussieren';
+
+  @override
+  String get shortcutJumpFirst => 'Zum ersten Regal/Buch springen';
+
+  @override
+  String get shortcutJumpLast => 'Zum letzten Regal/Buch springen';
+
+  @override
+  String get shortcutFocusSearch => 'Suchfeld fokussieren/aufheben';
+
+  @override
+  String get shortcutSwitchFocus =>
+      'Fokus zwischen Regalen und Büchern wechseln';
+
+  @override
+  String get shortcutMoveDown => 'Nach unten bewegen';
+
+  @override
+  String get shortcutMoveUp => 'Nach oben bewegen';
+
+  @override
+  String get shortcutMoveLeft => 'Nach links bewegen';
+
+  @override
+  String get shortcutMoveRight => 'Nach rechts bewegen';
+
+  @override
+  String get shortcutMoveShelfDown => 'Regal nach unten bewegen';
+
+  @override
+  String get shortcutMoveShelfUp => 'Regal nach oben bewegen';
+
+  @override
+  String get shortcutDeleteShelf => 'Regal löschen';
+
+  @override
+  String get shortcutOpenFocused => 'Fokussiertes Buch öffnen';
+
+  @override
+  String get shortcutToggleSelection =>
+      'Auswahl des fokussierten Buchs umschalten';
+
+  @override
+  String get shortcutRemoveFromShelf =>
+      'Ausgewählte Bücher aus Regal entfernen';
 }

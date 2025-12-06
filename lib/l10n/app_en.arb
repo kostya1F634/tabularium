@@ -479,5 +479,76 @@
   "sortTitleZA": "Title Z-A",
   "@sortTitleZA": {
     "description": "Sort by title Z to A"
-  }
+  },
+
+  "searchThemes": "Search themes...",
+  "@searchThemes": {
+    "description": "Placeholder for theme search field"
+  },
+
+  "sizeSmall": "Small",
+  "@sizeSmall": {
+    "description": "Small size label"
+  },
+
+  "sizeMedium": "Medium",
+  "@sizeMedium": {
+    "description": "Medium size label"
+  },
+
+  "sizeNormal": "Normal",
+  "@sizeNormal": {
+    "description": "Normal size label"
+  },
+
+  "sizeLarge": "Large",
+  "@sizeLarge": {
+    "description": "Large size label"
+  },
+
+  "sizeExtraLarge": "Extra Large",
+  "@sizeExtraLarge": {
+    "description": "Extra large size label"
+  },
+
+  "sizeTiny": "Tiny",
+  "@sizeTiny": {
+    "description": "Tiny size label"
+  },
+
+  "sizeXXL": "XXL",
+  "@sizeXXL": {
+    "description": "XXL size label"
+  },
+
+  "shortcutsGeneral": "General",
+  "shortcutsNavigationShelves": "Navigation - Shelves",
+  "shortcutsNavigationBooks": "Navigation - Books",
+  "shortcutsShelves": "Shelves",
+  "shortcutsBooks": "Books",
+
+  "shortcutToggleScreen": "Toggle between library and welcome screen",
+  "shortcutCreateShelf": "Create new shelf",
+  "shortcutOpenBooks": "Open books (all or selected)",
+  "shortcutSelectAll": "Select all books",
+  "shortcutClearSelection": "Clear selection",
+  "shortcutQuickShelf": "Quick shelf selection (first 10 shelves)",
+  "shortcutEdit": "Edit shelf / Book properties",
+  "shortcutToggleView": "Toggle view mode (Grid/Cabinet)",
+  "shortcutAddToShelf": "Add selected/focused/all books to shelf",
+  "shortcutFocusCenter": "Focus on center visible book",
+  "shortcutJumpFirst": "Jump to first shelf/book",
+  "shortcutJumpLast": "Jump to last shelf/book",
+  "shortcutFocusSearch": "Focus/unfocus search field",
+  "shortcutSwitchFocus": "Switch focus between shelves and books",
+  "shortcutMoveDown": "Move down",
+  "shortcutMoveUp": "Move up",
+  "shortcutMoveLeft": "Move left",
+  "shortcutMoveRight": "Move right",
+  "shortcutMoveShelfDown": "Move shelf down",
+  "shortcutMoveShelfUp": "Move shelf up",
+  "shortcutDeleteShelf": "Delete shelf",
+  "shortcutOpenFocused": "Open focused book",
+  "shortcutToggleSelection": "Toggle selection of focused book",
+  "shortcutRemoveFromShelf": "Remove selected books from shelf"
 }

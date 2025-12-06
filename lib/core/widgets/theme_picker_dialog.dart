@@ -87,7 +87,7 @@ class _ThemePickerDialogState extends State<ThemePickerDialog> {
                   focusNode: _searchFocusNode,
                   autofocus: true,
                   decoration: InputDecoration(
-                    hintText: 'Search themes...',
+                    hintText: l10n.searchThemes,
                     prefixIcon: const Icon(Icons.search, size: 20),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(

@@ -11,6 +11,7 @@ import '../services/language_provider.dart';
 import '../services/language_service.dart';
 import '../services/theme_provider.dart';
 import '../services/ui_settings_provider.dart';
+import '../services/ui_settings_service.dart';
 import '../services/window_settings_provider.dart';
 import '../theme/app_theme.dart';
 import 'dialog_shortcuts_wrapper.dart';
@@ -179,7 +180,9 @@ class AppMenuBar extends StatelessWidget {
                         horizontal: 8,
                         vertical: 4,
                       ),
-                      child: Text(uiSettings.getFontSizeLabel(size)),
+                      child: Text(
+                        UISettingsService.getFontSizeLabel(l10n, size),
+                      ),
                     ),
                   );
                 }).toList(),
@@ -226,7 +229,9 @@ class AppMenuBar extends StatelessWidget {
                             horizontal: 8,
                             vertical: 4,
                           ),
-                          child: Text(uiSettings.getBookScaleLabel(scale)),
+                          child: Text(
+                            UISettingsService.getBookScaleLabel(l10n, scale),
+                          ),
                         ),
                       );
                     }).toList(),
@@ -273,7 +278,9 @@ class AppMenuBar extends StatelessWidget {
                             horizontal: 8,
                             vertical: 4,
                           ),
-                          child: Text(uiSettings.getBookScaleLabel(scale)),
+                          child: Text(
+                            UISettingsService.getBookScaleLabel(l10n, scale),
+                          ),
                         ),
                       );
                     }).toList(),
@@ -283,12 +290,12 @@ class AppMenuBar extends StatelessWidget {
                     vertical: 12,
                   ),
                   child: Row(
-                    children: const [
-                      Icon(Icons.shelves, size: 16),
-                      SizedBox(width: 8),
-                      Text('Book Scale (Cabinet)'),
-                      Spacer(),
-                      Icon(Icons.arrow_right, size: 16),
+                    children: [
+                      const Icon(Icons.shelves, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.bookScaleCabinet),
+                      const Spacer(),
+                      const Icon(Icons.arrow_right, size: 16),
                     ],
                   ),
                 ),
@@ -299,7 +306,7 @@ class AppMenuBar extends StatelessWidget {
         // Help button
         PopupMenuButton<String>(
           icon: const Icon(Icons.help_outline, size: 16),
-          tooltip: 'Help',
+          tooltip: l10n.help,
           offset: const Offset(0, 30),
           onSelected: (value) async {
             if (value == 'scan') {

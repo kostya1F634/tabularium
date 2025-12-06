@@ -304,4 +304,116 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Title Z-A';
+
+  @override
+  String get searchThemes => 'Search themes...';
+
+  @override
+  String get sizeSmall => 'Small';
+
+  @override
+  String get sizeMedium => 'Medium';
+
+  @override
+  String get sizeNormal => 'Normal';
+
+  @override
+  String get sizeLarge => 'Large';
+
+  @override
+  String get sizeExtraLarge => 'Extra Large';
+
+  @override
+  String get sizeTiny => 'Tiny';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'General';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navigation - Shelves';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navigation - Books';
+
+  @override
+  String get shortcutsShelves => 'Shelves';
+
+  @override
+  String get shortcutsBooks => 'Books';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Toggle between library and welcome screen';
+
+  @override
+  String get shortcutCreateShelf => 'Create new shelf';
+
+  @override
+  String get shortcutOpenBooks => 'Open books (all or selected)';
+
+  @override
+  String get shortcutSelectAll => 'Select all books';
+
+  @override
+  String get shortcutClearSelection => 'Clear selection';
+
+  @override
+  String get shortcutQuickShelf => 'Quick shelf selection (first 10 shelves)';
+
+  @override
+  String get shortcutEdit => 'Edit shelf / Book properties';
+
+  @override
+  String get shortcutToggleView => 'Toggle view mode (Grid/Cabinet)';
+
+  @override
+  String get shortcutAddToShelf => 'Add selected/focused/all books to shelf';
+
+  @override
+  String get shortcutFocusCenter => 'Focus on center visible book';
+
+  @override
+  String get shortcutJumpFirst => 'Jump to first shelf/book';
+
+  @override
+  String get shortcutJumpLast => 'Jump to last shelf/book';
+
+  @override
+  String get shortcutFocusSearch => 'Focus/unfocus search field';
+
+  @override
+  String get shortcutSwitchFocus => 'Switch focus between shelves and books';
+
+  @override
+  String get shortcutMoveDown => 'Move down';
+
+  @override
+  String get shortcutMoveUp => 'Move up';
+
+  @override
+  String get shortcutMoveLeft => 'Move left';
+
+  @override
+  String get shortcutMoveRight => 'Move right';
+
+  @override
+  String get shortcutMoveShelfDown => 'Move shelf down';
+
+  @override
+  String get shortcutMoveShelfUp => 'Move shelf up';
+
+  @override
+  String get shortcutDeleteShelf => 'Delete shelf';
+
+  @override
+  String get shortcutOpenFocused => 'Open focused book';
+
+  @override
+  String get shortcutToggleSelection => 'Toggle selection of focused book';
+
+  @override
+  String get shortcutRemoveFromShelf => 'Remove selected books from shelf';
 }

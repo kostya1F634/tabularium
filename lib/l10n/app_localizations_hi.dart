@@ -292,4 +292,116 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'शीर्षक Z-A';
+
+  @override
+  String get searchThemes => 'थीम खोजें...';
+
+  @override
+  String get sizeSmall => 'छोटा';
+
+  @override
+  String get sizeMedium => 'मध्यम';
+
+  @override
+  String get sizeNormal => 'सामान्य';
+
+  @override
+  String get sizeLarge => 'बड़ा';
+
+  @override
+  String get sizeExtraLarge => 'बहुत बड़ा';
+
+  @override
+  String get sizeTiny => 'अति छोटा';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'सामान्य';
+
+  @override
+  String get shortcutsNavigationShelves => 'नेविगेशन - शेल्फ़';
+
+  @override
+  String get shortcutsNavigationBooks => 'नेविगेशन - किताबें';
+
+  @override
+  String get shortcutsShelves => 'शेल्फ़';
+
+  @override
+  String get shortcutsBooks => 'किताबें';
+
+  @override
+  String get shortcutToggleScreen =>
+      'लाइब्रेरी और स्वागत स्क्रीन के बीच टॉगल करें';
+
+  @override
+  String get shortcutCreateShelf => 'नई शेल्फ़ बनाएं';
+
+  @override
+  String get shortcutOpenBooks => 'किताबें खोलें (सभी या चयनित)';
+
+  @override
+  String get shortcutSelectAll => 'सभी चुनें';
+
+  @override
+  String get shortcutClearSelection => 'चयन साफ़ करें';
+
+  @override
+  String get shortcutQuickShelf => 'त्वरित शेल्फ़ चयन (पहले 10)';
+
+  @override
+  String get shortcutEdit => 'शेल्फ़ संपादित करें / किताब गुण';
+
+  @override
+  String get shortcutToggleView => 'दृश्य मोड टॉगल करें (ग्रिड/कैबिनेट)';
+
+  @override
+  String get shortcutAddToShelf => 'शेल्फ़ में जोड़ें (चयनित/फोकस/सभी)';
+
+  @override
+  String get shortcutFocusCenter => 'केंद्रीय दृश्यमान किताब पर फोकस करें';
+
+  @override
+  String get shortcutJumpFirst => 'पहली शेल्फ़/किताब पर जाएं';
+
+  @override
+  String get shortcutJumpLast => 'अंतिम शेल्फ़/किताब पर जाएं';
+
+  @override
+  String get shortcutFocusSearch => 'खोज फ़ील्ड फोकस/अनफोकस करें';
+
+  @override
+  String get shortcutSwitchFocus => 'शेल्फ़ और किताबों के बीच फोकस स्विच करें';
+
+  @override
+  String get shortcutMoveDown => 'नीचे जाएं';
+
+  @override
+  String get shortcutMoveUp => 'ऊपर जाएं';
+
+  @override
+  String get shortcutMoveLeft => 'बाईं ओर जाएं';
+
+  @override
+  String get shortcutMoveRight => 'दाईं ओर जाएं';
+
+  @override
+  String get shortcutMoveShelfDown => 'शेल्फ़ को नीचे ले जाएं';
+
+  @override
+  String get shortcutMoveShelfUp => 'शेल्फ़ को ऊपर ले जाएं';
+
+  @override
+  String get shortcutDeleteShelf => 'शेल्फ़ हटाएं';
+
+  @override
+  String get shortcutOpenFocused => 'फोकस की गई किताब खोलें';
+
+  @override
+  String get shortcutToggleSelection => 'फोकस की गई किताब का चयन टॉगल करें';
+
+  @override
+  String get shortcutRemoveFromShelf => 'चयनित किताबें शेल्फ़ से हटाएं';
 }

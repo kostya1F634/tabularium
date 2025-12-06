@@ -290,4 +290,115 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get sortTitleZA => '제목 Z-A';
+
+  @override
+  String get searchThemes => '테마 검색...';
+
+  @override
+  String get sizeSmall => '작게';
+
+  @override
+  String get sizeMedium => '중간';
+
+  @override
+  String get sizeNormal => '보통';
+
+  @override
+  String get sizeLarge => '크게';
+
+  @override
+  String get sizeExtraLarge => '매우 크게';
+
+  @override
+  String get sizeTiny => '아주 작게';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => '일반';
+
+  @override
+  String get shortcutsNavigationShelves => '탐색 - 서가';
+
+  @override
+  String get shortcutsNavigationBooks => '탐색 - 책';
+
+  @override
+  String get shortcutsShelves => '서가';
+
+  @override
+  String get shortcutsBooks => '책';
+
+  @override
+  String get shortcutToggleScreen => '도서관과 시작 화면 전환';
+
+  @override
+  String get shortcutCreateShelf => '새 서가 만들기';
+
+  @override
+  String get shortcutOpenBooks => '책 열기 (전체 또는 선택)';
+
+  @override
+  String get shortcutSelectAll => '모두 선택';
+
+  @override
+  String get shortcutClearSelection => '선택 해제';
+
+  @override
+  String get shortcutQuickShelf => '서가 빠른 선택 (처음 10개)';
+
+  @override
+  String get shortcutEdit => '서가 편집 / 책 속성';
+
+  @override
+  String get shortcutToggleView => '보기 모드 전환 (그리드/서가)';
+
+  @override
+  String get shortcutAddToShelf => '서가에 추가 (선택/포커스/전체)';
+
+  @override
+  String get shortcutFocusCenter => '중앙 표시 책에 포커스';
+
+  @override
+  String get shortcutJumpFirst => '첫 번째 서가/책으로 이동';
+
+  @override
+  String get shortcutJumpLast => '마지막 서가/책으로 이동';
+
+  @override
+  String get shortcutFocusSearch => '검색 필드 포커스/해제';
+
+  @override
+  String get shortcutSwitchFocus => '서가와 책 사이 포커스 전환';
+
+  @override
+  String get shortcutMoveDown => '아래로 이동';
+
+  @override
+  String get shortcutMoveUp => '위로 이동';
+
+  @override
+  String get shortcutMoveLeft => '왼쪽으로 이동';
+
+  @override
+  String get shortcutMoveRight => '오른쪽으로 이동';
+
+  @override
+  String get shortcutMoveShelfDown => '서가 아래로 이동';
+
+  @override
+  String get shortcutMoveShelfUp => '서가 위로 이동';
+
+  @override
+  String get shortcutDeleteShelf => '서가 삭제';
+
+  @override
+  String get shortcutOpenFocused => '포커스된 책 열기';
+
+  @override
+  String get shortcutToggleSelection => '포커스된 책 선택 전환';
+
+  @override
+  String get shortcutRemoveFromShelf => '선택한 책을 서가에서 제거';
 }

@@ -307,4 +307,117 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Название Я-А';
+
+  @override
+  String get searchThemes => 'Поиск тем...';
+
+  @override
+  String get sizeSmall => 'Маленький';
+
+  @override
+  String get sizeMedium => 'Средний';
+
+  @override
+  String get sizeNormal => 'Обычный';
+
+  @override
+  String get sizeLarge => 'Большой';
+
+  @override
+  String get sizeExtraLarge => 'Очень большой';
+
+  @override
+  String get sizeTiny => 'Крошечный';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Общие';
+
+  @override
+  String get shortcutsNavigationShelves => 'Навигация - Полки';
+
+  @override
+  String get shortcutsNavigationBooks => 'Навигация - Книги';
+
+  @override
+  String get shortcutsShelves => 'Полки';
+
+  @override
+  String get shortcutsBooks => 'Книги';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Переключение между библиотекой и главным экраном';
+
+  @override
+  String get shortcutCreateShelf => 'Создать новую полку';
+
+  @override
+  String get shortcutOpenBooks => 'Открыть книги (все или выбранные)';
+
+  @override
+  String get shortcutSelectAll => 'Выбрать все книги';
+
+  @override
+  String get shortcutClearSelection => 'Снять выделение';
+
+  @override
+  String get shortcutQuickShelf => 'Быстрый выбор полки (первые 10)';
+
+  @override
+  String get shortcutEdit => 'Редактировать полку / Свойства книги';
+
+  @override
+  String get shortcutToggleView => 'Переключить вид (Сетка/Шкаф)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Добавить выбранные/фокусную/все книги на полку';
+
+  @override
+  String get shortcutFocusCenter => 'Фокус на центральной видимой книге';
+
+  @override
+  String get shortcutJumpFirst => 'Перейти к первой полке/книге';
+
+  @override
+  String get shortcutJumpLast => 'Перейти к последней полке/книге';
+
+  @override
+  String get shortcutFocusSearch => 'Фокус/снять фокус с поля поиска';
+
+  @override
+  String get shortcutSwitchFocus => 'Переключить фокус между полками и книгами';
+
+  @override
+  String get shortcutMoveDown => 'Вниз';
+
+  @override
+  String get shortcutMoveUp => 'Вверх';
+
+  @override
+  String get shortcutMoveLeft => 'Влево';
+
+  @override
+  String get shortcutMoveRight => 'Вправо';
+
+  @override
+  String get shortcutMoveShelfDown => 'Переместить полку вниз';
+
+  @override
+  String get shortcutMoveShelfUp => 'Переместить полку вверх';
+
+  @override
+  String get shortcutDeleteShelf => 'Удалить полку';
+
+  @override
+  String get shortcutOpenFocused => 'Открыть фокусную книгу';
+
+  @override
+  String get shortcutToggleSelection => 'Переключить выделение фокусной книги';
+
+  @override
+  String get shortcutRemoveFromShelf => 'Удалить выбранные книги с полки';
 }

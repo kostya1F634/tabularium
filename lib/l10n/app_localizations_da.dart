@@ -304,4 +304,116 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Titel Z-A';
+
+  @override
+  String get searchThemes => 'Søg temaer...';
+
+  @override
+  String get sizeSmall => 'Lille';
+
+  @override
+  String get sizeMedium => 'Mellem';
+
+  @override
+  String get sizeNormal => 'Normal';
+
+  @override
+  String get sizeLarge => 'Stor';
+
+  @override
+  String get sizeExtraLarge => 'Ekstra stor';
+
+  @override
+  String get sizeTiny => 'Meget lille';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Generelt';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navigation - Hylder';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navigation - Bøger';
+
+  @override
+  String get shortcutsShelves => 'Hylder';
+
+  @override
+  String get shortcutsBooks => 'Bøger';
+
+  @override
+  String get shortcutToggleScreen => 'Skift mellem bibliotek og velkomstskærm';
+
+  @override
+  String get shortcutCreateShelf => 'Opret ny hylde';
+
+  @override
+  String get shortcutOpenBooks => 'Åbn bøger (alle eller valgte)';
+
+  @override
+  String get shortcutSelectAll => 'Vælg alle';
+
+  @override
+  String get shortcutClearSelection => 'Ryd valg';
+
+  @override
+  String get shortcutQuickShelf => 'Hurtig hyldevalg (første 10)';
+
+  @override
+  String get shortcutEdit => 'Rediger hylde / Bogegenskaber';
+
+  @override
+  String get shortcutToggleView => 'Skift visningstilstand (Gitter/Skab)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Tilføj bøger til hylde (valgte/fokuseret/alle)';
+
+  @override
+  String get shortcutFocusCenter => 'Fokuser på central synlig bog';
+
+  @override
+  String get shortcutJumpFirst => 'Hop til første hylde/bog';
+
+  @override
+  String get shortcutJumpLast => 'Hop til sidste hylde/bog';
+
+  @override
+  String get shortcutFocusSearch => 'Fokuser/defokuser søgefelt';
+
+  @override
+  String get shortcutSwitchFocus => 'Skift fokus mellem hylder og bøger';
+
+  @override
+  String get shortcutMoveDown => 'Flyt ned';
+
+  @override
+  String get shortcutMoveUp => 'Flyt op';
+
+  @override
+  String get shortcutMoveLeft => 'Flyt til venstre';
+
+  @override
+  String get shortcutMoveRight => 'Flyt til højre';
+
+  @override
+  String get shortcutMoveShelfDown => 'Flyt hylde ned';
+
+  @override
+  String get shortcutMoveShelfUp => 'Flyt hylde op';
+
+  @override
+  String get shortcutDeleteShelf => 'Slet hylde';
+
+  @override
+  String get shortcutOpenFocused => 'Åbn fokuseret bog';
+
+  @override
+  String get shortcutToggleSelection => 'Skift valg af fokuseret bog';
+
+  @override
+  String get shortcutRemoveFromShelf => 'Fjern valgte bøger fra hylde';
 }

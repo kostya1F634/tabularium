@@ -292,4 +292,115 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'العنوان Z-A';
+
+  @override
+  String get searchThemes => 'البحث عن مظاهر...';
+
+  @override
+  String get sizeSmall => 'صغير';
+
+  @override
+  String get sizeMedium => 'متوسط';
+
+  @override
+  String get sizeNormal => 'عادي';
+
+  @override
+  String get sizeLarge => 'كبير';
+
+  @override
+  String get sizeExtraLarge => 'كبير جداً';
+
+  @override
+  String get sizeTiny => 'صغير جداً';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'عام';
+
+  @override
+  String get shortcutsNavigationShelves => 'التنقل - الرفوف';
+
+  @override
+  String get shortcutsNavigationBooks => 'التنقل - الكتب';
+
+  @override
+  String get shortcutsShelves => 'الرفوف';
+
+  @override
+  String get shortcutsBooks => 'الكتب';
+
+  @override
+  String get shortcutToggleScreen => 'التبديل بين المكتبة وشاشة الترحيب';
+
+  @override
+  String get shortcutCreateShelf => 'إنشاء رف جديد';
+
+  @override
+  String get shortcutOpenBooks => 'فتح الكتب (الكل أو المحدد)';
+
+  @override
+  String get shortcutSelectAll => 'تحديد الكل';
+
+  @override
+  String get shortcutClearSelection => 'إلغاء التحديد';
+
+  @override
+  String get shortcutQuickShelf => 'اختيار رف سريع (أول 10)';
+
+  @override
+  String get shortcutEdit => 'تعديل الرف / خصائص الكتاب';
+
+  @override
+  String get shortcutToggleView => 'تبديل وضع العرض (الشبكة/الخزانة)';
+
+  @override
+  String get shortcutAddToShelf => 'إضافة كتب للرف (المحدد/المركز/الكل)';
+
+  @override
+  String get shortcutFocusCenter => 'التركيز على الكتاب المرئي الأوسط';
+
+  @override
+  String get shortcutJumpFirst => 'الانتقال لأول رف/كتاب';
+
+  @override
+  String get shortcutJumpLast => 'الانتقال لآخر رف/كتاب';
+
+  @override
+  String get shortcutFocusSearch => 'تفعيل/إلغاء حقل البحث';
+
+  @override
+  String get shortcutSwitchFocus => 'تبديل التركيز بين الرفوف والكتب';
+
+  @override
+  String get shortcutMoveDown => 'التحرك للأسفل';
+
+  @override
+  String get shortcutMoveUp => 'التحرك للأعلى';
+
+  @override
+  String get shortcutMoveLeft => 'التحرك لليسار';
+
+  @override
+  String get shortcutMoveRight => 'التحرك لليمين';
+
+  @override
+  String get shortcutMoveShelfDown => 'تحريك الرف للأسفل';
+
+  @override
+  String get shortcutMoveShelfUp => 'تحريك الرف للأعلى';
+
+  @override
+  String get shortcutDeleteShelf => 'حذف الرف';
+
+  @override
+  String get shortcutOpenFocused => 'فتح الكتاب المركز عليه';
+
+  @override
+  String get shortcutToggleSelection => 'تبديل تحديد الكتاب المركز عليه';
+
+  @override
+  String get shortcutRemoveFromShelf => 'إزالة الكتب المحددة من الرف';
 }

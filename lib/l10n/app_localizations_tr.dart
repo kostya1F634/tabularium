@@ -292,4 +292,117 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Başlık Z-A';
+
+  @override
+  String get searchThemes => 'Tema ara...';
+
+  @override
+  String get sizeSmall => 'Küçük';
+
+  @override
+  String get sizeMedium => 'Orta';
+
+  @override
+  String get sizeNormal => 'Normal';
+
+  @override
+  String get sizeLarge => 'Büyük';
+
+  @override
+  String get sizeExtraLarge => 'Çok büyük';
+
+  @override
+  String get sizeTiny => 'Çok küçük';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Genel';
+
+  @override
+  String get shortcutsNavigationShelves => 'Gezinti - Raflar';
+
+  @override
+  String get shortcutsNavigationBooks => 'Gezinti - Kitaplar';
+
+  @override
+  String get shortcutsShelves => 'Raflar';
+
+  @override
+  String get shortcutsBooks => 'Kitaplar';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Kütüphane ve hoş geldiniz ekranı arasında geçiş';
+
+  @override
+  String get shortcutCreateShelf => 'Yeni raf oluştur';
+
+  @override
+  String get shortcutOpenBooks => 'Kitapları aç (tümü veya seçili)';
+
+  @override
+  String get shortcutSelectAll => 'Tümünü seç';
+
+  @override
+  String get shortcutClearSelection => 'Seçimi temizle';
+
+  @override
+  String get shortcutQuickShelf => 'Hızlı raf seçimi (ilk 10)';
+
+  @override
+  String get shortcutEdit => 'Rafı düzenle / Kitap özellikleri';
+
+  @override
+  String get shortcutToggleView => 'Görünüm modunu değiştir (Izgara/Dolap)';
+
+  @override
+  String get shortcutAddToShelf => 'Rafa kitap ekle (seçili/odaklanmış/tümü)';
+
+  @override
+  String get shortcutFocusCenter => 'Merkez görünür kitaba odaklan';
+
+  @override
+  String get shortcutJumpFirst => 'İlk rafa/kitaba atla';
+
+  @override
+  String get shortcutJumpLast => 'Son rafa/kitaba atla';
+
+  @override
+  String get shortcutFocusSearch => 'Arama alanına odaklan/odaklanmayı kaldır';
+
+  @override
+  String get shortcutSwitchFocus =>
+      'Raflar ve kitaplar arasında odağı değiştir';
+
+  @override
+  String get shortcutMoveDown => 'Aşağı git';
+
+  @override
+  String get shortcutMoveUp => 'Yukarı git';
+
+  @override
+  String get shortcutMoveLeft => 'Sola git';
+
+  @override
+  String get shortcutMoveRight => 'Sağa git';
+
+  @override
+  String get shortcutMoveShelfDown => 'Rafı aşağı taşı';
+
+  @override
+  String get shortcutMoveShelfUp => 'Rafı yukarı taşı';
+
+  @override
+  String get shortcutDeleteShelf => 'Rafı sil';
+
+  @override
+  String get shortcutOpenFocused => 'Odaklanmış kitabı aç';
+
+  @override
+  String get shortcutToggleSelection => 'Odaklanmış kitabın seçimini değiştir';
+
+  @override
+  String get shortcutRemoveFromShelf => 'Seçili kitapları raftan çıkar';
 }

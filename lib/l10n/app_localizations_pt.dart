@@ -304,4 +304,120 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get sortTitleZA => 'Título Z-A';
+
+  @override
+  String get searchThemes => 'Pesquisar temas...';
+
+  @override
+  String get sizeSmall => 'Pequeno';
+
+  @override
+  String get sizeMedium => 'Médio';
+
+  @override
+  String get sizeNormal => 'Normal';
+
+  @override
+  String get sizeLarge => 'Grande';
+
+  @override
+  String get sizeExtraLarge => 'Muito grande';
+
+  @override
+  String get sizeTiny => 'Minúsculo';
+
+  @override
+  String get sizeXXL => 'XXL';
+
+  @override
+  String get shortcutsGeneral => 'Geral';
+
+  @override
+  String get shortcutsNavigationShelves => 'Navegação - Prateleiras';
+
+  @override
+  String get shortcutsNavigationBooks => 'Navegação - Livros';
+
+  @override
+  String get shortcutsShelves => 'Prateleiras';
+
+  @override
+  String get shortcutsBooks => 'Livros';
+
+  @override
+  String get shortcutToggleScreen =>
+      'Alternar entre biblioteca e tela de boas-vindas';
+
+  @override
+  String get shortcutCreateShelf => 'Criar nova prateleira';
+
+  @override
+  String get shortcutOpenBooks => 'Abrir livros (todos ou selecionados)';
+
+  @override
+  String get shortcutSelectAll => 'Selecionar tudo';
+
+  @override
+  String get shortcutClearSelection => 'Limpar seleção';
+
+  @override
+  String get shortcutQuickShelf =>
+      'Seleção rápida de prateleira (primeiras 10)';
+
+  @override
+  String get shortcutEdit => 'Editar prateleira / Propriedades do livro';
+
+  @override
+  String get shortcutToggleView =>
+      'Alternar modo de visualização (Grade/Estante)';
+
+  @override
+  String get shortcutAddToShelf =>
+      'Adicionar livros à prateleira (selecionados/foco/todos)';
+
+  @override
+  String get shortcutFocusCenter => 'Focar no livro central visível';
+
+  @override
+  String get shortcutJumpFirst => 'Ir para primeira prateleira/livro';
+
+  @override
+  String get shortcutJumpLast => 'Ir para última prateleira/livro';
+
+  @override
+  String get shortcutFocusSearch => 'Focar/desfocar campo de pesquisa';
+
+  @override
+  String get shortcutSwitchFocus => 'Alternar foco entre prateleiras e livros';
+
+  @override
+  String get shortcutMoveDown => 'Mover para baixo';
+
+  @override
+  String get shortcutMoveUp => 'Mover para cima';
+
+  @override
+  String get shortcutMoveLeft => 'Mover para esquerda';
+
+  @override
+  String get shortcutMoveRight => 'Mover para direita';
+
+  @override
+  String get shortcutMoveShelfDown => 'Mover prateleira para baixo';
+
+  @override
+  String get shortcutMoveShelfUp => 'Mover prateleira para cima';
+
+  @override
+  String get shortcutDeleteShelf => 'Excluir prateleira';
+
+  @override
+  String get shortcutOpenFocused => 'Abrir livro em foco';
+
+  @override
+  String get shortcutToggleSelection => 'Alternar seleção do livro em foco';
+
+  @override
+  String get shortcutRemoveFromShelf =>
+      'Remover livros selecionados da prateleira';
 }

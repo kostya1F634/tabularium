@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'app_settings.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Service for managing UI settings like font size and book scale
 class UISettingsService extends ChangeNotifier {
@@ -51,21 +52,21 @@ class UISettingsService extends ChangeNotifier {
   }
 
   /// Get font size label
-  String getFontSizeLabel(double size) {
-    if (size <= 0.8) return 'Small';
-    if (size <= 0.9) return 'Medium';
-    if (size <= 1.0) return 'Normal';
-    if (size <= 1.2) return 'Large';
-    return 'Extra Large';
+  static String getFontSizeLabel(AppLocalizations l10n, double size) {
+    if (size <= 0.8) return l10n.sizeSmall;
+    if (size <= 0.9) return l10n.sizeMedium;
+    if (size <= 1.0) return l10n.sizeNormal;
+    if (size <= 1.2) return l10n.sizeLarge;
+    return l10n.sizeExtraLarge;
   }
 
   /// Get book scale label
-  String getBookScaleLabel(double scale) {
-    if (scale <= 0.7) return 'Tiny';
-    if (scale <= 0.85) return 'Small';
-    if (scale <= 1.0) return 'Normal';
-    if (scale <= 1.25) return 'Large';
-    if (scale <= 1.5) return 'Extra Large';
-    return 'XXL';
+  static String getBookScaleLabel(AppLocalizations l10n, double scale) {
+    if (scale <= 0.7) return l10n.sizeTiny;
+    if (scale <= 0.85) return l10n.sizeSmall;
+    if (scale <= 1.0) return l10n.sizeNormal;
+    if (scale <= 1.25) return l10n.sizeLarge;
+    if (scale <= 1.5) return l10n.sizeExtraLarge;
+    return l10n.sizeXXL;
   }
 }
