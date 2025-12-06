@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../features/library/presentation/pages/library_view_wrapper.dart';
 import '../../features/library/presentation/bloc/library_bloc.dart';
 import '../../features/library/presentation/bloc/library_event.dart';
+import '../services/ai_settings_provider.dart';
 import '../services/language_provider.dart';
 import '../services/language_service.dart';
 import '../services/theme_provider.dart';
@@ -14,6 +15,7 @@ import '../services/ui_settings_provider.dart';
 import '../services/ui_settings_service.dart';
 import '../services/window_settings_provider.dart';
 import '../theme/app_theme.dart';
+import 'ai_settings_dialog.dart';
 import 'dialog_shortcuts_wrapper.dart';
 import 'shortcuts_dialog.dart';
 import 'theme_picker_dialog.dart';
@@ -121,6 +123,49 @@ class AppMenuBar extends StatelessWidget {
             );
           },
         ),
+        // AI button (only in library screen)
+        if (_isInLibraryScreen(context))
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.psychology, size: 16),
+            tooltip: l10n.ai,
+            offset: const Offset(0, 30),
+            onSelected: (value) {
+              if (value == 'settings') {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AISettingsDialog(),
+                );
+              } else if (value == 'fullsort') {
+                context.read<LibraryBloc>().add(const AIFullSort());
+              }
+            },
+            itemBuilder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return [
+                PopupMenuItem(
+                  value: 'settings',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.settings, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiSettings),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'fullsort',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.auto_awesome, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiFullSort),
+                    ],
+                  ),
+                ),
+              ];
+            },
+          ),
         // Settings button
         PopupMenuButton<String>(
           icon: const Icon(Icons.settings, size: 16),

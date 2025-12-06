@@ -418,4 +418,60 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get shortcutRemoveFromShelf =>
       'Geselecteerde boeken van plank verwijderen';
+
+  @override
+  String get ai => 'AI';
+
+  @override
+  String get aiSettings => 'AI Settings';
+
+  @override
+  String get aiFullSort => 'Full Sort (AI)';
+
+  @override
+  String get ollamaUrl => 'Ollama URL';
+
+  @override
+  String get ollamaModel => 'Ollama Model';
+
+  @override
+  String get generalization => 'Generalization';
+
+  @override
+  String get generalizationHint =>
+      '0 = many specific shelves, 1 = few broad shelves';
+
+  @override
+  String get testConnection => 'Test Connection';
+
+  @override
+  String get connectionSuccess => 'Connection successful!';
+
+  @override
+  String get connectionFailed => 'Connection failed';
+
+  @override
+  String get analyzeBook => 'Analyzing book';
+
+  @override
+  String get analyzingBooks => 'Analyzing books...';
+
+  @override
+  String get sortingLibrary => 'Sorting library...';
+
+  @override
+  String get aiSortComplete => 'AI sort complete';
+
+  @override
+  String get aiSortFailed => 'AI sort failed';
+
+  @override
+  String booksAnalyzed(int count) {
+    return '$count books analyzed';
+  }
+
+  @override
+  String shelvesCreated(int count) {
+    return '$count new shelves created';
+  }
 }

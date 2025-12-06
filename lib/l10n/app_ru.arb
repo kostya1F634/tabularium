@@ -129,5 +129,23 @@
   "shortcutDeleteShelf": "Удалить полку",
   "shortcutOpenFocused": "Открыть фокусную книгу",
   "shortcutToggleSelection": "Переключить выделение фокусной книги",
-  "shortcutRemoveFromShelf": "Удалить выбранные книги с полки"
+  "shortcutRemoveFromShelf": "Удалить выбранные книги с полки",
+
+  "ai": "ИИ",
+  "aiSettings": "Настройки ИИ",
+  "aiFullSort": "Полная сортировка (ИИ)",
+  "ollamaUrl": "Ollama URL",
+  "ollamaModel": "Модель Ollama",
+  "generalization": "Обобщение",
+  "generalizationHint": "0 = много узких полок, 1 = мало широких полок",
+  "testConnection": "Проверить соединение",
+  "connectionSuccess": "Соединение установлено!",
+  "connectionFailed": "Ошибка соединения",
+  "analyzeBook": "Анализ книги",
+  "analyzingBooks": "Анализ книг...",
+  "sortingLibrary": "Сортировка библиотеки...",
+  "aiSortComplete": "Сортировка ИИ завершена",
+  "aiSortFailed": "Ошибка сортировки ИИ",
+  "booksAnalyzed": "Проанализировано книг: {count}",
+  "shelvesCreated": "Создано новых полок: {count}"
 }

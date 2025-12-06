@@ -310,3 +310,8 @@ class SaveFocusArea extends LibraryEvent {
   @override
   List<Object?> get props => [focusArea];
 }
+
+/// Event to trigger AI full sort
+class AIFullSort extends LibraryEvent {
+  const AIFullSort();
+}

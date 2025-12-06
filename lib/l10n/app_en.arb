@@ -550,5 +550,39 @@
   "shortcutDeleteShelf": "Delete shelf",
   "shortcutOpenFocused": "Open focused book",
   "shortcutToggleSelection": "Toggle selection of focused book",
-  "shortcutRemoveFromShelf": "Remove selected books from shelf"
+  "shortcutRemoveFromShelf": "Remove selected books from shelf",
+
+  "ai": "AI",
+  "aiSettings": "AI Settings",
+  "aiFullSort": "Full Sort (AI)",
+  "ollamaUrl": "Ollama URL",
+  "ollamaModel": "Ollama Model",
+  "generalization": "Generalization",
+  "generalizationHint": "0 = many specific shelves, 1 = few broad shelves",
+  "testConnection": "Test Connection",
+  "connectionSuccess": "Connection successful!",
+  "connectionFailed": "Connection failed",
+  "analyzeBook": "Analyzing book",
+  "analyzingBooks": "Analyzing books...",
+  "sortingLibrary": "Sorting library...",
+  "aiSortComplete": "AI sort complete",
+  "aiSortFailed": "AI sort failed",
+  "booksAnalyzed": "{count} books analyzed",
+  "@booksAnalyzed": {
+    "description": "Number of books analyzed",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shelvesCreated": "{count} new shelves created",
+  "@shelvesCreated": {
+    "description": "Number of new shelves created",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

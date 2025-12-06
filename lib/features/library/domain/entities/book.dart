@@ -13,6 +13,7 @@ class Book extends Equatable {
   final DateTime lastOpenedDate;
   final int pageCount;
   final int fileSize;
+  final List<String> tags;
 
   const Book({
     required this.id,
@@ -26,6 +27,7 @@ class Book extends Equatable {
     required this.lastOpenedDate,
     this.pageCount = 0,
     this.fileSize = 0,
+    this.tags = const [],
   });
 
   /// Get display title (use alias if available, then title, otherwise fileName without extension)
@@ -55,6 +57,7 @@ class Book extends Equatable {
     DateTime? lastOpenedDate,
     int? pageCount,
     int? fileSize,
+    List<String>? tags,
     bool clearAlias = false,
   }) {
     return Book(
@@ -69,6 +72,7 @@ class Book extends Equatable {
       lastOpenedDate: lastOpenedDate ?? this.lastOpenedDate,
       pageCount: pageCount ?? this.pageCount,
       fileSize: fileSize ?? this.fileSize,
+      tags: tags ?? this.tags,
     );
   }
 
@@ -86,6 +90,7 @@ class Book extends Equatable {
       'lastOpenedDate': lastOpenedDate.toIso8601String(),
       'pageCount': pageCount,
       'fileSize': fileSize,
+      'tags': tags,
     };
   }
 
@@ -103,6 +108,7 @@ class Book extends Equatable {
       lastOpenedDate: DateTime.parse(json['lastOpenedDate'] as String),
       pageCount: json['pageCount'] as int? ?? 0,
       fileSize: json['fileSize'] as int? ?? 0,
+      tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : [],
     );
   }
 
@@ -119,5 +125,6 @@ class Book extends Equatable {
     lastOpenedDate,
     pageCount,
     fileSize,
+    tags,
   ];
 }

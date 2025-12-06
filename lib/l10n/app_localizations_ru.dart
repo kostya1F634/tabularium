@@ -420,4 +420,60 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get shortcutRemoveFromShelf => 'Удалить выбранные книги с полки';
+
+  @override
+  String get ai => 'ИИ';
+
+  @override
+  String get aiSettings => 'Настройки ИИ';
+
+  @override
+  String get aiFullSort => 'Полная сортировка (ИИ)';
+
+  @override
+  String get ollamaUrl => 'Ollama URL';
+
+  @override
+  String get ollamaModel => 'Модель Ollama';
+
+  @override
+  String get generalization => 'Обобщение';
+
+  @override
+  String get generalizationHint =>
+      '0 = много узких полок, 1 = мало широких полок';
+
+  @override
+  String get testConnection => 'Проверить соединение';
+
+  @override
+  String get connectionSuccess => 'Соединение установлено!';
+
+  @override
+  String get connectionFailed => 'Ошибка соединения';
+
+  @override
+  String get analyzeBook => 'Анализ книги';
+
+  @override
+  String get analyzingBooks => 'Анализ книг...';
+
+  @override
+  String get sortingLibrary => 'Сортировка библиотеки...';
+
+  @override
+  String get aiSortComplete => 'Сортировка ИИ завершена';
+
+  @override
+  String get aiSortFailed => 'Ошибка сортировки ИИ';
+
+  @override
+  String booksAnalyzed(int count) {
+    return 'Проанализировано книг: $count';
+  }
+
+  @override
+  String shelvesCreated(int count) {
+    return 'Создано новых полок: $count';
+  }
 }

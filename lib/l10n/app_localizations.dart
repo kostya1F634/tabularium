@@ -881,6 +881,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove selected books from shelf'**
   String get shortcutRemoveFromShelf;
+
+  /// No description provided for @ai.
+  ///
+  /// In en, this message translates to:
+  /// **'AI'**
+  String get ai;
+
+  /// No description provided for @aiSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Settings'**
+  String get aiSettings;
+
+  /// No description provided for @aiFullSort.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Sort (AI)'**
+  String get aiFullSort;
+
+  /// No description provided for @ollamaUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Ollama URL'**
+  String get ollamaUrl;
+
+  /// No description provided for @ollamaModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ollama Model'**
+  String get ollamaModel;
+
+  /// No description provided for @generalization.
+  ///
+  /// In en, this message translates to:
+  /// **'Generalization'**
+  String get generalization;
+
+  /// No description provided for @generalizationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'0 = many specific shelves, 1 = few broad shelves'**
+  String get generalizationHint;
+
+  /// No description provided for @testConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Connection'**
+  String get testConnection;
+
+  /// No description provided for @connectionSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection successful!'**
+  String get connectionSuccess;
+
+  /// No description provided for @connectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed'**
+  String get connectionFailed;
+
+  /// No description provided for @analyzeBook.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing book'**
+  String get analyzeBook;
+
+  /// No description provided for @analyzingBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing books...'**
+  String get analyzingBooks;
+
+  /// No description provided for @sortingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorting library...'**
+  String get sortingLibrary;
+
+  /// No description provided for @aiSortComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'AI sort complete'**
+  String get aiSortComplete;
+
+  /// No description provided for @aiSortFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'AI sort failed'**
+  String get aiSortFailed;
+
+  /// Number of books analyzed
+  ///
+  /// In en, this message translates to:
+  /// **'{count} books analyzed'**
+  String booksAnalyzed(int count);
+
+  /// Number of new shelves created
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new shelves created'**
+  String shelvesCreated(int count);
 }
 
 class _AppLocalizationsDelegate
