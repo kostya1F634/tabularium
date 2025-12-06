@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/services/app_settings.dart';
 import '../../../../core/services/ui_settings_provider.dart';
+import '../../../../core/services/ai_settings_provider.dart';
 import 'package:tabularium/l10n/app_localizations.dart';
 
 import '../../../../core/widgets/dialog_shortcuts_wrapper.dart';
+import '../../../../core/widgets/ai_progress_dialog.dart';
 import '../../di/library_dependencies.dart';
 import '../../domain/entities/shelf.dart';
 import '../bloc/library_bloc.dart';
@@ -29,9 +31,11 @@ class LibraryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final aiSettings = AISettingsProvider.of(context);
+
     return BlocProvider(
       create: (_) =>
-          LibraryDependencies().createLibraryBloc()
+          LibraryDependencies(aiSettingsService: aiSettings).createLibraryBloc()
             ..add(InitializeLibrary(directoryPath)),
       child: const _LibraryScreenContent(),
     );
@@ -66,6 +70,7 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
   _isShelfSearchFocused; // Callback to check if shelf search has focus
   List<Shelf> _filteredShelves = []; // Shelves after applying search filter
   bool _hasRestoredFocus = false; // Track if focus was restored from config
+  bool _isAIDialogShown = false; // Track if AI progress dialog is shown
 
   @override
   void initState() {
@@ -757,6 +762,25 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
         appBar: const LibraryAppBar(),
         body: BlocListener<LibraryBloc, LibraryState>(
           listener: (context, state) {
+            // Show/hide AI progress dialog
+            if (state is LibraryAIProcessing) {
+              if (!_isAIDialogShown) {
+                _isAIDialogShown = true;
+                final bloc = context.read<LibraryBloc>();
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (dialogContext) => BlocProvider.value(
+                    value: bloc,
+                    child: const AIProgressDialog(),
+                  ),
+                );
+              }
+            } else if (_isAIDialogShown) {
+              _isAIDialogShown = false;
+              Navigator.of(context, rootNavigator: true).pop();
+            }
+
             // Restore focus area when library loads (only once)
             if (state is LibraryLoaded && !_hasRestoredFocus) {
               _hasRestoredFocus = true;
@@ -821,33 +845,41 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
 
               if (state is LibraryError) {
                 return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        state.message,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () async {
-                          // Clear last opened directory so app starts on welcome screen next time
-                          final prefs = await AppSettings.getInstance();
-                          await prefs.remove('last_opened_directory');
-                          if (context.mounted) {
-                            Navigator.of(context).pushReplacementNamed('/');
-                          }
-                        },
-                        child: Text(l10n.backToWelcome),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Flexible(
+                          child: SingleChildScrollView(
+                            child: Text(
+                              state.message,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () async {
+                            // Clear last opened directory so app starts on welcome screen next time
+                            final prefs = await AppSettings.getInstance();
+                            await prefs.remove('last_opened_directory');
+                            if (context.mounted) {
+                              Navigator.of(context).pushReplacementNamed('/');
+                            }
+                          },
+                          child: Text(l10n.backToWelcome),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }

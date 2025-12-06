@@ -3,9 +3,12 @@ import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'dart:io';
 
+import '../../../../core/services/ai_settings_service.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/shelf.dart';
 import '../../domain/entities/library_config.dart';
+import '../../domain/usecases/ai_analyze_book.dart';
+import '../../domain/usecases/ai_sort_library.dart';
 import '../../domain/usecases/initialize_library_usecase.dart';
 import '../../domain/usecases/load_library_usecase.dart';
 import '../../domain/usecases/save_library_usecase.dart';
@@ -21,6 +24,9 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   final SaveLibraryUseCase _saveLibrary;
   final OpenBookUseCase _openBook;
   final OpenAllBooksUseCase _openAllBooks;
+  final AIAnalyzeBook? _aiAnalyzeBook;
+  final AISortLibrary? _aiSortLibrary;
+  final AISettingsService _aiSettings;
 
   LibraryBloc({
     required InitializeLibraryUseCase initializeLibrary,
@@ -28,11 +34,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     required SaveLibraryUseCase saveLibrary,
     required OpenBookUseCase openBook,
     required OpenAllBooksUseCase openAllBooks,
+    AIAnalyzeBook? aiAnalyzeBook,
+    AISortLibrary? aiSortLibrary,
+    required AISettingsService aiSettings,
   }) : _initializeLibrary = initializeLibrary,
        _loadLibrary = loadLibrary,
        _saveLibrary = saveLibrary,
        _openBook = openBook,
        _openAllBooks = openAllBooks,
+       _aiAnalyzeBook = aiAnalyzeBook,
+       _aiSortLibrary = aiSortLibrary,
+       _aiSettings = aiSettings,
        super(const LibraryInitial()) {
     on<InitializeLibrary>(_onInitializeLibrary);
     on<LoadLibrary>(_onLoadLibrary);
@@ -65,6 +77,178 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<MoveFocusInDirection>(_onMoveFocusInDirection);
     on<ToggleFocusedBookSelection>(_onToggleFocusedBookSelection);
     on<SaveFocusArea>(_onSaveFocusArea);
+    on<AIFullSort>(_onAIFullSort);
+  }
+
+  Future<void> _onAIFullSort(
+    AIFullSort event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+    final currentState = state as LibraryLoaded;
+
+    // Check if AI is configured
+    if (_aiAnalyzeBook == null || _aiSortLibrary == null) {
+      emit(
+        const LibraryError(
+          'AI not configured. Please configure AI settings first.',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+      emit(currentState);
+      return;
+    }
+
+    try {
+      emit(const LibraryAIProcessing('Starting AI analysis...'));
+
+      // Get unsorted books using the proper helper method
+      final unsortedBooks = _getBooksForShelf(
+        currentState.config,
+        Shelf.unsortedShelfId,
+      );
+
+      if (unsortedBooks.isEmpty) {
+        emit(const LibraryError('No books in Unsorted shelf to analyze'));
+        await Future.delayed(const Duration(seconds: 2));
+        emit(currentState);
+        return;
+      }
+
+      // Step 1: Analyze each book
+      emit(
+        LibraryAIProcessing(
+          'Analyzing books...',
+          progress: 0,
+          total: unsortedBooks.length,
+        ),
+      );
+
+      final updatedBooks = <Book>[];
+      for (var i = 0; i < unsortedBooks.length; i++) {
+        final book = unsortedBooks[i];
+
+        try {
+          final analysis = await _aiAnalyzeBook!(book);
+
+          // Update book with AI-extracted metadata
+          final updatedBook = book.copyWith(
+            title: analysis.title ?? book.title,
+            author: analysis.author ?? book.author,
+            tags: analysis.tags,
+          );
+          updatedBooks.add(updatedBook);
+
+          emit(
+            LibraryAIProcessing(
+              'Analyzing books...',
+              progress: i + 1,
+              total: unsortedBooks.length,
+            ),
+          );
+        } catch (e) {
+          print('Error analyzing book ${book.fileName}: $e');
+          updatedBooks.add(book); // Keep original if analysis fails
+        }
+      }
+
+      // Update config with analyzed books
+      var newConfig = currentState.config;
+      for (final updatedBook in updatedBooks) {
+        final bookIndex = newConfig.books.indexWhere(
+          (b) => b.id == updatedBook.id,
+        );
+        if (bookIndex != -1) {
+          final newBooks = List<Book>.from(newConfig.books);
+          newBooks[bookIndex] = updatedBook;
+          newConfig = newConfig.copyWith(books: newBooks);
+        }
+      }
+
+      // Step 2: Sort library with AI
+      emit(const LibraryAIProcessing('Organizing into shelves...'));
+
+      final sortResult = await _aiSortLibrary!(
+        books: updatedBooks,
+        existingShelves: currentState.config.shelves,
+        generalization: _aiSettings.generalization,
+      );
+
+      // Step 3: Create new shelves
+      var shelves = List<Shelf>.from(newConfig.shelves);
+      for (final newShelfName in sortResult.newShelves) {
+        final newShelf = Shelf(
+          id: _generateShelfId(newShelfName),
+          name: newShelfName,
+          bookIds: [],
+          isDefault: false,
+          createdDate: DateTime.now(),
+        );
+        shelves.add(newShelf);
+      }
+
+      // Step 4: Assign books to shelves
+      for (final assignment in sortResult.assignments) {
+        final book = updatedBooks.firstWhere(
+          (b) => b.filePath == assignment.filePath,
+          orElse: () => updatedBooks.first,
+        );
+        final shelfIndex = shelves.indexWhere(
+          (s) => s.name == assignment.shelfName,
+        );
+
+        // Add book to the target shelf (no need to remove from Unsorted - it's virtual)
+        if (shelfIndex != -1 &&
+            !shelves[shelfIndex].bookIds.contains(book.id)) {
+          final updatedShelf = shelves[shelfIndex].copyWith(
+            bookIds: [...shelves[shelfIndex].bookIds, book.id],
+          );
+          shelves[shelfIndex] = updatedShelf;
+        }
+      }
+
+      newConfig = newConfig.copyWith(shelves: shelves);
+
+      // Save config
+      await _saveLibrary(newConfig);
+
+      // Update displayed books for current shelf
+      final booksForShelf = _getBooksForShelf(
+        newConfig,
+        currentState.selectedShelf.id,
+      );
+      final updatedDisplayedBooks = _getSortedBooks(
+        booksForShelf,
+        currentState.sortOption,
+        currentState.searchQuery,
+      );
+
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+
+      // Show success message briefly
+      emit(
+        LibraryAIProcessing(
+          'AI sort complete! ${updatedBooks.length} books analyzed, ${sortResult.newShelves.length} shelves created',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+    } catch (e) {
+      emit(LibraryError('AI sort failed: $e'));
+      await Future.delayed(const Duration(seconds: 3));
+      emit(currentState);
+    }
   }
 
   Future<void> _onInitializeLibrary(

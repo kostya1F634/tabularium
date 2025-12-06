@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/services/ai_settings_provider.dart';
 import '../../../../core/services/app_settings.dart';
 
 import '../../../../core/services/view_mode_service.dart';
@@ -77,13 +78,15 @@ class _LibraryViewWrapperState extends State<LibraryViewWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    final aiSettings = AISettingsProvider.of(context);
+
     // Wrap both screens with BLoC provider
     final screen = _viewMode == LibraryViewMode.grid
         ? LibraryScreen(directoryPath: widget.directoryPath)
         : BlocProvider(
-            create: (_) =>
-                LibraryDependencies().createLibraryBloc()
-                  ..add(InitializeLibrary(widget.directoryPath)),
+            create: (_) => LibraryDependencies(
+              aiSettingsService: aiSettings,
+            ).createLibraryBloc()..add(InitializeLibrary(widget.directoryPath)),
             child: const CabinetScreen(),
           );
 

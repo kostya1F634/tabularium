@@ -110,3 +110,15 @@ class LibraryError extends LibraryState {
   @override
   List<Object?> get props => [message];
 }
+
+/// AI processing state
+class LibraryAIProcessing extends LibraryState {
+  final String message;
+  final int? progress; // Current progress (e.g., books analyzed)
+  final int? total; // Total items to process
+
+  const LibraryAIProcessing(this.message, {this.progress, this.total});
+
+  @override
+  List<Object?> get props => [message, progress, total];
+}

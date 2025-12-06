@@ -7,8 +7,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../features/library/presentation/pages/library_view_wrapper.dart';
 import '../../features/library/presentation/bloc/library_bloc.dart';
 import '../../features/library/presentation/bloc/library_event.dart';
-import '../services/ai_settings_provider.dart';
 import '../services/language_provider.dart';
+import '../services/ai_settings_provider.dart';
 import '../services/language_service.dart';
 import '../services/theme_provider.dart';
 import '../services/ui_settings_provider.dart';
@@ -131,9 +131,15 @@ class AppMenuBar extends StatelessWidget {
             offset: const Offset(0, 30),
             onSelected: (value) {
               if (value == 'settings') {
+                final aiSettings = AISettingsProvider.of(context);
                 showDialog(
                   context: context,
-                  builder: (context) => const AISettingsDialog(),
+                  builder: (dialogContext) => AISettingsDialog(
+                    initialUrl: aiSettings.ollamaUrl,
+                    initialModel: aiSettings.ollamaModel,
+                    initialGeneralization: aiSettings.generalization,
+                    aiSettingsService: aiSettings,
+                  ),
                 );
               } else if (value == 'fullsort') {
                 context.read<LibraryBloc>().add(const AIFullSort());

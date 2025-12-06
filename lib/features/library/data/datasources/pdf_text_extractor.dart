@@ -16,17 +16,17 @@ class PdfTextExtractor {
       final doc = await PdfDocument.openFile(filePath);
 
       final buffer = StringBuffer();
-      final pagesToExtract = maxPages < doc.pageCount
-          ? maxPages
-          : doc.pageCount;
+      final totalPages = doc.pages.length;
+      final pagesToExtract = maxPages < totalPages ? maxPages : totalPages;
 
       for (int i = 0; i < pagesToExtract; i++) {
-        final page = await doc.getPage(i + 1);
+        final page = doc.pages[i];
         final text = await page.loadText();
 
-        if (text != null) {
+        final textString = text.fullText;
+        if (textString.isNotEmpty) {
           buffer.writeln('--- Page ${i + 1} ---');
-          buffer.writeln(text);
+          buffer.writeln(textString);
           buffer.writeln();
         }
       }

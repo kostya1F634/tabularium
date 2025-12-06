@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
-import '../services/ai_settings_provider.dart';
+import '../services/ai_settings_service.dart';
 import '../services/ollama_client.dart';
 import 'dialog_shortcuts_wrapper.dart';
 
 /// Dialog for AI settings configuration
 class AISettingsDialog extends StatefulWidget {
-  const AISettingsDialog({super.key});
+  final String initialUrl;
+  final String initialModel;
+  final double initialGeneralization;
+  final AISettingsService aiSettingsService;
+
+  const AISettingsDialog({
+    super.key,
+    required this.initialUrl,
+    required this.initialModel,
+    required this.initialGeneralization,
+    required this.aiSettingsService,
+  });
 
   @override
   State<AISettingsDialog> createState() => _AISettingsDialogState();
@@ -22,10 +33,9 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
   @override
   void initState() {
     super.initState();
-    final aiSettings = AISettingsProvider.of(context);
-    _urlController = TextEditingController(text: aiSettings.ollamaUrl);
-    _modelController = TextEditingController(text: aiSettings.ollamaModel);
-    _generalization = aiSettings.generalization;
+    _urlController = TextEditingController(text: widget.initialUrl);
+    _modelController = TextEditingController(text: widget.initialModel);
+    _generalization = widget.initialGeneralization;
   }
 
   @override
@@ -58,10 +68,9 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
   }
 
   Future<void> _save() async {
-    final aiSettings = AISettingsProvider.of(context);
-    await aiSettings.setOllamaUrl(_urlController.text);
-    await aiSettings.setOllamaModel(_modelController.text);
-    await aiSettings.setGeneralization(_generalization);
+    await widget.aiSettingsService.setOllamaUrl(_urlController.text);
+    await widget.aiSettingsService.setOllamaModel(_modelController.text);
+    await widget.aiSettingsService.setGeneralization(_generalization);
 
     if (mounted) {
       Navigator.of(context).pop();
