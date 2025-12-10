@@ -1,4 +1,5 @@
 import '../../../../core/services/ollama_client.dart';
+import '../../../../core/services/ai_settings_service.dart';
 import '../../data/datasources/pdf_text_extractor.dart';
 import '../entities/book.dart';
 
@@ -7,8 +8,14 @@ class BookAnalysisResult {
   final String? title;
   final String? author;
   final List<String> tags;
+  final String? reasoning; // LLM's explanation for tag choices
 
-  BookAnalysisResult({this.title, this.author, this.tags = const []});
+  BookAnalysisResult({
+    this.title,
+    this.author,
+    this.tags = const [],
+    this.reasoning,
+  });
 
   factory BookAnalysisResult.fromJson(Map<String, dynamic> json) {
     List<String> parseTags(dynamic tagsData) {
@@ -26,36 +33,43 @@ class BookAnalysisResult {
       title: json['title']?.toString(),
       author: json['author']?.toString(),
       tags: parseTags(json['tags']),
+      reasoning: json['reasoning']?.toString(),
     );
   }
 }
 
 /// Use case for analyzing a single book with AI
 class AIAnalyzeBook {
-  final OllamaClient ollamaClient;
+  final AISettingsService aiSettings;
   final PdfTextExtractor textExtractor;
-  final int maxPages;
 
-  AIAnalyzeBook({
-    required this.ollamaClient,
-    required this.textExtractor,
-    this.maxPages = 3,
-  });
+  AIAnalyzeBook({required this.aiSettings, required this.textExtractor});
 
   /// Analyze a book and extract metadata
   Future<BookAnalysisResult> call(Book book) async {
     try {
+      // Create OllamaClient with current settings
+      final ollamaClient = OllamaClient(
+        baseUrl: aiSettings.ollamaUrl,
+        model: aiSettings.ollamaModel,
+      );
+
       // Extract text from pages 2 to maxPages+1 (skip first page - usually cover)
       final fullText = await textExtractor.extractText(
         book.filePath,
         startPage: 2,
-        maxPages: maxPages,
+        maxPages: aiSettings.maxPages,
       );
 
       // Limit text to first 2000 characters to reduce token count
       final text = fullText.length > 2000
           ? fullText.substring(0, 2000) + '...'
           : fullText;
+
+      // Get language instruction
+      final languageNames = {'en': 'English', 'ru': 'Russian'};
+      final outputLanguage =
+          languageNames[aiSettings.outputLanguage] ?? 'English';
 
       // If no text extracted, analyze based on filename only
       final prompt = text.isNotEmpty
@@ -68,10 +82,15 @@ $text
 
 Please analyze this book and return ONLY a JSON object with the following structure (no additional text, no markdown):
 {
-  "title": "The actual title of the book",
-  "author": "The author's name",
-  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"]
+  "title": "The actual title of the book (keep in ORIGINAL language from the book)",
+  "author": "The author's name (keep in ORIGINAL language from the book)",
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"],
+  "reasoning": "2-3 sentences explaining: (1) what subject/genre this book belongs to, (2) why these specific tags were chosen and how they represent the book's main themes"
 }
+
+LANGUAGE INSTRUCTION:
+- Tags and reasoning MUST be in $outputLanguage language
+- Title and author MUST stay in the ORIGINAL language from the book (do not translate)
 
 CRITICAL RULES FOR TAGS - Tags describe THIS SPECIFIC BOOK'S CONTENT:
 - Prefer ONE WORD, use TWO WORDS only for established terms
@@ -112,6 +131,10 @@ Filename: ${book.fileName}
 
 Analyze and return JSON.
 
+LANGUAGE INSTRUCTION:
+- Tags and reasoning MUST be in $outputLanguage language
+- Title and author MUST stay in the ORIGINAL language from the book (do not translate)
+
 CRITICAL RULES FOR TAGS - Describe THIS BOOK SPECIFICALLY:
 - Prefer ONE WORD, TWO WORDS for established terms
 - Create 5-8 UNIQUE tags from filename analysis
@@ -132,8 +155,9 @@ CRITICAL RULES FOR TAGS - Describe THIS BOOK SPECIFICALLY:
             'type': 'array',
             'items': {'type': 'string'},
           },
+          'reasoning': {'type': 'string'},
         },
-        'required': ['title', 'author', 'tags'],
+        'required': ['title', 'author', 'tags', 'reasoning'],
       };
 
       // Get response from AI

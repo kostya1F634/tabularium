@@ -897,7 +897,7 @@ abstract class AppLocalizations {
   /// No description provided for @aiFullSort.
   ///
   /// In en, this message translates to:
-  /// **'Full Sort (AI)'**
+  /// **'Full Sort'**
   String get aiFullSort;
 
   /// No description provided for @ollamaUrl.
@@ -935,6 +935,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Number of pages to read per book (1-50, starting from page 2)'**
   String get maxPagesHint;
+
+  /// No description provided for @processImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Images'**
+  String get processImages;
+
+  /// No description provided for @processImagesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Include book cover thumbnail as visual context for analysis (requires vision-capable model)'**
+  String get processImagesHint;
 
   /// No description provided for @testConnection.
   ///
@@ -999,14 +1011,44 @@ abstract class AppLocalizations {
   /// No description provided for @aiRename.
   ///
   /// In en, this message translates to:
-  /// **'Analyze (no sorting)'**
+  /// **'Auto Titling'**
   String get aiRename;
+
+  /// No description provided for @aiSort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get aiSort;
 
   /// No description provided for @aiTitle.
   ///
   /// In en, this message translates to:
   /// **'AI: Title & Tags'**
   String get aiTitle;
+
+  /// No description provided for @outputLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Output Language'**
+  String get outputLanguage;
+
+  /// No description provided for @outputLanguageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Language for shelf names, tags, and reasoning (book titles stay in original language)'**
+  String get outputLanguageHint;
+
+  /// No description provided for @testLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Language'**
+  String get testLanguage;
+
+  /// No description provided for @languageTestResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Test Result'**
+  String get languageTestResult;
 }
 
 class _AppLocalizationsDelegate

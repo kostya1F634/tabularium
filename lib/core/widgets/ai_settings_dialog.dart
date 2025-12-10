@@ -11,6 +11,8 @@ class AISettingsDialog extends StatefulWidget {
   final String initialModel;
   final double initialGeneralization;
   final int initialMaxPages;
+  final bool initialProcessImages;
+  final String initialOutputLanguage;
   final AISettingsService aiSettingsService;
 
   const AISettingsDialog({
@@ -19,6 +21,8 @@ class AISettingsDialog extends StatefulWidget {
     required this.initialModel,
     required this.initialGeneralization,
     required this.initialMaxPages,
+    required this.initialProcessImages,
+    required this.initialOutputLanguage,
     required this.aiSettingsService,
   });
 
@@ -31,8 +35,11 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
   late TextEditingController _modelController;
   late TextEditingController _generalizationController;
   late TextEditingController _maxPagesController;
+  late bool _processImages;
+  late String _outputLanguage;
   String? _connectionStatus;
   bool _testing = false;
+  bool _testingLanguage = false;
 
   @override
   void initState() {
@@ -45,6 +52,8 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
     _maxPagesController = TextEditingController(
       text: widget.initialMaxPages.toString(),
     );
+    _processImages = widget.initialProcessImages;
+    _outputLanguage = widget.initialOutputLanguage;
   }
 
   @override
@@ -78,6 +87,69 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
     });
   }
 
+  Future<void> _testLanguage() async {
+    setState(() {
+      _testingLanguage = true;
+    });
+
+    final client = OllamaClient(
+      baseUrl: _urlController.text,
+      model: _modelController.text,
+    );
+
+    final languageNames = {'en': 'English', 'ru': 'Russian'};
+
+    final languageName = languageNames[_outputLanguage] ?? _outputLanguage;
+
+    try {
+      final response = await client.generate(
+        prompt:
+            'Please write 2-3 sentences about your capabilities in $languageName language. Respond ONLY in $languageName.',
+        temperature: 0.7,
+      );
+
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.languageTestResult),
+            content: SingleChildScrollView(child: Text(response)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.ok),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(l10n.error),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.ok),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _testingLanguage = false;
+        });
+      }
+    }
+  }
+
   Future<void> _save() async {
     // Parse generalization (0-100) to 0.0-1.0
     final generalizationValue =
@@ -91,6 +163,8 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
     await widget.aiSettingsService.setOllamaModel(_modelController.text);
     await widget.aiSettingsService.setGeneralization(generalization);
     await widget.aiSettingsService.setMaxPages(maxPages);
+    await widget.aiSettingsService.setProcessImages(_processImages);
+    await widget.aiSettingsService.setOutputLanguage(_outputLanguage);
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -206,6 +280,59 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
                     return newValue;
                   }),
                 ],
+              ),
+              const SizedBox(height: 16),
+
+              // Process Images checkbox
+              CheckboxListTile(
+                value: _processImages,
+                onChanged: (value) {
+                  setState(() {
+                    _processImages = value ?? false;
+                  });
+                },
+                title: Text(l10n.processImages),
+                subtitle: Text(
+                  l10n.processImagesHint,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+              const SizedBox(height: 16),
+
+              // Output Language dropdown
+              DropdownButtonFormField<String>(
+                value: _outputLanguage,
+                decoration: InputDecoration(
+                  labelText: l10n.outputLanguage,
+                  helperText: l10n.outputLanguageHint,
+                  border: const OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'en', child: Text('English')),
+                  DropdownMenuItem(value: 'ru', child: Text('Русский')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _outputLanguage = value;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 8),
+
+              // Test Language button
+              ElevatedButton.icon(
+                onPressed: _testingLanguage ? null : _testLanguage,
+                icon: _testingLanguage
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.translate),
+                label: Text(l10n.testLanguage),
               ),
             ],
           ),

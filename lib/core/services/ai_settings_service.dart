@@ -7,18 +7,24 @@ class AISettingsService extends ChangeNotifier {
   static const String _ollamaModelKey = 'ai_ollama_model';
   static const String _generalizationKey = 'ai_generalization';
   static const String _maxPagesKey = 'ai_max_pages';
+  static const String _processImagesKey = 'ai_process_images';
+  static const String _outputLanguageKey = 'ai_output_language';
 
   final AppSettings _prefs;
   String _ollamaUrl;
   String _ollamaModel;
   double _generalization;
   int _maxPages;
+  bool _processImages;
+  String _outputLanguage;
 
   AISettingsService(this._prefs)
     : _ollamaUrl = _prefs.getString(_ollamaUrlKey) ?? 'http://127.0.0.1:11434',
       _ollamaModel = _prefs.getString(_ollamaModelKey) ?? 'deepseek-r1:1.5b',
       _generalization = _prefs.getDouble(_generalizationKey) ?? 0.5,
-      _maxPages = _prefs.getInt(_maxPagesKey) ?? 3;
+      _maxPages = _prefs.getInt(_maxPagesKey) ?? 3,
+      _processImages = _prefs.getBool(_processImagesKey) ?? false,
+      _outputLanguage = _prefs.getString(_outputLanguageKey) ?? 'en';
 
   /// Ollama server URL
   String get ollamaUrl => _ollamaUrl;
@@ -31,6 +37,12 @@ class AISettingsService extends ChangeNotifier {
 
   /// Maximum pages to analyze per book (1-50)
   int get maxPages => _maxPages;
+
+  /// Whether to process book cover images for analysis
+  bool get processImages => _processImages;
+
+  /// Output language for AI responses (shelf names, tags, reasoning)
+  String get outputLanguage => _outputLanguage;
 
   /// Check if AI is configured
   bool get isConfigured => _ollamaUrl.isNotEmpty && _ollamaModel.isNotEmpty;
@@ -65,6 +77,22 @@ class AISettingsService extends ChangeNotifier {
     if (_maxPages == clampedPages) return;
     _maxPages = clampedPages;
     await _prefs.setInt(_maxPagesKey, clampedPages);
+    notifyListeners();
+  }
+
+  /// Set whether to process book cover images
+  Future<void> setProcessImages(bool value) async {
+    if (_processImages == value) return;
+    _processImages = value;
+    await _prefs.setBool(_processImagesKey, value);
+    notifyListeners();
+  }
+
+  /// Set output language for AI responses
+  Future<void> setOutputLanguage(String language) async {
+    if (_outputLanguage == language) return;
+    _outputLanguage = language;
+    await _prefs.setString(_outputLanguageKey, language);
     notifyListeners();
   }
 }

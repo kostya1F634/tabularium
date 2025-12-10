@@ -593,6 +593,16 @@ class _BookCard extends StatelessWidget {
             ],
           ),
         ),
+        PopupMenuItem<String>(
+          value: 'ai_sort',
+          child: Row(
+            children: [
+              const Icon(Icons.sort, size: 18),
+              const SizedBox(width: 8),
+              Text(l10n.aiSort),
+            ],
+          ),
+        ),
         const PopupMenuDivider(),
         PopupMenuItem<String>(
           value: 'delete',
@@ -738,6 +748,14 @@ class _BookCard extends StatelessWidget {
               : [book.id];
 
           bloc.add(AIAnalyzeSelectedBooks(bookIds: booksToAnalyze));
+          break;
+        case 'ai_sort':
+          // Determine which books to sort: if selection exists, sort selected books; otherwise, sort clicked book
+          final booksToSort = state.hasSelection
+              ? state.selectedBookIds.toList()
+              : [book.id];
+
+          bloc.add(AISortSelectedBooks(bookIds: booksToSort));
           break;
         case 'properties':
           showDialog(

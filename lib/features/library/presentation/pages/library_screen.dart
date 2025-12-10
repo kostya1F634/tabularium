@@ -778,7 +778,7 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
               }
             } else if (_isAIDialogShown) {
               _isAIDialogShown = false;
-              Navigator.of(context, rootNavigator: true).pop();
+              Navigator.of(context).pop();
             }
 
             // Restore focus area when library loads (only once)

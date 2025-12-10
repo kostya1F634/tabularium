@@ -330,3 +330,13 @@ class AIAnalyzeSelectedBooks extends LibraryEvent {
   @override
   List<Object?> get props => [bookIds];
 }
+
+/// AI Sort: Analyze and sort specific books into shelves
+class AISortSelectedBooks extends LibraryEvent {
+  final List<String> bookIds;
+
+  const AISortSelectedBooks({required this.bookIds});
+
+  @override
+  List<Object?> get props => [bookIds];
+}

@@ -14,6 +14,7 @@ class Book extends Equatable {
   final int pageCount;
   final int fileSize;
   final List<String> tags;
+  final String? aiReasoning; // LLM's explanation for tag/subject choices
 
   const Book({
     required this.id,
@@ -28,6 +29,7 @@ class Book extends Equatable {
     this.pageCount = 0,
     this.fileSize = 0,
     this.tags = const [],
+    this.aiReasoning,
   });
 
   /// Get display title (use alias if available, then title, otherwise fileName without extension)
@@ -58,6 +60,7 @@ class Book extends Equatable {
     int? pageCount,
     int? fileSize,
     List<String>? tags,
+    String? aiReasoning,
     bool clearAlias = false,
   }) {
     return Book(
@@ -73,6 +76,7 @@ class Book extends Equatable {
       pageCount: pageCount ?? this.pageCount,
       fileSize: fileSize ?? this.fileSize,
       tags: tags ?? this.tags,
+      aiReasoning: aiReasoning ?? this.aiReasoning,
     );
   }
 
@@ -91,6 +95,7 @@ class Book extends Equatable {
       'pageCount': pageCount,
       'fileSize': fileSize,
       'tags': tags,
+      'aiReasoning': aiReasoning,
     };
   }
 
@@ -109,6 +114,7 @@ class Book extends Equatable {
       pageCount: json['pageCount'] as int? ?? 0,
       fileSize: json['fileSize'] as int? ?? 0,
       tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : [],
+      aiReasoning: json['aiReasoning'] as String?,
     );
   }
 
@@ -126,5 +132,6 @@ class Book extends Equatable {
     pageCount,
     fileSize,
     tags,
+    aiReasoning,
   ];
 }

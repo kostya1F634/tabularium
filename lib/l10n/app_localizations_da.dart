@@ -424,7 +424,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get aiSettings => 'AI Settings';
 
   @override
-  String get aiFullSort => 'Full Sort (AI)';
+  String get aiFullSort => 'Full Sort';
 
   @override
   String get ollamaUrl => 'Ollama URL';
@@ -445,6 +445,13 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get maxPagesHint =>
       'Number of pages to read per book (1-50, starting from page 2)';
+
+  @override
+  String get processImages => 'Process Images';
+
+  @override
+  String get processImagesHint =>
+      'Include book cover thumbnail as visual context for analysis (requires vision-capable model)';
 
   @override
   String get testConnection => 'Test Connection';
@@ -481,8 +488,24 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get aiRename => 'Analyze (no sorting)';
+  String get aiRename => 'Auto Titling';
+
+  @override
+  String get aiSort => 'Sort';
 
   @override
   String get aiTitle => 'AI: Title & Tags';
+
+  @override
+  String get outputLanguage => 'Output Language';
+
+  @override
+  String get outputLanguageHint =>
+      'Language for shelf names, tags, and reasoning (book titles stay in original language)';
+
+  @override
+  String get testLanguage => 'Test Language';
+
+  @override
+  String get languageTestResult => 'Language Test Result';
 }

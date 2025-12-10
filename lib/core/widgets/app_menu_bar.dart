@@ -139,6 +139,8 @@ class AppMenuBar extends StatelessWidget {
                     initialModel: aiSettings.ollamaModel,
                     initialGeneralization: aiSettings.generalization,
                     initialMaxPages: aiSettings.maxPages,
+                    initialProcessImages: aiSettings.processImages,
+                    initialOutputLanguage: aiSettings.outputLanguage,
                     aiSettingsService: aiSettings,
                   ),
                 );

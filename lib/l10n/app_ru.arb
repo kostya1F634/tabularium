@@ -133,13 +133,15 @@
 
   "ai": "ИИ",
   "aiSettings": "Настройки ИИ",
-  "aiFullSort": "Полная сортировка (ИИ)",
+  "aiFullSort": "Полная сортировка",
   "ollamaUrl": "Ollama URL",
   "ollamaModel": "Модель Ollama",
   "generalization": "Обобщение",
   "generalizationHint": "0 = много узких полок, 100 = мало широких полок",
   "maxPages": "Макс. страниц",
   "maxPagesHint": "Количество страниц для анализа книги (1-50, начиная со 2-й страницы)",
+  "processImages": "Обрабатывать изображения",
+  "processImagesHint": "Использовать обложку книги как визуальный контекст для анализа (требуется модель с vision)",
   "testConnection": "Проверить соединение",
   "connectionSuccess": "Соединение установлено!",
   "connectionFailed": "Ошибка соединения",
@@ -150,6 +152,11 @@
   "aiSortFailed": "Ошибка сортировки ИИ",
   "booksAnalyzed": "Проанализировано книг: {count}",
   "shelvesCreated": "Создано новых полок: {count}",
-  "aiRename": "Анализ (без сортировки)",
-  "aiTitle": "ИИ: Название и теги"
+  "aiRename": "Авто-заголовки",
+  "aiSort": "Сортировать",
+  "aiTitle": "ИИ: Название и теги",
+  "outputLanguage": "Язык вывода",
+  "outputLanguageHint": "Язык для названий полок, тегов и размышлений (названия книг остаются на оригинальном языке)",
+  "testLanguage": "Проверить язык",
+  "languageTestResult": "Результат проверки языка"
 }

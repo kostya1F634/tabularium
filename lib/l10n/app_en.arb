@@ -554,13 +554,15 @@
 
   "ai": "AI",
   "aiSettings": "AI Settings",
-  "aiFullSort": "Full Sort (AI)",
+  "aiFullSort": "Full Sort",
   "ollamaUrl": "Ollama URL",
   "ollamaModel": "Ollama Model",
   "generalization": "Generalization",
   "generalizationHint": "0 = many specific shelves, 100 = few broad shelves",
   "maxPages": "Max Pages",
   "maxPagesHint": "Number of pages to read per book (1-50, starting from page 2)",
+  "processImages": "Process Images",
+  "processImagesHint": "Include book cover thumbnail as visual context for analysis (requires vision-capable model)",
   "testConnection": "Test Connection",
   "connectionSuccess": "Connection successful!",
   "connectionFailed": "Connection failed",
@@ -587,6 +589,11 @@
       }
     }
   },
-  "aiRename": "Analyze (no sorting)",
-  "aiTitle": "AI: Title & Tags"
+  "aiRename": "Auto Titling",
+  "aiSort": "Sort",
+  "aiTitle": "AI: Title & Tags",
+  "outputLanguage": "Output Language",
+  "outputLanguageHint": "Language for shelf names, tags, and reasoning (book titles stay in original language)",
+  "testLanguage": "Test Language",
+  "languageTestResult": "Language Test Result"
 }

@@ -1,5 +1,4 @@
 import '../../../core/services/ai_settings_service.dart';
-import '../../../core/services/ollama_client.dart';
 import '../data/datasources/pdf_scanner_datasource.dart';
 import '../data/datasources/pdf_text_extractor.dart';
 import '../data/datasources/thumbnail_generator_datasource.dart';
@@ -64,16 +63,11 @@ class LibraryDependencies {
 
   void _setupAIUseCases() {
     if (aiSettingsService.isConfigured) {
-      final ollamaClient = OllamaClient(
-        baseUrl: aiSettingsService.ollamaUrl,
-        model: aiSettingsService.ollamaModel,
-      );
       _aiAnalyzeBook = AIAnalyzeBook(
-        ollamaClient: ollamaClient,
+        aiSettings: aiSettingsService,
         textExtractor: _pdfTextExtractor,
-        maxPages: aiSettingsService.maxPages,
       );
-      _aiSortLibrary = AISortLibrary(ollamaClient: ollamaClient);
+      _aiSortLibrary = AISortLibrary(aiSettings: aiSettingsService);
     } else {
       _aiAnalyzeBook = null;
       _aiSortLibrary = null;

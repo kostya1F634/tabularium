@@ -7,6 +7,7 @@ class Shelf extends Equatable {
   final List<String> bookIds;
   final bool isDefault;
   final DateTime createdDate;
+  final List<String> tags; // AI-assigned tags characterizing this shelf
 
   const Shelf({
     required this.id,
@@ -14,6 +15,7 @@ class Shelf extends Equatable {
     required this.bookIds,
     this.isDefault = false,
     required this.createdDate,
+    this.tags = const [],
   });
 
   /// Default "All" shelf ID
@@ -50,6 +52,7 @@ class Shelf extends Equatable {
     List<String>? bookIds,
     bool? isDefault,
     DateTime? createdDate,
+    List<String>? tags,
   }) {
     return Shelf(
       id: id ?? this.id,
@@ -57,6 +60,7 @@ class Shelf extends Equatable {
       bookIds: bookIds ?? this.bookIds,
       isDefault: isDefault ?? this.isDefault,
       createdDate: createdDate ?? this.createdDate,
+      tags: tags ?? this.tags,
     );
   }
 
@@ -87,6 +91,7 @@ class Shelf extends Equatable {
       'bookIds': bookIds,
       'isDefault': isDefault,
       'createdDate': createdDate.toIso8601String(),
+      'tags': tags,
     };
   }
 
@@ -98,9 +103,10 @@ class Shelf extends Equatable {
       bookIds: List<String>.from(json['bookIds'] as List),
       isDefault: json['isDefault'] as bool? ?? false,
       createdDate: DateTime.parse(json['createdDate'] as String),
+      tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : [],
     );
   }
 
   @override
-  List<Object?> get props => [id, name, bookIds, isDefault, createdDate];
+  List<Object?> get props => [id, name, bookIds, isDefault, createdDate, tags];
 }

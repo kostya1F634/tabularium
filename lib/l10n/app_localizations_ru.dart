@@ -428,7 +428,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aiSettings => 'Настройки ИИ';
 
   @override
-  String get aiFullSort => 'Полная сортировка (ИИ)';
+  String get aiFullSort => 'Полная сортировка';
 
   @override
   String get ollamaUrl => 'Ollama URL';
@@ -449,6 +449,13 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get maxPagesHint =>
       'Количество страниц для анализа книги (1-50, начиная со 2-й страницы)';
+
+  @override
+  String get processImages => 'Обрабатывать изображения';
+
+  @override
+  String get processImagesHint =>
+      'Использовать обложку книги как визуальный контекст для анализа (требуется модель с vision)';
 
   @override
   String get testConnection => 'Проверить соединение';
@@ -485,8 +492,24 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get aiRename => 'Анализ (без сортировки)';
+  String get aiRename => 'Авто-заголовки';
+
+  @override
+  String get aiSort => 'Сортировать';
 
   @override
   String get aiTitle => 'ИИ: Название и теги';
+
+  @override
+  String get outputLanguage => 'Язык вывода';
+
+  @override
+  String get outputLanguageHint =>
+      'Язык для названий полок, тегов и размышлений (названия книг остаются на оригинальном языке)';
+
+  @override
+  String get testLanguage => 'Проверить язык';
+
+  @override
+  String get languageTestResult => 'Результат проверки языка';
 }

@@ -80,6 +80,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<AIFullSort>(_onAIFullSort);
     on<AIRenameBooks>(_onAIRenameBooks);
     on<AIAnalyzeSelectedBooks>(_onAIAnalyzeSelectedBooks);
+    on<AISortSelectedBooks>(_onAISortSelectedBooks);
   }
 
   Future<void> _onAIFullSort(
@@ -130,6 +131,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       for (var i = 0; i < unsortedBooks.length; i++) {
         final book = unsortedBooks[i];
 
+        emit(
+          LibraryAIProcessing(
+            'Analyzing books...',
+            progress: i,
+            total: unsortedBooks.length,
+            currentItem: book.title ?? book.fileName,
+          ),
+        );
+
         try {
           final analysis = await _aiAnalyzeBook!(book);
 
@@ -138,6 +148,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
             title: analysis.title ?? book.title,
             author: analysis.author ?? book.author,
             tags: analysis.tags,
+            aiReasoning: analysis.reasoning,
           );
           updatedBooks.add(updatedBook);
 
@@ -146,6 +157,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
               'Analyzing books...',
               progress: i + 1,
               total: unsortedBooks.length,
+              currentItem: updatedBook.title ?? updatedBook.fileName,
             ),
           );
         } catch (e) {
@@ -176,15 +188,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         generalization: _aiSettings.generalization,
       );
 
-      // Step 3: Create new shelves
+      // Step 3: Create new shelves with AI-assigned tags
       var shelves = List<Shelf>.from(newConfig.shelves);
       for (final newShelfName in sortResult.newShelves) {
+        final shelfTags = sortResult.shelfTags[newShelfName] ?? [];
         final newShelf = Shelf(
           id: _generateShelfId(newShelfName),
           name: newShelfName,
           bookIds: [],
           isDefault: false,
           createdDate: DateTime.now(),
+          tags: shelfTags,
         );
         shelves.add(newShelf);
       }
@@ -321,6 +335,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
             title: analysis.title ?? book.title,
             author: analysis.author ?? book.author,
             tags: analysis.tags,
+            aiReasoning: analysis.reasoning,
           );
 
           // Save book to config
@@ -454,6 +469,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
             title: analysis.title ?? book.title,
             author: analysis.author ?? book.author,
             tags: analysis.tags,
+            aiReasoning: analysis.reasoning,
           );
 
           // Save book to config
@@ -515,6 +531,168 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     } catch (e) {
       print('AI analysis failed: $e');
       emit(LibraryError('AI analysis failed: $e'));
+      await Future.delayed(const Duration(seconds: 3));
+      emit(savedState);
+    }
+  }
+
+  Future<void> _onAISortSelectedBooks(
+    AISortSelectedBooks event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+    final currentState = state as LibraryLoaded;
+
+    // Check if AI is configured
+    if (_aiAnalyzeBook == null || _aiSortLibrary == null) {
+      emit(
+        const LibraryError(
+          'AI not configured. Please configure AI settings first.',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+      emit(currentState);
+      return;
+    }
+
+    final savedState = currentState;
+
+    try {
+      emit(const LibraryAIProcessing('Starting AI sort...'));
+
+      // Step 1: Get selected books
+      final selectedBooks = currentState.config.books
+          .where((book) => event.bookIds.contains(book.id))
+          .toList();
+
+      if (selectedBooks.isEmpty) {
+        emit(const LibraryError('No books selected'));
+        await Future.delayed(const Duration(seconds: 2));
+        emit(currentState);
+        return;
+      }
+
+      // Step 2: Analyze each book to get tags and reasoning
+      emit(
+        LibraryAIProcessing(
+          'Analyzing books...',
+          progress: 0,
+          total: selectedBooks.length,
+        ),
+      );
+
+      var newConfig = currentState.config;
+      final updatedBooks = <Book>[];
+
+      for (var i = 0; i < selectedBooks.length; i++) {
+        final book = selectedBooks[i];
+
+        emit(
+          LibraryAIProcessing(
+            'Analyzing books...',
+            progress: i,
+            total: selectedBooks.length,
+            currentItem: book.title ?? book.fileName,
+          ),
+        );
+
+        try {
+          final analysis = await _aiAnalyzeBook!(book);
+
+          // Update book with AI-extracted metadata
+          final updatedBook = book.copyWith(
+            title: analysis.title ?? book.title,
+            author: analysis.author ?? book.author,
+            tags: analysis.tags,
+            aiReasoning: analysis.reasoning,
+          );
+
+          updatedBooks.add(updatedBook);
+
+          // Save book to config
+          final bookIndex = newConfig.books.indexWhere(
+            (b) => b.id == updatedBook.id,
+          );
+          if (bookIndex != -1) {
+            final newBooks = List<Book>.from(newConfig.books);
+            newBooks[bookIndex] = updatedBook;
+            newConfig = newConfig.copyWith(books: newBooks);
+          }
+        } catch (e) {
+          print('Error analyzing book ${book.fileName}: $e');
+          updatedBooks.add(book); // Use original book if analysis fails
+        }
+      }
+
+      // Step 3: Sort books into shelves
+      emit(const LibraryAIProcessing('Organizing into shelves...'));
+
+      final sortResult = await _aiSortLibrary!(
+        books: updatedBooks,
+        existingShelves: currentState.config.shelves,
+        generalization: _aiSettings.generalization,
+      );
+
+      // Step 4: Create new shelves with AI-assigned tags
+      var shelves = List<Shelf>.from(newConfig.shelves);
+      for (final newShelfName in sortResult.newShelves) {
+        final shelfTags = sortResult.shelfTags[newShelfName] ?? [];
+        final newShelf = Shelf(
+          id: _generateShelfId(newShelfName),
+          name: newShelfName,
+          bookIds: [],
+          isDefault: false,
+          createdDate: DateTime.now(),
+          tags: shelfTags,
+        );
+        shelves.add(newShelf);
+      }
+
+      // Step 5: Assign books to shelves
+      for (final assignment in sortResult.assignments) {
+        final book = updatedBooks.firstWhere(
+          (b) => b.filePath == assignment.filePath,
+          orElse: () => updatedBooks.first,
+        );
+        final shelfIndex = shelves.indexWhere(
+          (s) => s.name == assignment.shelfName,
+        );
+
+        // Add book to the target shelf
+        if (shelfIndex != -1 &&
+            !shelves[shelfIndex].bookIds.contains(book.id)) {
+          final updatedShelf = shelves[shelfIndex].copyWith(
+            bookIds: [...shelves[shelfIndex].bookIds, book.id],
+          );
+          shelves[shelfIndex] = updatedShelf;
+        }
+      }
+
+      newConfig = newConfig.copyWith(shelves: shelves);
+
+      // Save config
+      await _saveLibrary(newConfig);
+
+      // Update displayed books for current shelf
+      final booksForShelf = _getBooksForShelf(
+        newConfig,
+        currentState.selectedShelf.id,
+      );
+      final updatedDisplayedBooks = _getSortedBooks(
+        booksForShelf,
+        currentState.sortOption,
+        currentState.searchQuery,
+      );
+
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+    } catch (e) {
+      print('Error during AI sort: $e');
+      emit(LibraryError('AI sort failed: $e'));
       await Future.delayed(const Duration(seconds: 3));
       emit(savedState);
     }
