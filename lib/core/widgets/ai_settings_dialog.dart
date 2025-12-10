@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../l10n/app_localizations.dart';
 import '../services/ai_settings_service.dart';
 import '../services/ollama_client.dart';
@@ -9,6 +10,7 @@ class AISettingsDialog extends StatefulWidget {
   final String initialUrl;
   final String initialModel;
   final double initialGeneralization;
+  final int initialMaxPages;
   final AISettingsService aiSettingsService;
 
   const AISettingsDialog({
@@ -16,6 +18,7 @@ class AISettingsDialog extends StatefulWidget {
     required this.initialUrl,
     required this.initialModel,
     required this.initialGeneralization,
+    required this.initialMaxPages,
     required this.aiSettingsService,
   });
 
@@ -26,7 +29,8 @@ class AISettingsDialog extends StatefulWidget {
 class _AISettingsDialogState extends State<AISettingsDialog> {
   late TextEditingController _urlController;
   late TextEditingController _modelController;
-  late double _generalization;
+  late TextEditingController _generalizationController;
+  late TextEditingController _maxPagesController;
   String? _connectionStatus;
   bool _testing = false;
 
@@ -35,13 +39,20 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
     super.initState();
     _urlController = TextEditingController(text: widget.initialUrl);
     _modelController = TextEditingController(text: widget.initialModel);
-    _generalization = widget.initialGeneralization;
+    _generalizationController = TextEditingController(
+      text: (widget.initialGeneralization * 100).round().toString(),
+    );
+    _maxPagesController = TextEditingController(
+      text: widget.initialMaxPages.toString(),
+    );
   }
 
   @override
   void dispose() {
     _urlController.dispose();
     _modelController.dispose();
+    _generalizationController.dispose();
+    _maxPagesController.dispose();
     super.dispose();
   }
 
@@ -68,9 +79,18 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
   }
 
   Future<void> _save() async {
+    // Parse generalization (0-100) to 0.0-1.0
+    final generalizationValue =
+        int.tryParse(_generalizationController.text) ?? 50;
+    final generalization = (generalizationValue.clamp(0, 100) / 100.0);
+
+    // Parse max pages (1-50)
+    final maxPages = int.tryParse(_maxPagesController.text) ?? 3;
+
     await widget.aiSettingsService.setOllamaUrl(_urlController.text);
     await widget.aiSettingsService.setOllamaModel(_modelController.text);
-    await widget.aiSettingsService.setGeneralization(_generalization);
+    await widget.aiSettingsService.setGeneralization(generalization);
+    await widget.aiSettingsService.setMaxPages(maxPages);
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -143,27 +163,49 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
               ),
               const SizedBox(height: 24),
 
-              // Generalization slider
-              Text(
-                l10n.generalization,
-                style: Theme.of(context).textTheme.titleSmall,
+              // Generalization (0-100)
+              TextField(
+                controller: _generalizationController,
+                decoration: InputDecoration(
+                  labelText: l10n.generalization,
+                  hintText: '50',
+                  helperText: l10n.generalizationHint,
+                  border: const OutlineInputBorder(),
+                  suffixText: '%',
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  TextInputFormatter.withFunction((oldValue, newValue) {
+                    if (newValue.text.isEmpty) return newValue;
+                    final value = int.tryParse(newValue.text);
+                    if (value == null || value > 100) return oldValue;
+                    return newValue;
+                  }),
+                ],
               ),
-              const SizedBox(height: 8),
-              Slider(
-                value: _generalization,
-                min: 0.0,
-                max: 1.0,
-                divisions: 10,
-                label: _generalization.toStringAsFixed(1),
-                onChanged: (value) {
-                  setState(() {
-                    _generalization = value;
-                  });
-                },
-              ),
-              Text(
-                l10n.generalizationHint,
-                style: Theme.of(context).textTheme.bodySmall,
+              const SizedBox(height: 16),
+
+              // Max pages (1-50)
+              TextField(
+                controller: _maxPagesController,
+                decoration: InputDecoration(
+                  labelText: l10n.maxPages,
+                  hintText: '3',
+                  helperText: l10n.maxPagesHint,
+                  border: const OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  TextInputFormatter.withFunction((oldValue, newValue) {
+                    if (newValue.text.isEmpty) return newValue;
+                    final value = int.tryParse(newValue.text);
+                    if (value == null || value < 1 || value > 50)
+                      return oldValue;
+                    return newValue;
+                  }),
+                ],
               ),
             ],
           ),

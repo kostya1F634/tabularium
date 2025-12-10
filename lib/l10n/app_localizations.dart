@@ -921,8 +921,20 @@ abstract class AppLocalizations {
   /// No description provided for @generalizationHint.
   ///
   /// In en, this message translates to:
-  /// **'0 = many specific shelves, 1 = few broad shelves'**
+  /// **'0 = many specific shelves, 100 = few broad shelves'**
   String get generalizationHint;
+
+  /// No description provided for @maxPages.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Pages'**
+  String get maxPages;
+
+  /// No description provided for @maxPagesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of pages to read per book (1-50, starting from page 2)'**
+  String get maxPagesHint;
 
   /// No description provided for @testConnection.
   ///
@@ -983,6 +995,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} new shelves created'**
   String shelvesCreated(int count);
+
+  /// No description provided for @aiRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze (no sorting)'**
+  String get aiRename;
+
+  /// No description provided for @aiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI: Title & Tags'**
+  String get aiTitle;
 }
 
 class _AppLocalizationsDelegate

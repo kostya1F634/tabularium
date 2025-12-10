@@ -582,6 +582,18 @@ class _BookCard extends StatelessWidget {
               ],
             ),
           ),
+        const PopupMenuDivider(),
+        PopupMenuItem<String>(
+          value: 'ai_title',
+          child: Row(
+            children: [
+              const Icon(Icons.auto_awesome, size: 18),
+              const SizedBox(width: 8),
+              Text(l10n.aiTitle),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(),
         PopupMenuItem<String>(
           value: 'delete',
           child: Row(
@@ -718,6 +730,14 @@ class _BookCard extends StatelessWidget {
           if (confirmed == true && context.mounted) {
             bloc.add(DeleteBookPermanently(book.id));
           }
+          break;
+        case 'ai_title':
+          // Determine which books to analyze: if selection exists, analyze selected books; otherwise, analyze clicked book
+          final booksToAnalyze = state.hasSelection
+              ? state.selectedBookIds.toList()
+              : [book.id];
+
+          bloc.add(AIAnalyzeSelectedBooks(bookIds: booksToAnalyze));
           break;
         case 'properties':
           showDialog(

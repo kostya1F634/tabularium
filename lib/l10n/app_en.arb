@@ -558,7 +558,9 @@
   "ollamaUrl": "Ollama URL",
   "ollamaModel": "Ollama Model",
   "generalization": "Generalization",
-  "generalizationHint": "0 = many specific shelves, 1 = few broad shelves",
+  "generalizationHint": "0 = many specific shelves, 100 = few broad shelves",
+  "maxPages": "Max Pages",
+  "maxPagesHint": "Number of pages to read per book (1-50, starting from page 2)",
   "testConnection": "Test Connection",
   "connectionSuccess": "Connection successful!",
   "connectionFailed": "Connection failed",
@@ -584,5 +586,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "aiRename": "Analyze (no sorting)",
+  "aiTitle": "AI: Title & Tags"
 }

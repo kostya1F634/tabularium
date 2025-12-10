@@ -441,7 +441,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get generalizationHint =>
-      '0 = много узких полок, 1 = мало широких полок';
+      '0 = много узких полок, 100 = мало широких полок';
+
+  @override
+  String get maxPages => 'Макс. страниц';
+
+  @override
+  String get maxPagesHint =>
+      'Количество страниц для анализа книги (1-50, начиная со 2-й страницы)';
 
   @override
   String get testConnection => 'Проверить соединение';
@@ -476,4 +483,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String shelvesCreated(int count) {
     return 'Создано новых полок: $count';
   }
+
+  @override
+  String get aiRename => 'Анализ (без сортировки)';
+
+  @override
+  String get aiTitle => 'ИИ: Название и теги';
 }

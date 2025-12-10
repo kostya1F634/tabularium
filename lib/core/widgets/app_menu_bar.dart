@@ -138,11 +138,14 @@ class AppMenuBar extends StatelessWidget {
                     initialUrl: aiSettings.ollamaUrl,
                     initialModel: aiSettings.ollamaModel,
                     initialGeneralization: aiSettings.generalization,
+                    initialMaxPages: aiSettings.maxPages,
                     aiSettingsService: aiSettings,
                   ),
                 );
               } else if (value == 'fullsort') {
                 context.read<LibraryBloc>().add(const AIFullSort());
+              } else if (value == 'rename') {
+                context.read<LibraryBloc>().add(const AIRenameBooks());
               }
             },
             itemBuilder: (context) {
@@ -166,6 +169,16 @@ class AppMenuBar extends StatelessWidget {
                       const Icon(Icons.auto_awesome, size: 16),
                       const SizedBox(width: 8),
                       Text(l10n.aiFullSort),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'rename',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.edit, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiRename),
                     ],
                   ),
                 ),

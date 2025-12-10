@@ -422,7 +422,14 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get generalizationHint =>
-      '0 = many specific shelves, 1 = few broad shelves';
+      '0 = many specific shelves, 100 = few broad shelves';
+
+  @override
+  String get maxPages => 'Max Pages';
+
+  @override
+  String get maxPagesHint =>
+      'Number of pages to read per book (1-50, starting from page 2)';
 
   @override
   String get testConnection => 'Test Connection';
@@ -457,4 +464,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String shelvesCreated(int count) {
     return '$count new shelves created';
   }
+
+  @override
+  String get aiRename => 'Analyze (no sorting)';
+
+  @override
+  String get aiTitle => 'AI: Title & Tags';
 }

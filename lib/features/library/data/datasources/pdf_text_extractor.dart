@@ -3,9 +3,15 @@ import 'package:pdfrx/pdfrx.dart';
 
 /// Service for extracting text from PDF files
 class PdfTextExtractor {
-  /// Extract text from first N pages of a PDF file
+  /// Extract text from PDF file
+  /// [startPage] - 1-based page number to start from (default: 1)
+  /// [maxPages] - maximum number of pages to extract (default: 3)
   /// Returns the extracted text
-  Future<String> extractText(String filePath, {int maxPages = 3}) async {
+  Future<String> extractText(
+    String filePath, {
+    int startPage = 1,
+    int maxPages = 3,
+  }) async {
     try {
       final file = File(filePath);
       if (!await file.exists()) {
@@ -17,9 +23,12 @@ class PdfTextExtractor {
 
       final buffer = StringBuffer();
       final totalPages = doc.pages.length;
-      final pagesToExtract = maxPages < totalPages ? maxPages : totalPages;
 
-      for (int i = 0; i < pagesToExtract; i++) {
+      // Convert 1-based startPage to 0-based index
+      final startIndex = (startPage - 1).clamp(0, totalPages - 1);
+      final endIndex = (startIndex + maxPages).clamp(0, totalPages);
+
+      for (int i = startIndex; i < endIndex; i++) {
         final page = doc.pages[i];
         final text = await page.loadText();
 

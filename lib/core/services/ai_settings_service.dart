@@ -6,16 +6,19 @@ class AISettingsService extends ChangeNotifier {
   static const String _ollamaUrlKey = 'ai_ollama_url';
   static const String _ollamaModelKey = 'ai_ollama_model';
   static const String _generalizationKey = 'ai_generalization';
+  static const String _maxPagesKey = 'ai_max_pages';
 
   final AppSettings _prefs;
   String _ollamaUrl;
   String _ollamaModel;
   double _generalization;
+  int _maxPages;
 
   AISettingsService(this._prefs)
     : _ollamaUrl = _prefs.getString(_ollamaUrlKey) ?? 'http://127.0.0.1:11434',
       _ollamaModel = _prefs.getString(_ollamaModelKey) ?? 'deepseek-r1:1.5b',
-      _generalization = _prefs.getDouble(_generalizationKey) ?? 0.5;
+      _generalization = _prefs.getDouble(_generalizationKey) ?? 0.5,
+      _maxPages = _prefs.getInt(_maxPagesKey) ?? 3;
 
   /// Ollama server URL
   String get ollamaUrl => _ollamaUrl;
@@ -25,6 +28,9 @@ class AISettingsService extends ChangeNotifier {
 
   /// Generalization level (0.0 = maximize splitting, 1.0 = maximize grouping)
   double get generalization => _generalization;
+
+  /// Maximum pages to analyze per book (1-50)
+  int get maxPages => _maxPages;
 
   /// Check if AI is configured
   bool get isConfigured => _ollamaUrl.isNotEmpty && _ollamaModel.isNotEmpty;
@@ -50,6 +56,15 @@ class AISettingsService extends ChangeNotifier {
     if (_generalization == value) return;
     _generalization = value;
     await _prefs.setDouble(_generalizationKey, value);
+    notifyListeners();
+  }
+
+  /// Set maximum pages to analyze (1-50)
+  Future<void> setMaxPages(int pages) async {
+    final clampedPages = pages.clamp(1, 50);
+    if (_maxPages == clampedPages) return;
+    _maxPages = clampedPages;
+    await _prefs.setInt(_maxPagesKey, clampedPages);
     notifyListeners();
   }
 }

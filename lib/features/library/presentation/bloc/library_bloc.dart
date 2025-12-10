@@ -78,6 +78,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<ToggleFocusedBookSelection>(_onToggleFocusedBookSelection);
     on<SaveFocusArea>(_onSaveFocusArea);
     on<AIFullSort>(_onAIFullSort);
+    on<AIRenameBooks>(_onAIRenameBooks);
+    on<AIAnalyzeSelectedBooks>(_onAIAnalyzeSelectedBooks);
   }
 
   Future<void> _onAIFullSort(
@@ -248,6 +250,273 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       emit(LibraryError('AI sort failed: $e'));
       await Future.delayed(const Duration(seconds: 3));
       emit(currentState);
+    }
+  }
+
+  Future<void> _onAIRenameBooks(
+    AIRenameBooks event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+    final currentState = state as LibraryLoaded;
+
+    // Check if AI is configured
+    if (_aiAnalyzeBook == null) {
+      emit(
+        const LibraryError(
+          'AI not configured. Please configure AI settings first.',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+      emit(currentState);
+      return;
+    }
+
+    final savedState = currentState;
+
+    try {
+      emit(const LibraryAIProcessing('Starting AI analysis...'));
+
+      // Get unsorted books
+      final unsortedBooks = _getBooksForShelf(
+        currentState.config,
+        Shelf.unsortedShelfId,
+      );
+
+      if (unsortedBooks.isEmpty) {
+        emit(const LibraryError('No books in Unsorted shelf to analyze'));
+        await Future.delayed(const Duration(seconds: 2));
+        emit(currentState);
+        return;
+      }
+
+      // Analyze each book
+      emit(
+        LibraryAIProcessing(
+          'Analyzing books...',
+          progress: 0,
+          total: unsortedBooks.length,
+        ),
+      );
+
+      var newConfig = currentState.config;
+
+      for (var i = 0; i < unsortedBooks.length; i++) {
+        final book = unsortedBooks[i];
+
+        emit(
+          LibraryAIProcessing(
+            'Analyzing books...',
+            progress: i,
+            total: unsortedBooks.length,
+            currentItem: book.title ?? book.fileName,
+          ),
+        );
+
+        try {
+          final analysis = await _aiAnalyzeBook!(book);
+
+          // Update book with AI-extracted metadata
+          final updatedBook = book.copyWith(
+            title: analysis.title ?? book.title,
+            author: analysis.author ?? book.author,
+            tags: analysis.tags,
+          );
+
+          // Save book to config
+          final bookIndex = newConfig.books.indexWhere(
+            (b) => b.id == updatedBook.id,
+          );
+          if (bookIndex != -1) {
+            final newBooks = List<Book>.from(newConfig.books);
+            newBooks[bookIndex] = updatedBook;
+            newConfig = newConfig.copyWith(books: newBooks);
+            await _saveLibrary(newConfig);
+          }
+
+          emit(
+            LibraryAIProcessing(
+              'Analyzing books...',
+              progress: i + 1,
+              total: unsortedBooks.length,
+              currentItem: updatedBook.title ?? updatedBook.fileName,
+            ),
+          );
+        } catch (e) {
+          print('Error analyzing book ${book.fileName}: $e');
+        }
+      }
+
+      // Update displayed books
+      final booksForShelf = _getBooksForShelf(
+        newConfig,
+        currentState.selectedShelf.id,
+      );
+      final updatedDisplayedBooks = _getSortedBooks(
+        booksForShelf,
+        currentState.sortOption,
+        currentState.searchQuery,
+      );
+
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+
+      // Show success message
+      emit(
+        LibraryAIProcessing(
+          'Analysis complete! ${unsortedBooks.length} books analyzed',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+    } catch (e) {
+      print('AI rename failed: $e');
+      emit(LibraryError('AI rename failed: $e'));
+      await Future.delayed(const Duration(seconds: 3));
+      emit(savedState);
+    }
+  }
+
+  Future<void> _onAIAnalyzeSelectedBooks(
+    AIAnalyzeSelectedBooks event,
+    Emitter<LibraryState> emit,
+  ) async {
+    if (state is! LibraryLoaded) return;
+    final currentState = state as LibraryLoaded;
+
+    // Check if AI is configured
+    if (_aiAnalyzeBook == null) {
+      emit(
+        const LibraryError(
+          'AI not configured. Please configure AI settings first.',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+      emit(currentState);
+      return;
+    }
+
+    final savedState = currentState;
+
+    try {
+      emit(const LibraryAIProcessing('Starting AI analysis...'));
+
+      // Get selected books
+      final selectedBooks = currentState.config.books
+          .where((book) => event.bookIds.contains(book.id))
+          .toList();
+
+      if (selectedBooks.isEmpty) {
+        emit(const LibraryError('No books selected'));
+        await Future.delayed(const Duration(seconds: 2));
+        emit(currentState);
+        return;
+      }
+
+      // Analyze each book
+      emit(
+        LibraryAIProcessing(
+          'Analyzing books...',
+          progress: 0,
+          total: selectedBooks.length,
+        ),
+      );
+
+      var newConfig = currentState.config;
+
+      for (var i = 0; i < selectedBooks.length; i++) {
+        final book = selectedBooks[i];
+
+        emit(
+          LibraryAIProcessing(
+            'Analyzing books...',
+            progress: i,
+            total: selectedBooks.length,
+            currentItem: book.title ?? book.fileName,
+          ),
+        );
+
+        try {
+          final analysis = await _aiAnalyzeBook!(book);
+
+          // Update book with AI-extracted metadata
+          final updatedBook = book.copyWith(
+            title: analysis.title ?? book.title,
+            author: analysis.author ?? book.author,
+            tags: analysis.tags,
+          );
+
+          // Save book to config
+          final bookIndex = newConfig.books.indexWhere(
+            (b) => b.id == updatedBook.id,
+          );
+          if (bookIndex != -1) {
+            final newBooks = List<Book>.from(newConfig.books);
+            newBooks[bookIndex] = updatedBook;
+            newConfig = newConfig.copyWith(books: newBooks);
+            await _saveLibrary(newConfig);
+          }
+
+          emit(
+            LibraryAIProcessing(
+              'Analyzing books...',
+              progress: i + 1,
+              total: selectedBooks.length,
+              currentItem: updatedBook.title ?? updatedBook.fileName,
+            ),
+          );
+        } catch (e) {
+          print('Error analyzing book ${book.fileName}: $e');
+        }
+      }
+
+      // Update displayed books
+      final booksForShelf = _getBooksForShelf(
+        newConfig,
+        currentState.selectedShelf.id,
+      );
+      final updatedDisplayedBooks = _getSortedBooks(
+        booksForShelf,
+        currentState.sortOption,
+        currentState.searchQuery,
+      );
+
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+
+      // Show success message
+      emit(
+        LibraryAIProcessing(
+          'Analysis complete! ${selectedBooks.length} books analyzed',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+    } catch (e) {
+      print('AI analysis failed: $e');
+      emit(LibraryError('AI analysis failed: $e'));
+      await Future.delayed(const Duration(seconds: 3));
+      emit(savedState);
     }
   }
 

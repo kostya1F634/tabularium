@@ -10,22 +10,32 @@ class OllamaClient {
 
   /// Generate completion from Ollama
   /// Returns the generated text
+  ///
+  /// If [format] is provided, enforces structured output via JSON schema
   Future<String> generate({
     required String prompt,
     double temperature = 0.7,
+    Map<String, dynamic>? format,
   }) async {
     final url = Uri.parse('$baseUrl/api/generate');
 
     try {
+      final requestBody = {
+        'model': model,
+        'prompt': prompt,
+        'stream': false,
+        'options': {'temperature': temperature},
+      };
+
+      // Add format if provided (for structured outputs)
+      if (format != null) {
+        requestBody['format'] = format;
+      }
+
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'model': model,
-          'prompt': prompt,
-          'stream': false,
-          'options': {'temperature': temperature},
-        }),
+        body: jsonEncode(requestBody),
       );
 
       if (response.statusCode == 200) {
@@ -54,7 +64,8 @@ class OllamaClient {
 
   /// Parse JSON from AI response
   /// Extracts JSON from markdown code blocks or raw JSON
-  Map<String, dynamic> parseJsonResponse(String response) {
+  /// Returns dynamic to support both objects and arrays
+  dynamic parseJsonResponse(String response) {
     // Remove markdown code blocks if present
     String cleaned = response.trim();
 
@@ -65,15 +76,15 @@ class OllamaClient {
       cleaned = match.group(1)!.trim();
     }
 
-    // Try to extract JSON object
-    final jsonRegex = RegExp(r'\{[\s\S]*\}');
+    // Try to extract JSON (object or array)
+    final jsonRegex = RegExp(r'[\{\[][\s\S]*[\}\]]');
     final jsonMatch = jsonRegex.firstMatch(cleaned);
     if (jsonMatch != null) {
       cleaned = jsonMatch.group(0)!;
     }
 
     try {
-      return jsonDecode(cleaned) as Map<String, dynamic>;
+      return jsonDecode(cleaned);
     } catch (e) {
       throw Exception(
         'Failed to parse JSON from AI response: $e\nResponse: $response',

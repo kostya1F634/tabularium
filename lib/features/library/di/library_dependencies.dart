@@ -71,6 +71,7 @@ class LibraryDependencies {
       _aiAnalyzeBook = AIAnalyzeBook(
         ollamaClient: ollamaClient,
         textExtractor: _pdfTextExtractor,
+        maxPages: aiSettingsService.maxPages,
       );
       _aiSortLibrary = AISortLibrary(ollamaClient: ollamaClient);
     } else {

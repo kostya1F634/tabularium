@@ -52,6 +52,18 @@ class AIProgressDialog extends StatelessWidget {
                     '${state.progress} / ${state.total}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
+                  if (state.currentItem != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      state.currentItem!,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
               ],
             ),

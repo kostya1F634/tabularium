@@ -61,115 +61,192 @@ enum AppThemeMode {
 class AppTheme {
   static const Color primaryColor = Color(0xFF6B4EFF);
 
+  /// Apply macOS design system to any theme
+  static ThemeData _applyMacOSDesign(ThemeData theme) {
+    return theme.copyWith(
+      // Rounded corners everywhere
+      cardTheme: theme.cardTheme.copyWith(
+        elevation: 0,
+        shadowColor: Colors.black.withOpacity(0.05),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: theme.dividerColor.withOpacity(0.3),
+            width: 0.5,
+          ),
+        ),
+      ),
+      // Flat buttons with rounded corners
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      // Rounded input fields
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: theme.dividerColor, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: theme.dividerColor, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
+        ),
+      ),
+      // Rounded popups
+      popupMenuTheme: PopupMenuThemeData(
+        elevation: 8,
+        shadowColor: Colors.black.withOpacity(0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+      // Rounded dialogs
+      dialogTheme: DialogThemeData(
+        elevation: 8,
+        shadowColor: Colors.black.withOpacity(0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      // Thin dividers
+      dividerTheme: DividerThemeData(
+        thickness: 0.5,
+        space: 0.5,
+        color: theme.dividerColor,
+      ),
+    );
+  }
+
   static ThemeData getTheme(AppThemeMode mode) {
     switch (mode) {
       // Default (always first)
       case AppThemeMode.light:
-        return _lightTheme();
+        return _applyMacOSDesign(_lightTheme());
       case AppThemeMode.dark:
-        return _darkTheme();
+        return _applyMacOSDesign(_darkTheme());
 
       // All other themes in alphabetical order
       case AppThemeMode.akane:
-        return _akaneTheme();
+        return _applyMacOSDesign(_akaneTheme());
       case AppThemeMode.atomOneDark:
-        return _atomOneDarkTheme();
+        return _applyMacOSDesign(_atomOneDarkTheme());
       case AppThemeMode.atomOneLight:
-        return _atomOneLightTheme();
+        return _applyMacOSDesign(_atomOneLightTheme());
       case AppThemeMode.ayuDark:
-        return _ayuDarkTheme();
+        return _applyMacOSDesign(_ayuDarkTheme());
       case AppThemeMode.ayuLight:
-        return _ayuLightTheme();
+        return _applyMacOSDesign(_ayuLightTheme());
       case AppThemeMode.aura:
-        return _auraTheme();
+        return _applyMacOSDesign(_auraTheme());
       case AppThemeMode.azureGlow:
-        return _azureGlowTheme();
+        return _applyMacOSDesign(_azureGlowTheme());
       case AppThemeMode.batou:
-        return _batouTheme();
+        return _applyMacOSDesign(_batouTheme());
       case AppThemeMode.catppuccinLatte:
-        return _catppuccinLatteTheme();
+        return _applyMacOSDesign(_catppuccinLatteTheme());
       case AppThemeMode.catppuccinMocha:
-        return _catppuccinMochaTheme();
+        return _applyMacOSDesign(_catppuccinMochaTheme());
       case AppThemeMode.dracula:
-        return _draculaTheme();
+        return _applyMacOSDesign(_draculaTheme());
       case AppThemeMode.everforestDark:
-        return _everforestDarkTheme();
+        return _applyMacOSDesign(_everforestDarkTheme());
       case AppThemeMode.everforestLight:
-        return _everforestLightTheme();
+        return _applyMacOSDesign(_everforestLightTheme());
       case AppThemeMode.flexokiDark:
-        return _flexokiDarkTheme();
+        return _applyMacOSDesign(_flexokiDarkTheme());
       case AppThemeMode.flexokiLight:
-        return _flexokiLightTheme();
+        return _applyMacOSDesign(_flexokiLightTheme());
       case AppThemeMode.felix:
-        return _felixTheme();
+        return _applyMacOSDesign(_felixTheme());
       case AppThemeMode.futurism:
-        return _futurismTheme();
+        return _applyMacOSDesign(_futurismTheme());
       case AppThemeMode.githubDark:
-        return _githubDarkTheme();
+        return _applyMacOSDesign(_githubDarkTheme());
       case AppThemeMode.githubDimmed:
-        return _githubDimmedTheme();
+        return _applyMacOSDesign(_githubDimmedTheme());
       case AppThemeMode.githubLight:
-        return _githubLightTheme();
+        return _applyMacOSDesign(_githubLightTheme());
       case AppThemeMode.greenGarden:
-        return _greenGardenTheme();
+        return _applyMacOSDesign(_greenGardenTheme());
       case AppThemeMode.gruber:
-        return _gruberTheme();
+        return _applyMacOSDesign(_gruberTheme());
       case AppThemeMode.grudark:
-        return _grudarkTheme();
+        return _applyMacOSDesign(_grudarkTheme());
       case AppThemeMode.gruvboxDark:
-        return _gruvboxDarkTheme();
+        return _applyMacOSDesign(_gruvboxDarkTheme());
       case AppThemeMode.gruvboxLight:
-        return _gruvboxLightTheme();
+        return _applyMacOSDesign(_gruvboxLightTheme());
       case AppThemeMode.highContrast:
-        return _highContrastTheme();
+        return _applyMacOSDesign(_highContrastTheme());
       case AppThemeMode.kanagawa:
-        return _kanagawaTheme();
+        return _applyMacOSDesign(_kanagawaTheme());
       case AppThemeMode.materialDark:
-        return _materialDarkTheme();
+        return _applyMacOSDesign(_materialDarkTheme());
       case AppThemeMode.materialLight:
-        return _materialLightTheme();
+        return _applyMacOSDesign(_materialLightTheme());
       case AppThemeMode.mars:
-        return _marsTheme();
+        return _applyMacOSDesign(_marsTheme());
       case AppThemeMode.matteBlack:
-        return _matteBlackTheme();
+        return _applyMacOSDesign(_matteBlackTheme());
       case AppThemeMode.milkyMatcha:
-        return _milkyMatchaTheme();
+        return _applyMacOSDesign(_milkyMatchaTheme());
       case AppThemeMode.monokai:
-        return _monokaiTheme();
+        return _applyMacOSDesign(_monokaiTheme());
       case AppThemeMode.monochrome:
-        return _monochromeTheme();
+        return _applyMacOSDesign(_monochromeTheme());
       case AppThemeMode.nordDark:
-        return _nordDarkTheme();
+        return _applyMacOSDesign(_nordDarkTheme());
       case AppThemeMode.nordLight:
-        return _nordLightTheme();
+        return _applyMacOSDesign(_nordLightTheme());
       case AppThemeMode.osakaJade:
-        return _osakaJadeTheme();
+        return _applyMacOSDesign(_osakaJadeTheme());
       case AppThemeMode.paper:
-        return _paperTheme();
+        return _applyMacOSDesign(_paperTheme());
       case AppThemeMode.pulsar:
-        return _pulsarTheme();
+        return _applyMacOSDesign(_pulsarTheme());
       case AppThemeMode.realistic:
-        return _realisticTheme();
+        return _applyMacOSDesign(_realisticTheme());
       case AppThemeMode.ristretto:
-        return _ristrettoTheme();
+        return _applyMacOSDesign(_ristrettoTheme());
       case AppThemeMode.retroPC:
-        return _retroPCTheme();
+        return _applyMacOSDesign(_retroPCTheme());
       case AppThemeMode.rosePineDawn:
-        return _rosePineDawnTheme();
+        return _applyMacOSDesign(_rosePineDawnTheme());
       case AppThemeMode.rosePineMoon:
-        return _rosePineMoonTheme();
+        return _applyMacOSDesign(_rosePineMoonTheme());
       case AppThemeMode.snow:
-        return _snowTheme();
+        return _applyMacOSDesign(_snowTheme());
       case AppThemeMode.solarizedDark:
-        return _solarizedDarkTheme();
+        return _applyMacOSDesign(_solarizedDarkTheme());
       case AppThemeMode.solarizedLight:
-        return _solarizedLightTheme();
+        return _applyMacOSDesign(_solarizedLightTheme());
       case AppThemeMode.solarizedOsaka:
-        return _solarizedOsakaTheme();
+        return _applyMacOSDesign(_solarizedOsakaTheme());
       case AppThemeMode.spaceMonkey:
-        return _spaceMonkeyTheme();
+        return _applyMacOSDesign(_spaceMonkeyTheme());
       case AppThemeMode.tokyoNight:
-        return _tokyoNightTheme();
+        return _applyMacOSDesign(_tokyoNightTheme());
     }
   }
 

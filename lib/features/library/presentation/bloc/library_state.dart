@@ -116,9 +116,15 @@ class LibraryAIProcessing extends LibraryState {
   final String message;
   final int? progress; // Current progress (e.g., books analyzed)
   final int? total; // Total items to process
+  final String? currentItem; // Current book/item being processed
 
-  const LibraryAIProcessing(this.message, {this.progress, this.total});
+  const LibraryAIProcessing(
+    this.message, {
+    this.progress,
+    this.total,
+    this.currentItem,
+  });
 
   @override
-  List<Object?> get props => [message, progress, total];
+  List<Object?> get props => [message, progress, total, currentItem];
 }

@@ -137,7 +137,9 @@
   "ollamaUrl": "Ollama URL",
   "ollamaModel": "Модель Ollama",
   "generalization": "Обобщение",
-  "generalizationHint": "0 = много узких полок, 1 = мало широких полок",
+  "generalizationHint": "0 = много узких полок, 100 = мало широких полок",
+  "maxPages": "Макс. страниц",
+  "maxPagesHint": "Количество страниц для анализа книги (1-50, начиная со 2-й страницы)",
   "testConnection": "Проверить соединение",
   "connectionSuccess": "Соединение установлено!",
   "connectionFailed": "Ошибка соединения",
@@ -147,5 +149,7 @@
   "aiSortComplete": "Сортировка ИИ завершена",
   "aiSortFailed": "Ошибка сортировки ИИ",
   "booksAnalyzed": "Проанализировано книг: {count}",
-  "shelvesCreated": "Создано новых полок: {count}"
+  "shelvesCreated": "Создано новых полок: {count}",
+  "aiRename": "Анализ (без сортировки)",
+  "aiTitle": "ИИ: Название и теги"
 }

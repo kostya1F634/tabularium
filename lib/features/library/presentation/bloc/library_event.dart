@@ -315,3 +315,18 @@ class SaveFocusArea extends LibraryEvent {
 class AIFullSort extends LibraryEvent {
   const AIFullSort();
 }
+
+/// AI Rename: Analyze all books and update metadata (no shelf organization)
+class AIRenameBooks extends LibraryEvent {
+  const AIRenameBooks();
+}
+
+/// AI Title: Analyze specific books and update their metadata
+class AIAnalyzeSelectedBooks extends LibraryEvent {
+  final List<String> bookIds;
+
+  const AIAnalyzeSelectedBooks({required this.bookIds});
+
+  @override
+  List<Object?> get props => [bookIds];
+}
