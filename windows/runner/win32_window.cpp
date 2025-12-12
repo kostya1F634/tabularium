@@ -296,8 +296,14 @@ void Win32Window::UpdateTheme(HWND const window) {
                           &enable_dark_mode, sizeof(enable_dark_mode));
   }
 
-  // Fix thick black border issue on Windows by setting border color to transparent
+  // Fix thick black border issue on Windows by extending frame into client area
+  // This removes the thick black border that can appear on some systems
   // See: https://github.com/flutter/flutter/issues/76465
+  // See: https://handmade.network/forums/articles/t/9073-custom_window_title_bar_and_almost_correctly_drawing_windows_10_borders
+
+  MARGINS margins = {0, 0, 0, 0};
+  DwmExtendFrameIntoClientArea(window, &margins);
+
   COLORREF border_color = DWMWA_COLOR_NONE; // Transparent border
   DwmSetWindowAttribute(window, DWMWA_BORDER_COLOR,
                         &border_color, sizeof(border_color));
