@@ -778,7 +778,22 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
               }
             } else if (_isAIDialogShown) {
               _isAIDialogShown = false;
-              Navigator.of(context).pop();
+              print('DEBUG: Closing AI dialog, state: ${state.runtimeType}');
+              // Close the dialog by popping it
+              // Only pop if we can safely pop (dialog is actually shown)
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  final canPop = Navigator.of(
+                    context,
+                    rootNavigator: false,
+                  ).canPop();
+                  print('DEBUG: Can pop dialog: $canPop, mounted: $mounted');
+                  if (canPop) {
+                    Navigator.of(context, rootNavigator: false).pop();
+                    print('DEBUG: Dialog popped');
+                  }
+                }
+              });
             }
 
             // Restore focus area when library loads (only once)
@@ -971,12 +986,6 @@ class _LibraryScreenContentState extends State<_LibraryScreenContent> {
                                 onRegisterCheckFocusCallback: (callback) {
                                   _isSearchFocused = callback;
                                 },
-                              ),
-                              Container(
-                                height: 3,
-                                color: _currentFocus == FocusArea.books
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).dividerColor,
                               ),
                               // Books grid
                               Expanded(

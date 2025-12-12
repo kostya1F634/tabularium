@@ -13,6 +13,10 @@ class AISettingsDialog extends StatefulWidget {
   final int initialMaxPages;
   final bool initialProcessImages;
   final String initialOutputLanguage;
+  final bool initialIncludeDetailedExamples;
+  final bool initialIncludeBookReasoning;
+  final bool initialIncludeExtendedInstructions;
+  final bool initialUseIncrementalSort;
   final AISettingsService aiSettingsService;
 
   const AISettingsDialog({
@@ -23,6 +27,10 @@ class AISettingsDialog extends StatefulWidget {
     required this.initialMaxPages,
     required this.initialProcessImages,
     required this.initialOutputLanguage,
+    required this.initialIncludeDetailedExamples,
+    required this.initialIncludeBookReasoning,
+    required this.initialIncludeExtendedInstructions,
+    required this.initialUseIncrementalSort,
     required this.aiSettingsService,
   });
 
@@ -37,6 +45,10 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
   late TextEditingController _maxPagesController;
   late bool _processImages;
   late String _outputLanguage;
+  late bool _includeDetailedExamples;
+  late bool _includeBookReasoning;
+  late bool _includeExtendedInstructions;
+  late bool _useIncrementalSort;
   String? _connectionStatus;
   bool _testing = false;
   bool _testingLanguage = false;
@@ -54,6 +66,10 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
     );
     _processImages = widget.initialProcessImages;
     _outputLanguage = widget.initialOutputLanguage;
+    _includeDetailedExamples = widget.initialIncludeDetailedExamples;
+    _includeBookReasoning = widget.initialIncludeBookReasoning;
+    _includeExtendedInstructions = widget.initialIncludeExtendedInstructions;
+    _useIncrementalSort = widget.initialUseIncrementalSort;
   }
 
   @override
@@ -165,6 +181,16 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
     await widget.aiSettingsService.setMaxPages(maxPages);
     await widget.aiSettingsService.setProcessImages(_processImages);
     await widget.aiSettingsService.setOutputLanguage(_outputLanguage);
+    await widget.aiSettingsService.setIncludeDetailedExamples(
+      _includeDetailedExamples,
+    );
+    await widget.aiSettingsService.setIncludeBookReasoning(
+      _includeBookReasoning,
+    );
+    await widget.aiSettingsService.setIncludeExtendedInstructions(
+      _includeExtendedInstructions,
+    );
+    await widget.aiSettingsService.setUseIncrementalSort(_useIncrementalSort);
 
     if (mounted) {
       Navigator.of(context).pop();
@@ -180,161 +206,287 @@ class _AISettingsDialogState extends State<AISettingsDialog> {
       dialog: AlertDialog(
         title: Text(l10n.aiSettings),
         content: SizedBox(
-          width: 500,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Ollama URL
-              TextField(
-                controller: _urlController,
-                decoration: InputDecoration(
-                  labelText: l10n.ollamaUrl,
-                  hintText: 'http://127.0.0.1:11434',
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Ollama Model
-              TextField(
-                controller: _modelController,
-                decoration: InputDecoration(
-                  labelText: l10n.ollamaModel,
-                  hintText: 'deepseek-r1:1.5b',
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Test connection button
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _testing ? null : _testConnection,
-                    icon: _testing
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.cable, size: 18),
-                    label: Text(l10n.testConnection),
+          width: 800,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Connection settings (full width)
+                TextField(
+                  controller: _urlController,
+                  decoration: InputDecoration(
+                    labelText: l10n.ollamaUrl,
+                    hintText: 'http://127.0.0.1:11434',
+                    border: const OutlineInputBorder(),
                   ),
-                  if (_connectionStatus != null) ...[
+                ),
+                const SizedBox(height: 16),
+
+                TextField(
+                  controller: _modelController,
+                  decoration: InputDecoration(
+                    labelText: l10n.ollamaModel,
+                    hintText: 'deepseek-r1:1.5b',
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Test connection button
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _testing ? null : _testConnection,
+                      icon: _testing
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.cable, size: 18),
+                      label: Text(l10n.testConnection),
+                    ),
+                    if (_connectionStatus != null) ...[
+                      const SizedBox(width: 16),
+                      Text(
+                        _connectionStatus!,
+                        style: TextStyle(
+                          color: _connectionStatus == l10n.connectionSuccess
+                              ? Colors.green
+                              : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Two columns layout
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Generalization (0-100)
+                          TextField(
+                            controller: _generalizationController,
+                            decoration: InputDecoration(
+                              labelText: l10n.generalization,
+                              hintText: '50',
+                              helperText: l10n.generalizationHint,
+                              border: const OutlineInputBorder(),
+                              suffixText: '%',
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              TextInputFormatter.withFunction((
+                                oldValue,
+                                newValue,
+                              ) {
+                                if (newValue.text.isEmpty) return newValue;
+                                final value = int.tryParse(newValue.text);
+                                if (value == null || value > 100)
+                                  return oldValue;
+                                return newValue;
+                              }),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Max pages (1-50)
+                          TextField(
+                            controller: _maxPagesController,
+                            decoration: InputDecoration(
+                              labelText: l10n.maxPages,
+                              hintText: '3',
+                              helperText: l10n.maxPagesHint,
+                              border: const OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              TextInputFormatter.withFunction((
+                                oldValue,
+                                newValue,
+                              ) {
+                                if (newValue.text.isEmpty) return newValue;
+                                final value = int.tryParse(newValue.text);
+                                if (value == null || value < 1 || value > 50)
+                                  return oldValue;
+                                return newValue;
+                              }),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Process Images checkbox
+                          CheckboxListTile(
+                            value: _processImages,
+                            onChanged: (value) {
+                              setState(() {
+                                _processImages = value ?? false;
+                              });
+                            },
+                            title: Text(l10n.processImages),
+                            subtitle: Text(
+                              l10n.processImagesHint,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(width: 16),
-                    Text(
-                      _connectionStatus!,
-                      style: TextStyle(
-                        color: _connectionStatus == l10n.connectionSuccess
-                            ? Colors.green
-                            : Colors.red,
-                        fontWeight: FontWeight.bold,
+
+                    // Right column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Output Language dropdown
+                          DropdownButtonFormField<String>(
+                            value: _outputLanguage,
+                            decoration: InputDecoration(
+                              labelText: l10n.outputLanguage,
+                              helperText: l10n.outputLanguageHint,
+                              border: const OutlineInputBorder(),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'en',
+                                child: Text('English'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'ru',
+                                child: Text('Русский'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _outputLanguage = value;
+                                });
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Test Language button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: _testingLanguage
+                                  ? null
+                                  : _testLanguage,
+                              icon: _testingLanguage
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.translate),
+                              label: Text(l10n.testLanguage),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Generalization (0-100)
-              TextField(
-                controller: _generalizationController,
-                decoration: InputDecoration(
-                  labelText: l10n.generalization,
-                  hintText: '50',
-                  helperText: l10n.generalizationHint,
-                  border: const OutlineInputBorder(),
-                  suffixText: '%',
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  TextInputFormatter.withFunction((oldValue, newValue) {
-                    if (newValue.text.isEmpty) return newValue;
-                    final value = int.tryParse(newValue.text);
-                    if (value == null || value > 100) return oldValue;
-                    return newValue;
-                  }),
-                ],
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-              // Max pages (1-50)
-              TextField(
-                controller: _maxPagesController,
-                decoration: InputDecoration(
-                  labelText: l10n.maxPages,
-                  hintText: '3',
-                  helperText: l10n.maxPagesHint,
-                  border: const OutlineInputBorder(),
+                // Token Optimization section
+                Text(
+                  'Token Optimization',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  TextInputFormatter.withFunction((oldValue, newValue) {
-                    if (newValue.text.isEmpty) return newValue;
-                    final value = int.tryParse(newValue.text);
-                    if (value == null || value < 1 || value > 50)
-                      return oldValue;
-                    return newValue;
-                  }),
-                ],
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
-              // Process Images checkbox
-              CheckboxListTile(
-                value: _processImages,
-                onChanged: (value) {
-                  setState(() {
-                    _processImages = value ?? false;
-                  });
-                },
-                title: Text(l10n.processImages),
-                subtitle: Text(
-                  l10n.processImagesHint,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-              const SizedBox(height: 16),
-
-              // Output Language dropdown
-              DropdownButtonFormField<String>(
-                value: _outputLanguage,
-                decoration: InputDecoration(
-                  labelText: l10n.outputLanguage,
-                  helperText: l10n.outputLanguageHint,
-                  border: const OutlineInputBorder(),
-                ),
-                items: const [
-                  DropdownMenuItem(value: 'en', child: Text('English')),
-                  DropdownMenuItem(value: 'ru', child: Text('Русский')),
-                ],
-                onChanged: (value) {
-                  if (value != null) {
+                // Include Detailed Examples checkbox
+                CheckboxListTile(
+                  value: _includeDetailedExamples,
+                  onChanged: (value) {
                     setState(() {
-                      _outputLanguage = value;
+                      _includeDetailedExamples = value ?? true;
                     });
-                  }
-                },
-              ),
-              const SizedBox(height: 8),
+                  },
+                  title: Text(l10n.includeDetailedExamples),
+                  subtitle: Text(
+                    l10n.includeDetailedExamplesHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
 
-              // Test Language button
-              ElevatedButton.icon(
-                onPressed: _testingLanguage ? null : _testLanguage,
-                icon: _testingLanguage
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.translate),
-                label: Text(l10n.testLanguage),
-              ),
-            ],
+                // Include Book Reasoning checkbox
+                CheckboxListTile(
+                  value: _includeBookReasoning,
+                  onChanged: (value) {
+                    setState(() {
+                      _includeBookReasoning = value ?? true;
+                    });
+                  },
+                  title: Text(l10n.includeBookReasoning),
+                  subtitle: Text(
+                    l10n.includeBookReasoningHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
+
+                // Include Extended Instructions checkbox
+                CheckboxListTile(
+                  value: _includeExtendedInstructions,
+                  onChanged: (value) {
+                    setState(() {
+                      _includeExtendedInstructions = value ?? true;
+                    });
+                  },
+                  title: Text(l10n.includeExtendedInstructions),
+                  subtitle: Text(
+                    l10n.includeExtendedInstructionsHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
+
+                const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 8),
+
+                // Use Incremental Sort checkbox
+                CheckboxListTile(
+                  value: _useIncrementalSort,
+                  onChanged: (value) {
+                    setState(() {
+                      _useIncrementalSort = value ?? false;
+                    });
+                  },
+                  title: Text(l10n.useIncrementalSort),
+                  subtitle: Text(
+                    l10n.useIncrementalSortHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ],
+            ),
           ),
         ),
         actions: [

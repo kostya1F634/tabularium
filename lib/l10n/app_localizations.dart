@@ -1049,6 +1049,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language Test Result'**
   String get languageTestResult;
+
+  /// No description provided for @includeDetailedExamples.
+  ///
+  /// In en, this message translates to:
+  /// **'Include Detailed Examples'**
+  String get includeDetailedExamples;
+
+  /// No description provided for @includeDetailedExamplesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Include GOOD/BAD tag examples in prompts (reduces tokens when disabled)'**
+  String get includeDetailedExamplesHint;
+
+  /// No description provided for @includeBookReasoning.
+  ///
+  /// In en, this message translates to:
+  /// **'Include Book Reasoning'**
+  String get includeBookReasoning;
+
+  /// No description provided for @includeBookReasoningHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Include AI reasoning about books when sorting library (reduces tokens when disabled)'**
+  String get includeBookReasoningHint;
+
+  /// No description provided for @includeExtendedInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Include Extended Instructions'**
+  String get includeExtendedInstructions;
+
+  /// No description provided for @includeExtendedInstructionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Include validation checklists and detailed explanations in prompts (reduces tokens when disabled)'**
+  String get includeExtendedInstructionsHint;
+
+  /// No description provided for @aiParameters.
+  ///
+  /// In en, this message translates to:
+  /// **'Parameters'**
+  String get aiParameters;
+
+  /// No description provided for @ollamaParameters.
+  ///
+  /// In en, this message translates to:
+  /// **'Ollama Parameters'**
+  String get ollamaParameters;
+
+  /// No description provided for @numCtx.
+  ///
+  /// In en, this message translates to:
+  /// **'Context Window'**
+  String get numCtx;
+
+  /// No description provided for @numCtxHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of tokens in context window (2048-32768). Default Ollama value is 2048, which may be too small for complex prompts. Larger values use more memory.'**
+  String get numCtxHint;
+
+  /// No description provided for @numCtxEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ More context → Better understanding | ↓ Less context → Faster, less memory'**
+  String get numCtxEffect;
+
+  /// No description provided for @numPredict.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Output Tokens'**
+  String get numPredict;
+
+  /// No description provided for @numPredictHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum number of tokens to generate (128-4096, -1 for unlimited). Limits response length.'**
+  String get numPredictHint;
+
+  /// No description provided for @numPredictEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ Longer responses | ↓ Shorter responses'**
+  String get numPredictEffect;
+
+  /// No description provided for @repeatPenalty.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat Penalty'**
+  String get repeatPenalty;
+
+  /// No description provided for @repeatPenaltyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Penalty for repeating tokens (0.0-2.0). Higher values reduce repetition. Default: 1.1'**
+  String get repeatPenaltyHint;
+
+  /// No description provided for @repeatPenaltyEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ Less repetition | ↓ More repetition'**
+  String get repeatPenaltyEffect;
+
+  /// No description provided for @topK.
+  ///
+  /// In en, this message translates to:
+  /// **'Top-K'**
+  String get topK;
+
+  /// No description provided for @topKHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of top tokens to consider (1-100). Lower values make output more focused. Default: 40'**
+  String get topKHint;
+
+  /// No description provided for @topKEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ More diverse | ↓ More focused'**
+  String get topKEffect;
+
+  /// No description provided for @topP.
+  ///
+  /// In en, this message translates to:
+  /// **'Top-P (Nucleus)'**
+  String get topP;
+
+  /// No description provided for @topPHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Nucleus sampling threshold (0.0-1.0). Lower values make output more deterministic. Default: 0.9'**
+  String get topPHint;
+
+  /// No description provided for @topPEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ More creative | ↓ More deterministic'**
+  String get topPEffect;
+
+  /// No description provided for @numBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch Size'**
+  String get numBatch;
+
+  /// No description provided for @numBatchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch size for prompt processing (32-1024). Reduce if experiencing out-of-memory errors. Default: 512'**
+  String get numBatchHint;
+
+  /// No description provided for @numBatchEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ Faster processing | ↓ Less memory usage'**
+  String get numBatchEffect;
+
+  /// No description provided for @presencePenalty.
+  ///
+  /// In en, this message translates to:
+  /// **'Presence Penalty'**
+  String get presencePenalty;
+
+  /// No description provided for @presencePenaltyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Penalizes tokens that already appeared (0.0-2.0). Encourages diversity. Higher values = more variety in tags/shelves. Default: 0.0'**
+  String get presencePenaltyHint;
+
+  /// No description provided for @presencePenaltyEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ More variety | ↓ May repeat'**
+  String get presencePenaltyEffect;
+
+  /// No description provided for @frequencyPenalty.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency Penalty'**
+  String get frequencyPenalty;
+
+  /// No description provided for @frequencyPenaltyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Penalizes tokens based on frequency (0.0-2.0). Reduces repetition proportionally. Default: 0.0'**
+  String get frequencyPenaltyHint;
+
+  /// No description provided for @frequencyPenaltyEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ Less frequent words | ↓ Common words OK'**
+  String get frequencyPenaltyEffect;
+
+  /// No description provided for @minP.
+  ///
+  /// In en, this message translates to:
+  /// **'Min-P'**
+  String get minP;
+
+  /// No description provided for @minPHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum probability threshold (0.0-1.0). Alternative to Top-P. Only considers tokens with probability ≥ min_p × max_probability. Default: 0.0 (disabled)'**
+  String get minPHint;
+
+  /// No description provided for @minPEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'↑ More conservative | ↓ More diverse'**
+  String get minPEffect;
+
+  /// No description provided for @seed.
+  ///
+  /// In en, this message translates to:
+  /// **'Random Seed'**
+  String get seed;
+
+  /// No description provided for @seedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Random seed for reproducibility. Set to -1 for random generation, or fixed value (e.g., 42) for consistent results. Useful for debugging.'**
+  String get seedHint;
+
+  /// No description provided for @seedEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed = Reproducible | -1 = Random'**
+  String get seedEffect;
+
+  /// No description provided for @stopSequences.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Sequences'**
+  String get stopSequences;
+
+  /// No description provided for @stopSequencesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Comma-separated stop sequences (e.g., \\n\\n\\n,```,---). Generation stops when encountering these. Saves tokens by stopping after JSON.'**
+  String get stopSequencesHint;
+
+  /// No description provided for @stopSequencesEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves tokens by early stopping'**
+  String get stopSequencesEffect;
+
+  /// No description provided for @contextParameters.
+  ///
+  /// In en, this message translates to:
+  /// **'Context & Output'**
+  String get contextParameters;
+
+  /// No description provided for @samplingParameters.
+  ///
+  /// In en, this message translates to:
+  /// **'Sampling & Creativity'**
+  String get samplingParameters;
+
+  /// No description provided for @penaltyParameters.
+  ///
+  /// In en, this message translates to:
+  /// **'Penalties & Control'**
+  String get penaltyParameters;
+
+  /// No description provided for @resetDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to Defaults'**
+  String get resetDefaults;
+
+  /// No description provided for @advancedParameters.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Parameters'**
+  String get advancedParameters;
+
+  /// No description provided for @useIncrementalSort.
+  ///
+  /// In en, this message translates to:
+  /// **'Incremental Sort (Reliable)'**
+  String get useIncrementalSort;
+
+  /// No description provided for @useIncrementalSortHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort books one at a time instead of all at once. More reliable and debuggable, but slower. Recommended for large libraries or if batch sorting fails.'**
+  String get useIncrementalSortHint;
 }
 
 class _AppLocalizationsDelegate

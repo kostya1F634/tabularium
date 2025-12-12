@@ -183,7 +183,7 @@ class _ShelfsSidebarState extends State<ShelfsSidebar> {
           Container(
             padding: const EdgeInsets.all(16),
             child: SizedBox(
-              height: 40, // Fixed height to match LibraryHeader
+              height: 36, // Fixed height to match LibraryHeader
               child: Row(
                 children: [
                   Icon(

@@ -493,4 +493,165 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageTestResult => 'Language Test Result';
+
+  @override
+  String get includeDetailedExamples => 'Include Detailed Examples';
+
+  @override
+  String get includeDetailedExamplesHint =>
+      'Include GOOD/BAD tag examples in prompts (reduces tokens when disabled)';
+
+  @override
+  String get includeBookReasoning => 'Include Book Reasoning';
+
+  @override
+  String get includeBookReasoningHint =>
+      'Include AI reasoning about books when sorting library (reduces tokens when disabled)';
+
+  @override
+  String get includeExtendedInstructions => 'Include Extended Instructions';
+
+  @override
+  String get includeExtendedInstructionsHint =>
+      'Include validation checklists and detailed explanations in prompts (reduces tokens when disabled)';
+
+  @override
+  String get aiParameters => 'Parameters';
+
+  @override
+  String get ollamaParameters => 'Ollama Parameters';
+
+  @override
+  String get numCtx => 'Context Window';
+
+  @override
+  String get numCtxHint =>
+      'Number of tokens in context window (2048-32768). Default Ollama value is 2048, which may be too small for complex prompts. Larger values use more memory.';
+
+  @override
+  String get numCtxEffect =>
+      '↑ More context → Better understanding | ↓ Less context → Faster, less memory';
+
+  @override
+  String get numPredict => 'Max Output Tokens';
+
+  @override
+  String get numPredictHint =>
+      'Maximum number of tokens to generate (128-4096, -1 for unlimited). Limits response length.';
+
+  @override
+  String get numPredictEffect => '↑ Longer responses | ↓ Shorter responses';
+
+  @override
+  String get repeatPenalty => 'Repeat Penalty';
+
+  @override
+  String get repeatPenaltyHint =>
+      'Penalty for repeating tokens (0.0-2.0). Higher values reduce repetition. Default: 1.1';
+
+  @override
+  String get repeatPenaltyEffect => '↑ Less repetition | ↓ More repetition';
+
+  @override
+  String get topK => 'Top-K';
+
+  @override
+  String get topKHint =>
+      'Number of top tokens to consider (1-100). Lower values make output more focused. Default: 40';
+
+  @override
+  String get topKEffect => '↑ More diverse | ↓ More focused';
+
+  @override
+  String get topP => 'Top-P (Nucleus)';
+
+  @override
+  String get topPHint =>
+      'Nucleus sampling threshold (0.0-1.0). Lower values make output more deterministic. Default: 0.9';
+
+  @override
+  String get topPEffect => '↑ More creative | ↓ More deterministic';
+
+  @override
+  String get numBatch => 'Batch Size';
+
+  @override
+  String get numBatchHint =>
+      'Batch size for prompt processing (32-1024). Reduce if experiencing out-of-memory errors. Default: 512';
+
+  @override
+  String get numBatchEffect => '↑ Faster processing | ↓ Less memory usage';
+
+  @override
+  String get presencePenalty => 'Presence Penalty';
+
+  @override
+  String get presencePenaltyHint =>
+      'Penalizes tokens that already appeared (0.0-2.0). Encourages diversity. Higher values = more variety in tags/shelves. Default: 0.0';
+
+  @override
+  String get presencePenaltyEffect => '↑ More variety | ↓ May repeat';
+
+  @override
+  String get frequencyPenalty => 'Frequency Penalty';
+
+  @override
+  String get frequencyPenaltyHint =>
+      'Penalizes tokens based on frequency (0.0-2.0). Reduces repetition proportionally. Default: 0.0';
+
+  @override
+  String get frequencyPenaltyEffect =>
+      '↑ Less frequent words | ↓ Common words OK';
+
+  @override
+  String get minP => 'Min-P';
+
+  @override
+  String get minPHint =>
+      'Minimum probability threshold (0.0-1.0). Alternative to Top-P. Only considers tokens with probability ≥ min_p × max_probability. Default: 0.0 (disabled)';
+
+  @override
+  String get minPEffect => '↑ More conservative | ↓ More diverse';
+
+  @override
+  String get seed => 'Random Seed';
+
+  @override
+  String get seedHint =>
+      'Random seed for reproducibility. Set to -1 for random generation, or fixed value (e.g., 42) for consistent results. Useful for debugging.';
+
+  @override
+  String get seedEffect => 'Fixed = Reproducible | -1 = Random';
+
+  @override
+  String get stopSequences => 'Stop Sequences';
+
+  @override
+  String get stopSequencesHint =>
+      'Comma-separated stop sequences (e.g., \\n\\n\\n,```,---). Generation stops when encountering these. Saves tokens by stopping after JSON.';
+
+  @override
+  String get stopSequencesEffect => 'Saves tokens by early stopping';
+
+  @override
+  String get contextParameters => 'Context & Output';
+
+  @override
+  String get samplingParameters => 'Sampling & Creativity';
+
+  @override
+  String get penaltyParameters => 'Penalties & Control';
+
+  @override
+  String get resetDefaults => 'Reset to Defaults';
+
+  @override
+  String get advancedParameters => 'Advanced Parameters';
+
+  @override
+  String get useIncrementalSort => 'Incremental Sort (Reliable)';
+
+  @override
+  String get useIncrementalSortHint =>
+      'Sort books one at a time instead of all at once. More reliable and debuggable, but slower. Recommended for large libraries or if batch sorting fails.';
 }

@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../features/library/presentation/pages/library_view_wrapper.dart';
 import '../../features/library/presentation/bloc/library_bloc.dart';
 import '../../features/library/presentation/bloc/library_event.dart';
+import '../../features/library/presentation/bloc/library_state.dart';
 import '../services/language_provider.dart';
 import '../services/ai_settings_provider.dart';
 import '../services/language_service.dart';
@@ -16,6 +17,7 @@ import '../services/ui_settings_service.dart';
 import '../services/window_settings_provider.dart';
 import '../theme/app_theme.dart';
 import 'ai_settings_dialog.dart';
+import 'ai_parameters_dialog.dart';
 import 'dialog_shortcuts_wrapper.dart';
 import 'shortcuts_dialog.dart';
 import 'theme_picker_dialog.dart';
@@ -141,9 +143,55 @@ class AppMenuBar extends StatelessWidget {
                     initialMaxPages: aiSettings.maxPages,
                     initialProcessImages: aiSettings.processImages,
                     initialOutputLanguage: aiSettings.outputLanguage,
+                    initialIncludeDetailedExamples:
+                        aiSettings.includeDetailedExamples,
+                    initialIncludeBookReasoning:
+                        aiSettings.includeBookReasoning,
+                    initialIncludeExtendedInstructions:
+                        aiSettings.includeExtendedInstructions,
+                    initialUseIncrementalSort: aiSettings.useIncrementalSort,
                     aiSettingsService: aiSettings,
                   ),
                 );
+              } else if (value == 'parameters') {
+                final aiSettings = AISettingsProvider.of(context);
+                showDialog(
+                  context: context,
+                  builder: (dialogContext) => AIParametersDialog(
+                    initialNumCtx: aiSettings.numCtx,
+                    initialNumPredict: aiSettings.numPredict,
+                    initialRepeatPenalty: aiSettings.repeatPenalty,
+                    initialTopK: aiSettings.topK,
+                    initialTopP: aiSettings.topP,
+                    initialNumBatch: aiSettings.numBatch,
+                    initialPresencePenalty: aiSettings.presencePenalty,
+                    initialFrequencyPenalty: aiSettings.frequencyPenalty,
+                    initialMinP: aiSettings.minP,
+                    initialSeed: aiSettings.seed,
+                    initialStopSequences: aiSettings.stopSequences,
+                    aiSettingsService: aiSettings,
+                  ),
+                );
+              } else if (value == 'auto_titling') {
+                // Get all books from current library
+                final bloc = context.read<LibraryBloc>();
+                final state = bloc.state;
+                if (state is LibraryLoaded) {
+                  final allBookIds = state.config.books
+                      .map((b) => b.id)
+                      .toList();
+                  bloc.add(AIAnalyzeSelectedBooks(bookIds: allBookIds));
+                }
+              } else if (value == 'sort') {
+                // Get all books from current library
+                final bloc = context.read<LibraryBloc>();
+                final state = bloc.state;
+                if (state is LibraryLoaded) {
+                  final allBookIds = state.config.books
+                      .map((b) => b.id)
+                      .toList();
+                  bloc.add(AISortSelectedBooks(bookIds: allBookIds));
+                }
               } else if (value == 'fullsort') {
                 context.read<LibraryBloc>().add(const AIFullSort());
               } else if (value == 'rename') {
@@ -163,7 +211,37 @@ class AppMenuBar extends StatelessWidget {
                     ],
                   ),
                 ),
+                PopupMenuItem(
+                  value: 'parameters',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.tune, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiParameters),
+                    ],
+                  ),
+                ),
                 const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'auto_titling',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.title, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiTitle),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'sort',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.sort, size: 16),
+                      const SizedBox(width: 8),
+                      Text(l10n.aiSort),
+                    ],
+                  ),
+                ),
                 PopupMenuItem(
                   value: 'fullsort',
                   child: Row(
@@ -174,6 +252,7 @@ class AppMenuBar extends StatelessWidget {
                     ],
                   ),
                 ),
+                const PopupMenuDivider(),
                 PopupMenuItem(
                   value: 'rename',
                   child: Row(

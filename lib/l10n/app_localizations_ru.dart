@@ -512,4 +512,166 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get languageTestResult => 'Результат проверки языка';
+
+  @override
+  String get includeDetailedExamples => 'Включать детальные примеры';
+
+  @override
+  String get includeDetailedExamplesHint =>
+      'Включать примеры ХОРОШИХ/ПЛОХИХ тегов в запросы (уменьшает токены при отключении)';
+
+  @override
+  String get includeBookReasoning => 'Включать размышления о книгах';
+
+  @override
+  String get includeBookReasoningHint =>
+      'Включать размышления ИИ о книгах при сортировке библиотеки (уменьшает токены при отключении)';
+
+  @override
+  String get includeExtendedInstructions => 'Включать расширенные инструкции';
+
+  @override
+  String get includeExtendedInstructionsHint =>
+      'Включать валидационные чеклисты и детальные объяснения в запросы (уменьшает токены при отключении)';
+
+  @override
+  String get aiParameters => 'Параметры';
+
+  @override
+  String get ollamaParameters => 'Параметры Ollama';
+
+  @override
+  String get numCtx => 'Контекстное окно';
+
+  @override
+  String get numCtxHint =>
+      'Количество токенов в контекстном окне (2048-32768). По умолчанию в Ollama 2048, что может быть мало для сложных запросов. Большие значения требуют больше памяти.';
+
+  @override
+  String get numCtxEffect =>
+      '↑ Больше контекста → Лучше понимание | ↓ Меньше → Быстрее, меньше памяти';
+
+  @override
+  String get numPredict => 'Макс. выходных токенов';
+
+  @override
+  String get numPredictHint =>
+      'Максимальное количество генерируемых токенов (128-4096, -1 без ограничений). Ограничивает длину ответа.';
+
+  @override
+  String get numPredictEffect => '↑ Длиннее ответы | ↓ Короче ответы';
+
+  @override
+  String get repeatPenalty => 'Штраф за повторы';
+
+  @override
+  String get repeatPenaltyHint =>
+      'Штраф за повторяющиеся токены (0.0-2.0). Большие значения уменьшают повторения. По умолчанию: 1.1';
+
+  @override
+  String get repeatPenaltyEffect => '↑ Меньше повторов | ↓ Больше повторов';
+
+  @override
+  String get topK => 'Top-K';
+
+  @override
+  String get topKHint =>
+      'Число рассматриваемых топ токенов (1-100). Меньшие значения делают вывод более фокусированным. По умолчанию: 40';
+
+  @override
+  String get topKEffect => '↑ Разнообразнее | ↓ Фокуснее';
+
+  @override
+  String get topP => 'Top-P (Nucleus)';
+
+  @override
+  String get topPHint =>
+      'Порог nucleus sampling (0.0-1.0). Меньшие значения делают вывод более детерминированным. По умолчанию: 0.9';
+
+  @override
+  String get topPEffect => '↑ Креативнее | ↓ Детерминированнее';
+
+  @override
+  String get numBatch => 'Размер батча';
+
+  @override
+  String get numBatchHint =>
+      'Размер батча для обработки запросов (32-1024). Уменьшите при ошибках нехватки памяти. По умолчанию: 512';
+
+  @override
+  String get numBatchEffect => '↑ Быстрее обработка | ↓ Меньше памяти';
+
+  @override
+  String get presencePenalty => 'Штраф за присутствие';
+
+  @override
+  String get presencePenaltyHint =>
+      'Штрафует токены, которые уже появились (0.0-2.0). Поощряет разнообразие. Большие значения = больше вариативности тегов/полок. По умолчанию: 0.0';
+
+  @override
+  String get presencePenaltyEffect =>
+      '↑ Больше вариативности | ↓ Может повторяться';
+
+  @override
+  String get frequencyPenalty => 'Штраф за частоту';
+
+  @override
+  String get frequencyPenaltyHint =>
+      'Штрафует токены пропорционально частоте использования (0.0-2.0). Уменьшает повторы. По умолчанию: 0.0';
+
+  @override
+  String get frequencyPenaltyEffect =>
+      '↑ Меньше частых слов | ↓ Обычные слова ОК';
+
+  @override
+  String get minP => 'Min-P';
+
+  @override
+  String get minPHint =>
+      'Минимальный порог вероятности (0.0-1.0). Альтернатива Top-P. Рассматривает только токены с вероятностью ≥ min_p × макс_вероятность. По умолчанию: 0.0 (выкл)';
+
+  @override
+  String get minPEffect => '↑ Консервативнее | ↓ Разнообразнее';
+
+  @override
+  String get seed => 'Случайное зерно';
+
+  @override
+  String get seedHint =>
+      'Зерно для генератора случайных чисел. -1 для случайной генерации, или фиксированное значение (напр. 42) для воспроизводимых результатов. Полезно для отладки.';
+
+  @override
+  String get seedEffect => 'Фикс. = Воспроизводимо | -1 = Случайно';
+
+  @override
+  String get stopSequences => 'Стоп-последовательности';
+
+  @override
+  String get stopSequencesHint =>
+      'Стоп-последовательности через запятую (напр. \\n\\n\\n,```,---). Генерация останавливается при встрече. Экономит токены, останавливая после JSON.';
+
+  @override
+  String get stopSequencesEffect => 'Экономит токены ранней остановкой';
+
+  @override
+  String get contextParameters => 'Контекст и вывод';
+
+  @override
+  String get samplingParameters => 'Сэмплинг и креативность';
+
+  @override
+  String get penaltyParameters => 'Штрафы и контроль';
+
+  @override
+  String get resetDefaults => 'Сбросить на значения по умолчанию';
+
+  @override
+  String get advancedParameters => 'Расширенные параметры';
+
+  @override
+  String get useIncrementalSort => 'Инкрементная сортировка (Надежная)';
+
+  @override
+  String get useIncrementalSortHint =>
+      'Сортировать книги по одной вместо всех сразу. Более надежный и отлаживаемый метод, но медленнее. Рекомендуется для больших библиотек или если пакетная сортировка не работает.';
 }

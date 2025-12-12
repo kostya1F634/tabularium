@@ -9,6 +9,7 @@ import '../../domain/entities/shelf.dart';
 import '../../domain/entities/library_config.dart';
 import '../../domain/usecases/ai_analyze_book.dart';
 import '../../domain/usecases/ai_sort_library.dart';
+import '../../domain/usecases/ai_sort_book_incremental.dart';
 import '../../domain/usecases/initialize_library_usecase.dart';
 import '../../domain/usecases/load_library_usecase.dart';
 import '../../domain/usecases/save_library_usecase.dart';
@@ -26,6 +27,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   final OpenAllBooksUseCase _openAllBooks;
   final AIAnalyzeBook? _aiAnalyzeBook;
   final AISortLibrary? _aiSortLibrary;
+  final AISortBookIncremental? _aiSortBookIncremental;
   final AISettingsService _aiSettings;
 
   LibraryBloc({
@@ -36,6 +38,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     required OpenAllBooksUseCase openAllBooks,
     AIAnalyzeBook? aiAnalyzeBook,
     AISortLibrary? aiSortLibrary,
+    AISortBookIncremental? aiSortBookIncremental,
     required AISettingsService aiSettings,
   }) : _initializeLibrary = initializeLibrary,
        _loadLibrary = loadLibrary,
@@ -44,6 +47,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
        _openAllBooks = openAllBooks,
        _aiAnalyzeBook = aiAnalyzeBook,
        _aiSortLibrary = aiSortLibrary,
+       _aiSortBookIncremental = aiSortBookIncremental,
        _aiSettings = aiSettings,
        super(const LibraryInitial()) {
     on<InitializeLibrary>(_onInitializeLibrary);
@@ -162,7 +166,14 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           );
         } catch (e) {
           print('Error analyzing book ${book.fileName}: $e');
-          updatedBooks.add(book); // Keep original if analysis fails
+          emit(
+            LibraryError(
+              'Failed to analyze "${book.fileName}": ${e.toString()}. Check if Ollama is running.',
+            ),
+          );
+          await Future.delayed(const Duration(seconds: 4));
+          emit(currentState);
+          return;
         }
       }
 
@@ -182,11 +193,24 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       // Step 2: Sort library with AI
       emit(const LibraryAIProcessing('Organizing into shelves...'));
 
-      final sortResult = await _aiSortLibrary!(
-        books: updatedBooks,
-        existingShelves: currentState.config.shelves,
-        generalization: _aiSettings.generalization,
-      );
+      LibrarySortResult sortResult;
+      try {
+        sortResult = await _aiSortLibrary!(
+          books: updatedBooks,
+          existingShelves: currentState.config.shelves,
+          generalization: _aiSettings.generalization,
+        );
+      } catch (e) {
+        print('Error sorting library: $e');
+        emit(
+          LibraryError(
+            'Failed to sort library: ${e.toString()}. Check if Ollama is running.',
+          ),
+        );
+        await Future.delayed(const Duration(seconds: 4));
+        emit(currentState);
+        return;
+      }
 
       // Step 3: Create new shelves with AI-assigned tags
       var shelves = List<Shelf>.from(newConfig.shelves);
@@ -239,14 +263,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         currentState.searchQuery,
       );
 
-      emit(
-        currentState.copyWith(
-          config: newConfig,
-          displayedBooks: updatedDisplayedBooks,
-        ),
-      );
-
       // Show success message briefly
+      print('DEBUG: Emitting success message for AI full sort');
       emit(
         LibraryAIProcessing(
           'AI sort complete! ${updatedBooks.length} books analyzed, ${sortResult.newShelves.length} shelves created',
@@ -254,12 +272,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       );
       await Future.delayed(const Duration(seconds: 3));
 
+      // Emit final state
+      print('DEBUG: Emitting final LibraryLoaded state after AI full sort');
       emit(
         currentState.copyWith(
           config: newConfig,
           displayedBooks: updatedDisplayedBooks,
         ),
       );
+      print('DEBUG: AI full sort complete, final state emitted');
     } catch (e) {
       emit(LibraryError('AI sort failed: $e'));
       await Future.delayed(const Duration(seconds: 3));
@@ -300,7 +321,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       if (unsortedBooks.isEmpty) {
         emit(const LibraryError('No books in Unsorted shelf to analyze'));
         await Future.delayed(const Duration(seconds: 2));
-        emit(currentState);
+        emit(savedState);
         return;
       }
 
@@ -359,6 +380,14 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           );
         } catch (e) {
           print('Error analyzing book ${book.fileName}: $e');
+          emit(
+            LibraryError(
+              'Failed to analyze "${book.fileName}": ${e.toString()}. Check if Ollama is running.',
+            ),
+          );
+          await Future.delayed(const Duration(seconds: 4));
+          emit(savedState);
+          return;
         }
       }
 
@@ -373,14 +402,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         currentState.searchQuery,
       );
 
-      emit(
-        currentState.copyWith(
-          config: newConfig,
-          displayedBooks: updatedDisplayedBooks,
-        ),
-      );
-
-      // Show success message
+      // Show success message briefly
+      print('DEBUG: Emitting success message for AI rename');
       emit(
         LibraryAIProcessing(
           'Analysis complete! ${unsortedBooks.length} books analyzed',
@@ -388,12 +411,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       );
       await Future.delayed(const Duration(seconds: 3));
 
+      // Emit final state
+      print('DEBUG: Emitting final LibraryLoaded state after AI rename');
       emit(
         currentState.copyWith(
           config: newConfig,
           displayedBooks: updatedDisplayedBooks,
         ),
       );
+      print('DEBUG: AI rename complete, final state emitted');
     } catch (e) {
       print('AI rename failed: $e');
       emit(LibraryError('AI rename failed: $e'));
@@ -434,7 +460,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       if (selectedBooks.isEmpty) {
         emit(const LibraryError('No books selected'));
         await Future.delayed(const Duration(seconds: 2));
-        emit(currentState);
+        emit(savedState);
         return;
       }
 
@@ -493,6 +519,14 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
           );
         } catch (e) {
           print('Error analyzing book ${book.fileName}: $e');
+          emit(
+            LibraryError(
+              'Failed to analyze "${book.fileName}": ${e.toString()}. Check if Ollama is running.',
+            ),
+          );
+          await Future.delayed(const Duration(seconds: 4));
+          emit(savedState);
+          return;
         }
       }
 
@@ -507,14 +541,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         currentState.searchQuery,
       );
 
-      emit(
-        currentState.copyWith(
-          config: newConfig,
-          displayedBooks: updatedDisplayedBooks,
-        ),
-      );
-
-      // Show success message
+      // Show success message briefly
+      print('DEBUG: Emitting success message for AI analysis');
       emit(
         LibraryAIProcessing(
           'Analysis complete! ${selectedBooks.length} books analyzed',
@@ -522,12 +550,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       );
       await Future.delayed(const Duration(seconds: 3));
 
+      // Emit final state
+      print('DEBUG: Emitting final LibraryLoaded state after AI analysis');
       emit(
         currentState.copyWith(
           config: newConfig,
           displayedBooks: updatedDisplayedBooks,
         ),
       );
+      print('DEBUG: AI analysis complete, final state emitted');
     } catch (e) {
       print('AI analysis failed: $e');
       emit(LibraryError('AI analysis failed: $e'));
@@ -544,7 +575,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final currentState = state as LibraryLoaded;
 
     // Check if AI is configured
-    if (_aiAnalyzeBook == null || _aiSortLibrary == null) {
+    if (_aiSortLibrary == null) {
       emit(
         const LibraryError(
           'AI not configured. Please configure AI settings first.',
@@ -558,9 +589,9 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final savedState = currentState;
 
     try {
-      emit(const LibraryAIProcessing('Starting AI sort...'));
+      emit(const LibraryAIProcessing('Starting shelf organization...'));
 
-      // Step 1: Get selected books
+      // Get selected books
       final selectedBooks = currentState.config.books
           .where((book) => event.bookIds.contains(book.id))
           .toList();
@@ -568,72 +599,123 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       if (selectedBooks.isEmpty) {
         emit(const LibraryError('No books selected'));
         await Future.delayed(const Duration(seconds: 2));
-        emit(currentState);
+        emit(savedState);
         return;
       }
 
-      // Step 2: Analyze each book to get tags and reasoning
-      emit(
-        LibraryAIProcessing(
-          'Analyzing books...',
-          progress: 0,
-          total: selectedBooks.length,
-        ),
-      );
-
-      var newConfig = currentState.config;
-      final updatedBooks = <Book>[];
-
-      for (var i = 0; i < selectedBooks.length; i++) {
-        final book = selectedBooks[i];
-
+      // Check if books have tags (must be analyzed first)
+      final booksWithoutTags = selectedBooks
+          .where((b) => b.tags.isEmpty)
+          .toList();
+      if (booksWithoutTags.isNotEmpty) {
         emit(
-          LibraryAIProcessing(
-            'Analyzing books...',
-            progress: i,
-            total: selectedBooks.length,
-            currentItem: book.title ?? book.fileName,
+          LibraryError(
+            'Some books need analysis first! ${booksWithoutTags.length} books have no tags. Use "Auto titling" first.',
           ),
         );
-
-        try {
-          final analysis = await _aiAnalyzeBook!(book);
-
-          // Update book with AI-extracted metadata
-          final updatedBook = book.copyWith(
-            title: analysis.title ?? book.title,
-            author: analysis.author ?? book.author,
-            tags: analysis.tags,
-            aiReasoning: analysis.reasoning,
-          );
-
-          updatedBooks.add(updatedBook);
-
-          // Save book to config
-          final bookIndex = newConfig.books.indexWhere(
-            (b) => b.id == updatedBook.id,
-          );
-          if (bookIndex != -1) {
-            final newBooks = List<Book>.from(newConfig.books);
-            newBooks[bookIndex] = updatedBook;
-            newConfig = newConfig.copyWith(books: newBooks);
-          }
-        } catch (e) {
-          print('Error analyzing book ${book.fileName}: $e');
-          updatedBooks.add(book); // Use original book if analysis fails
-        }
+        await Future.delayed(const Duration(seconds: 4));
+        emit(savedState);
+        return;
       }
 
-      // Step 3: Sort books into shelves
+      var newConfig = currentState.config;
+
+      // Sort books into shelves (they already have tags)
       emit(const LibraryAIProcessing('Organizing into shelves...'));
 
-      final sortResult = await _aiSortLibrary!(
-        books: updatedBooks,
-        existingShelves: currentState.config.shelves,
-        generalization: _aiSettings.generalization,
+      // Use incremental or batch sorting based on settings
+      print('\n========== LIBRARY SORTING MODE (Sort Only) ==========');
+      print(
+        'DEBUG: useIncrementalSort setting: ${_aiSettings.useIncrementalSort}',
       );
+      print(
+        'DEBUG: Using ${_aiSettings.useIncrementalSort ? "INCREMENTAL" : "BATCH"} sorting',
+      );
+      print('DEBUG: Books to sort: ${selectedBooks.length}');
+      print('======================================================\n');
 
-      // Step 4: Create new shelves with AI-assigned tags
+      LibrarySortResult sortResult;
+
+      try {
+        if (_aiSettings.useIncrementalSort && _aiSortBookIncremental != null) {
+          // Incremental: sort each book separately
+          final assignments = <ShelfAssignment>[];
+          final newShelvesSet = <String>{};
+          final shelfTagsMap = <String, List<String>>{};
+          var currentShelves = List<Shelf>.from(currentState.config.shelves);
+
+          for (int i = 0; i < selectedBooks.length; i++) {
+            final book = selectedBooks[i];
+            emit(
+              LibraryAIProcessing(
+                'Organizing into shelves...',
+                progress: i + 1,
+                total: selectedBooks.length,
+              ),
+            );
+
+            final assignment = await _aiSortBookIncremental!(
+              book: book,
+              existingShelves: currentShelves,
+              generalization: _aiSettings.generalization,
+            );
+
+            assignments.add(
+              ShelfAssignment(
+                filePath: assignment.filePath,
+                shelfName: assignment.shelfName,
+              ),
+            );
+
+            // Track new shelves
+            final isExistingShelf = currentShelves.any(
+              (s) => s.name == assignment.shelfName,
+            );
+            if (!isExistingShelf &&
+                !newShelvesSet.contains(assignment.shelfName)) {
+              newShelvesSet.add(assignment.shelfName);
+              shelfTagsMap[assignment.shelfName] = assignment.shelfTags;
+
+              // Add to temporary shelf list so next books see it
+              currentShelves.add(
+                Shelf(
+                  id: _generateShelfId(assignment.shelfName),
+                  name: assignment.shelfName,
+                  bookIds: [],
+                  isDefault: false,
+                  createdDate: DateTime.now(),
+                  tags: assignment.shelfTags,
+                ),
+              );
+            }
+          }
+
+          sortResult = LibrarySortResult(
+            assignments: assignments,
+            newShelves: newShelvesSet.toList(),
+            shelfTags: shelfTagsMap,
+          );
+        } else {
+          // Batch: sort all books at once
+          sortResult = await _aiSortLibrary!(
+            books: selectedBooks,
+            existingShelves: currentState.config.shelves,
+            generalization: _aiSettings.generalization,
+          );
+        }
+      } catch (e) {
+        print('Error sorting books: $e');
+        emit(
+          LibraryError(
+            'Failed to sort books: ${e.toString()}. Check if Ollama is running.',
+          ),
+        );
+        await Future.delayed(const Duration(seconds: 4));
+        emit(savedState);
+        return;
+      }
+
+      // Create new shelves with AI-assigned tags
       var shelves = List<Shelf>.from(newConfig.shelves);
       for (final newShelfName in sortResult.newShelves) {
         final shelfTags = sortResult.shelfTags[newShelfName] ?? [];
@@ -648,11 +730,11 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         shelves.add(newShelf);
       }
 
-      // Step 5: Assign books to shelves
+      // Assign books to shelves
       for (final assignment in sortResult.assignments) {
-        final book = updatedBooks.firstWhere(
+        final book = selectedBooks.firstWhere(
           (b) => b.filePath == assignment.filePath,
-          orElse: () => updatedBooks.first,
+          orElse: () => selectedBooks.first,
         );
         final shelfIndex = shelves.indexWhere(
           (s) => s.name == assignment.shelfName,
@@ -684,12 +766,34 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         currentState.searchQuery,
       );
 
+      // First emit the updated state
       emit(
         currentState.copyWith(
           config: newConfig,
           displayedBooks: updatedDisplayedBooks,
         ),
       );
+
+      // Show success message briefly
+      print('DEBUG: Emitting success message for AI sort (selected books)');
+      emit(
+        LibraryAIProcessing(
+          'Sort complete! ${selectedBooks.length} books organized, ${sortResult.newShelves.length} shelves created',
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 3));
+
+      // Emit final state
+      print(
+        'DEBUG: Emitting final LibraryLoaded state after AI sort (selected books)',
+      );
+      emit(
+        currentState.copyWith(
+          config: newConfig,
+          displayedBooks: updatedDisplayedBooks,
+        ),
+      );
+      print('DEBUG: AI sort complete (selected books), final state emitted');
     } catch (e) {
       print('Error during AI sort: $e');
       emit(LibraryError('AI sort failed: $e'));

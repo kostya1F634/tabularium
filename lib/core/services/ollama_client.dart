@@ -12,19 +12,27 @@ class OllamaClient {
   /// Returns the generated text
   ///
   /// If [format] is provided, enforces structured output via JSON schema
+  /// If [options] is provided, allows passing additional Ollama options
   Future<String> generate({
     required String prompt,
     double temperature = 0.7,
     Map<String, dynamic>? format,
+    Map<String, dynamic>? options,
   }) async {
     final url = Uri.parse('$baseUrl/api/generate');
 
     try {
+      // Build options map with temperature and any additional options
+      final ollamaOptions = <String, dynamic>{'temperature': temperature};
+      if (options != null) {
+        ollamaOptions.addAll(options);
+      }
+
       final requestBody = {
         'model': model,
         'prompt': prompt,
         'stream': false,
-        'options': {'temperature': temperature},
+        'options': ollamaOptions,
       };
 
       // Add format if provided (for structured outputs)

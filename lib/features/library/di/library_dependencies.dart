@@ -7,6 +7,7 @@ import '../data/repositories/library_repository_impl.dart';
 import '../domain/repositories/library_repository.dart';
 import '../domain/usecases/ai_analyze_book.dart';
 import '../domain/usecases/ai_sort_library.dart';
+import '../domain/usecases/ai_sort_book_incremental.dart';
 import '../domain/usecases/initialize_library_usecase.dart';
 import '../domain/usecases/load_library_usecase.dart';
 import '../domain/usecases/save_library_usecase.dart';
@@ -30,6 +31,7 @@ class LibraryDependencies {
   late final OpenAllBooksUseCase _openAllBooks;
   late final AIAnalyzeBook? _aiAnalyzeBook;
   late final AISortLibrary? _aiSortLibrary;
+  late final AISortBookIncremental? _aiSortBookIncremental;
 
   LibraryDependencies({required this.aiSettingsService}) {
     _setupDataSources();
@@ -68,9 +70,13 @@ class LibraryDependencies {
         textExtractor: _pdfTextExtractor,
       );
       _aiSortLibrary = AISortLibrary(aiSettings: aiSettingsService);
+      _aiSortBookIncremental = AISortBookIncremental(
+        aiSettings: aiSettingsService,
+      );
     } else {
       _aiAnalyzeBook = null;
       _aiSortLibrary = null;
+      _aiSortBookIncremental = null;
     }
   }
 
@@ -84,6 +90,7 @@ class LibraryDependencies {
       openAllBooks: _openAllBooks,
       aiAnalyzeBook: _aiAnalyzeBook,
       aiSortLibrary: _aiSortLibrary,
+      aiSortBookIncremental: _aiSortBookIncremental,
       aiSettings: aiSettingsService,
     );
   }
