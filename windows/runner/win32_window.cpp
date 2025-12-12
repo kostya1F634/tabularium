@@ -16,6 +16,16 @@ namespace {
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
 
+/// Window border color attribute (Windows 11+)
+#ifndef DWMWA_BORDER_COLOR
+#define DWMWA_BORDER_COLOR 34
+#endif
+
+/// Special value for transparent/default border color
+#ifndef DWMWA_COLOR_NONE
+#define DWMWA_COLOR_NONE 0xFFFFFFFE
+#endif
+
 constexpr const wchar_t kWindowClassName[] = L"FLUTTER_RUNNER_WIN32_WINDOW";
 
 /// Registry key for app theme preference.
@@ -285,4 +295,10 @@ void Win32Window::UpdateTheme(HWND const window) {
     DwmSetWindowAttribute(window, DWMWA_USE_IMMERSIVE_DARK_MODE,
                           &enable_dark_mode, sizeof(enable_dark_mode));
   }
+
+  // Fix thick black border issue on Windows by setting border color to transparent
+  // See: https://github.com/flutter/flutter/issues/76465
+  COLORREF border_color = DWMWA_COLOR_NONE; // Transparent border
+  DwmSetWindowAttribute(window, DWMWA_BORDER_COLOR,
+                        &border_color, sizeof(border_color));
 }
